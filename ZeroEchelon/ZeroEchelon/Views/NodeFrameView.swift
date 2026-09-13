@@ -50,12 +50,6 @@ struct NodeFrameView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
 
-                    if engine.currentNode.id == "Home",
-                       let summary = engine.lastEventSummaryLine
-                    {
-                        lastEventCard(summary)
-                    }
-
                     if let anti = engine.antiPatternText {
                         Label(anti, systemImage: "exclamationmark.triangle.fill")
                             .font(.title3.weight(.bold))
@@ -116,6 +110,12 @@ struct NodeFrameView: View {
                         }
                     }
                     .padding(.top, 4)
+
+                    if engine.currentNode.id == "Home",
+                       let summary = engine.lastEventSummaryLine
+                    {
+                        lastEventCard(summary)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)

@@ -74,6 +74,7 @@ export interface EdgeSelectionResult {
   didNavigate: boolean;
   externalURL: string | null;
   clearedLog: boolean;
+  shouldScheduleWaveReminders?: boolean;
 }
 
 export function textFor(text: LocalizedText, locale: ContentLocale): string {

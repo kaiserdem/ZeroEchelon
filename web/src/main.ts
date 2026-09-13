@@ -2,6 +2,12 @@ import graphJson from "@protocol/graphs/zero-echelon-core/graph.json";
 import rulesJson from "@protocol/graphs/zero-echelon-core/engine-rules.json";
 import { ProtocolEngine } from "./engine";
 import {
+  clearLocalEvent,
+  loadLocalEvent,
+  saveLocalEvent,
+  scheduleWaveNotifications,
+} from "./eventStore";
+import {
   canDictate,
   isDictating,
   speak,
@@ -10,7 +16,7 @@ import {
   stopSpeaking,
 } from "./speech";
 import type { EngineRules } from "./rules";
-import type { ContentLocale, ProtocolGraph } from "./types";
+import type { ContentLocale, EdgeSelectionResult, ProtocolGraph } from "./types";
 import { buttonTitle } from "./types";
 import "./styles.css";
 
@@ -23,11 +29,51 @@ const root: HTMLDivElement = appRoot;
 const engine = new ProtocolEngine(graph, rules, "uk");
 engine.skipEntrySplashIfNeeded();
 
+const stored = loadLocalEvent();
+if (stored) {
+  engine.hydrate(stored);
+}
+
 let speakOnAppear = true;
 let lastSpokenKey = "";
 
 function dial(number: string): void {
   window.location.href = `tel:${number}`;
+}
+
+function persistNow(): void {
+  const snapshot = engine.makeEventSnapshot();
+  if (snapshot) saveLocalEvent(snapshot);
+}
+
+function applyPersistence(result: EdgeSelectionResult): void {
+  if (result.clearedLog) {
+    clearLocalEvent();
+    engine.reset();
+    return;
+  }
+
+  persistNow();
+
+  if (result.shouldScheduleWaveReminders && engine.eventStartedAt) {
+    void scheduleWaveNotifications(engine.eventStartedAt, engine.locale).then(
+      (ok) => {
+        if (!ok) return;
+        engine.markWaveRemindersScheduled();
+        persistNow();
+      },
+    );
+  }
+}
+
+function handleSelect(when: string): void {
+  stopDictation();
+  const result = engine.select(when);
+  if (result.externalURL) {
+    window.location.href = result.externalURL;
+  }
+  applyPersistence(result);
+  render({ keepFocus: engine.isManualLocationEntry });
 }
 
 function render(options?: { keepFocus?: boolean }): void {
@@ -72,6 +118,20 @@ function render(options?: { keepFocus?: boolean }): void {
   const anti = engine.antiPatternText;
   const detail = engine.detailBlock;
   const helper = engine.helperText;
+  const lastEvent =
+    engine.currentNode.id === "Home" && engine.lastEventSummaryLine
+      ? `
+      <div class="last-event">
+        <p class="last-event-title">${escapeHtml(engine.lastEventSummaryLine)}</p>
+        ${
+          engine.locationLine
+            ? `<p class="last-event-loc">${escapeHtml(engine.locationLine)}</p>`
+            : ""
+        }
+        <button type="button" class="last-event-btn" data-open-report>${escapeHtml(locale === "uk" ? "Відкрити звіт" : "Open report")}</button>
+      </div>
+    `
+      : "";
   const manual = engine.isManualLocationEntry
     ? `
       <div class="loc-input-row">
@@ -129,6 +189,7 @@ function render(options?: { keepFocus?: boolean }): void {
         }
         ${manual}
         <div class="${actionsClass}">${actionHtml}</div>
+        ${lastEvent}
       </main>
       <footer class="emergency">${emergencyHtml}</footer>
     </div>
@@ -162,6 +223,11 @@ function bind(): void {
     render();
   });
 
+  root.querySelector("[data-open-report]")?.addEventListener("click", () => {
+    engine.openLastReport();
+    render();
+  });
+
   root.querySelectorAll<HTMLButtonElement>("[data-locale]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const value = btn.dataset.locale;
@@ -185,9 +251,7 @@ function bind(): void {
   locInput?.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      stopDictation();
-      engine.select("next");
-      render({ keepFocus: engine.isManualLocationEntry });
+      handleSelect("next");
     }
   });
 
@@ -209,12 +273,7 @@ function bind(): void {
       const when = btn.dataset.when;
       if (!when) return;
       try {
-        stopDictation();
-        const result = engine.select(when);
-        if (result.externalURL) {
-          window.location.href = result.externalURL;
-        }
-        render({ keepFocus: engine.isManualLocationEntry });
+        handleSelect(when);
       } catch (error) {
         console.error(error);
       }
@@ -240,6 +299,19 @@ function escapeHtml(value: string): string {
 function escapeAttr(value: string): string {
   return escapeHtml(value).replaceAll("'", "&#39;");
 }
+
+window.addEventListener("pagehide", () => persistNow());
+window.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") persistNow();
+});
+window.addEventListener("line24-open-wave", () => {
+  try {
+    engine.openWaveChecklist();
+    render();
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 try {
   render();

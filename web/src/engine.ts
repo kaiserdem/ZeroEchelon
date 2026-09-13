@@ -12,6 +12,7 @@ import {
   textFor,
 } from "./types";
 import { type EngineRules, safetyQueue } from "./rules";
+import type { LocalEventRecord } from "./eventStore";
 
 function newStep(nodeId: string, edge: string | null): ProtocolLogStep {
   return {
@@ -41,6 +42,11 @@ export class ProtocolEngine {
   unreachableMarked = false;
   lastVetoNodeId: string | null = null;
   multipleCasualties = false;
+
+  eventId: string | null = null;
+  eventStartedAt: string | null = null;
+  reachedFormAt: string | null = null;
+  waveRemindersScheduled = false;
 
   /** Seconds between scene re-checks (overridable in tests). */
   sceneRecheckInterval: number;
@@ -407,14 +413,18 @@ export class ProtocolEngine {
 
     this.captureSideEffects(edgeWhen);
 
-    let cleared = false;
-    if (edgeWhen === "erase") {
-      this.steps = [];
-      cleared = true;
+    if (this.currentNode.id === "Home" && edgeWhen === "incident") {
+      this.beginEventIfNeeded();
     }
+
+    // Confirm on Erase → next only (do not wipe when opening the confirm screen).
     if (this.currentNode.id === "Erase" && edgeWhen === "next") {
-      this.steps = [];
-      cleared = true;
+      this.clearEventFields();
+      return {
+        didNavigate: false,
+        externalURL: null,
+        clearedLog: true,
+      };
     }
     if (edgeWhen === "report") {
       this.unreachableMarked = true;
@@ -429,14 +439,26 @@ export class ProtocolEngine {
         const url = this.externalURL(nodeById(this.graph, edge.to));
         if (url) {
           this.steps.push(newStep(this.currentNode.id, edgeWhen));
-          return { didNavigate: false, externalURL: url, clearedLog: cleared };
+          return { didNavigate: false, externalURL: url, clearedLog: false };
         }
       }
       const result = this.navigate(edge.to, edgeWhen, false, true);
+      let shouldScheduleWaveReminders = false;
+      if (
+        this.currentNode.id === "Form" &&
+        this.reachedFormAt == null &&
+        this.eventStartedAt != null
+      ) {
+        this.reachedFormAt = new Date(this.now()).toISOString();
+        if (!this.waveRemindersScheduled) {
+          shouldScheduleWaveReminders = true;
+        }
+      }
       return {
         didNavigate: result.didNavigate,
         externalURL: null,
-        clearedLog: cleared,
+        clearedLog: false,
+        shouldScheduleWaveReminders,
       };
     }
 
@@ -444,7 +466,7 @@ export class ProtocolEngine {
     return {
       didNavigate: false,
       externalURL: this.externalURL(this.currentNode),
-      clearedLog: cleared,
+      clearedLog: false,
     };
   }
 
@@ -513,7 +535,7 @@ export class ProtocolEngine {
     this.locationLine = null;
     this.locationLevel = null;
     this.resetManualLocationWizard();
-    this.steps = [];
+    this.clearEventFields();
     this.unreachableMarked = false;
     this.lastVetoNodeId = null;
     this.multipleCasualties = false;
@@ -523,6 +545,93 @@ export class ProtocolEngine {
     this.returnStack = [];
     this.history = [];
     this.skipEntrySplashIfNeeded();
+  }
+
+  get hasPersistableEvent(): boolean {
+    return this.eventStartedAt != null;
+  }
+
+  get lastEventSummaryLine(): string | null {
+    if (!this.eventStartedAt) return null;
+    const formatted = new Intl.DateTimeFormat(
+      this.locale === "uk" ? "uk-UA" : "en-GB",
+      { dateStyle: "medium", timeStyle: "short" },
+    ).format(new Date(this.eventStartedAt));
+    return this.locale === "uk"
+      ? `Остання подія: ${formatted}`
+      : `Last event: ${formatted}`;
+  }
+
+  makeEventSnapshot(): LocalEventRecord | null {
+    if (!this.eventId || !this.eventStartedAt) return null;
+    return {
+      eventId: this.eventId,
+      startedAt: this.eventStartedAt,
+      reachedFormAt: this.reachedFormAt,
+      sessionRole: this.sessionRole,
+      incidentType: this.incidentType,
+      locationLine: this.locationLine,
+      locationLevel: this.locationLevel,
+      steps: this.steps,
+      waveRemindersScheduled: this.waveRemindersScheduled,
+    };
+  }
+
+  hydrate(record: LocalEventRecord): void {
+    this.eventId = record.eventId;
+    this.eventStartedAt = record.startedAt;
+    this.reachedFormAt = record.reachedFormAt;
+    this.sessionRole = record.sessionRole;
+    this.incidentType = record.incidentType;
+    this.locationLine = record.locationLine;
+    this.locationLevel = record.locationLevel;
+    this.steps = record.steps;
+    this.waveRemindersScheduled = record.waveRemindersScheduled;
+  }
+
+  markWaveRemindersScheduled(): void {
+    this.waveRemindersScheduled = true;
+  }
+
+  openWaveChecklist(): void {
+    const node = nodeById(this.graph, "I0");
+    if (!node) throw new Error("Missing node I0");
+    this.history = [];
+    this.returnStack = [];
+    this.currentNode = node;
+  }
+
+  openLastReport(): void {
+    if (!this.hasPersistableEvent) return;
+    const node = nodeById(this.graph, "Form");
+    if (!node) throw new Error("Missing node Form");
+    this.history = [];
+    this.returnStack = [];
+    this.currentNode = node;
+  }
+
+  private beginEventIfNeeded(): void {
+    if (this.eventStartedAt != null) return;
+    this.eventId = crypto.randomUUID();
+    this.eventStartedAt = new Date(this.now()).toISOString();
+    this.waveRemindersScheduled = false;
+    this.reachedFormAt = null;
+  }
+
+  private clearEventFields(): void {
+    this.eventId = null;
+    this.eventStartedAt = null;
+    this.reachedFormAt = null;
+    this.waveRemindersScheduled = false;
+    this.steps = [];
+    this.locationLine = null;
+    this.locationLevel = null;
+    this.incidentType = null;
+    this.sessionRole = null;
+    this.unreachableMarked = false;
+    this.lastVetoNodeId = null;
+    this.multipleCasualties = false;
+    this.resetManualLocationWizard();
   }
 
   private handleManualLocationNext(): EdgeSelectionResult {
