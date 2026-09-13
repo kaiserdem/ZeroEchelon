@@ -21,6 +21,20 @@
                ReferencedContainer = "container:ZeroEchelon.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3265DAC40FC84038ED0578BA"
+               BuildableName = "ZeroEchelonTests.xctest"
+               BlueprintName = "ZeroEchelonTests"
+               ReferencedContainer = "container:ZeroEchelon.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -39,7 +53,20 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3265DAC40FC84038ED0578BA"
+               BuildableName = "ZeroEchelonTests.xctest"
+               BlueprintName = "ZeroEchelonTests"
+               ReferencedContainer = "container:ZeroEchelon.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

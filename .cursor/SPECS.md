@@ -2,4 +2,4 @@
 
 | Spec | Domain | Status |
 | --- | --- | --- |
-| [ios/protocol_engine.md](specs/ios/protocol_engine.md) | iOS | in progress |
+| [ios/protocol_engine.md](specs/ios/protocol_engine.md) | iOS | done (ZeroEchelon/) |

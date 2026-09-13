@@ -1,18 +1,23 @@
 import Foundation
 import Testing
-import ZeroEchelonKit
+@testable import ZeroEchelon
 
+@MainActor
 struct ProtocolEngineTests {
     private func loadGraph() throws -> ProtocolGraph {
+        if let bundled = Bundle.main.url(forResource: "graph", withExtension: "json") {
+            return try GraphLoader.load(from: bundled)
+        }
+        // Fallback: repo protocol/ when tests run without host resources
         let testsDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-        let iosDir = testsDir.deletingLastPathComponent().deletingLastPathComponent()
-        let url = iosDir
-            .deletingLastPathComponent()
-            .appendingPathComponent("protocol/graphs/zero-echelon-core/graph.json")
+        let repoRoot = testsDir
+            .deletingLastPathComponent() // ZeroEchelon/
+            .deletingLastPathComponent() // repo
+        let url = repoRoot.appendingPathComponent("protocol/graphs/zero-echelon-core/graph.json")
         return try GraphLoader.load(from: url)
     }
 
-    @Test func loadsGraphAndRejectsCommercialTrue() throws {
+    @Test func loadsGraph() throws {
         let graph = try loadGraph()
         #expect(graph.commercial == false)
         #expect(graph.entry == "Start")
@@ -61,9 +66,23 @@ struct ProtocolEngineTests {
         #expect(engine.currentNode.id == "Form")
         #expect(engine.unreachableMarked == true)
 
-        let titles = engine.visibleButtons.map(\.when)
-        #expect(titles.contains("back-out"))
-        #expect(titles.contains("erase"))
-        #expect(!titles.contains("back-cont"))
+        let whens = engine.visibleButtons.map(\.when)
+        #expect(whens.contains("back-out"))
+        #expect(whens.contains("erase"))
+        #expect(!whens.contains("back-cont"))
+    }
+
+    @Test func goBackRestoresPreviousNode() throws {
+        let engine = try ProtocolEngine(graph: try loadGraph())
+        try engine.skipEntrySplashIfNeeded()
+        #expect(engine.currentNode.id == "Disclaimer")
+        #expect(engine.canGoBack == false)
+
+        _ = try engine.select(edgeWhen: "agree")
+        #expect(engine.currentNode.id == "Loc-mode")
+        #expect(engine.canGoBack == true)
+
+        engine.goBack()
+        #expect(engine.currentNode.id == "Disclaimer")
     }
 }

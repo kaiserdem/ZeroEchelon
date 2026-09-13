@@ -58,8 +58,10 @@
 | A3 | Чи є вогонь, густий дим, запах газу? | Is there fire, thick smoke, or a smell of gas? |
 | A4 | Чи є оголені дроти або вода біля проводів? | Are there bare wires, or water near wires? |
 | A5 | Чи є різкий запах, невідома рідина, маслянисті плями? | Is there a sharp smell, an unknown liquid, or oily stains? |
-| Out | Відійдіть на сто–триста метрів. Нічого не чіпайте. Викличте 101. Не повертайтесь. | Move one hundred to three hundred metres away. Touch nothing. Call 101. Do not go back. |
-| Cont | Вважайте зону небезпечною. Не дійте тут. Викличте 101. | Treat the area as unsafe. Do not act here. Call 101. |
+| Out | Відійдіть на сто–триста метрів. Нічого не чіпайте. Натисніть 101 внизу. Не повертайтесь. | Move one hundred to three hundred metres away. Touch nothing. Tap 101 below. Do not go back. |
+| Cont | Вважайте зону небезпечною. Не дійте тут. Натисніть 101 внизу. | Treat the area as unsafe. Do not act here. Tap 101 below. |
+| CanLeave | Чи можете зараз відійти від небезпеки, не чіпаючи предмет і уламки? | Can you move away from the danger now without touching the object or rubble? |
+| Out-trapped | Не чіпайте предмет і уламки. Не смикайте. Не звільняйте. Натисніть 101 внизу. У звіті зазначте: ви або люди тут. | Do not touch the object or rubble. Do not pull. Do not free anyone. Tap 101 below. In the report mark: you or people are here. |
 | A6 | Не заходьте всередину завалу. Не рухайте уламки. | Do not enter the collapse. Do not move rubble. |
 | A7 | Перевірте загрози знову. Повторний удар можливий. | Check the threats again. A second strike is possible. |
 

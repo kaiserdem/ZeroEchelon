@@ -91,7 +91,8 @@ struct NodeFrameView: View {
                 dial(number)
             }
         }
-        .background(isVeto ? Color.orange.opacity(0.08) : Color(.systemBackground))
+        .background(screenBackground)
+        .ignoresSafeArea(edges: .bottom)
         .onAppear { speakCurrent() }
         .onChange(of: engine.currentNode.id) { _, _ in
             speakCurrent()
@@ -99,6 +100,14 @@ struct NodeFrameView: View {
         .onChange(of: engine.locale) { _, _ in
             speakCurrent()
         }
+    }
+
+    private var screenBackground: Color {
+        if isVeto {
+            return Color(red: 1.0, green: 0.96, blue: 0.92)
+        }
+        // Soft off-white instead of pure system white
+        return Color(red: 0.96, green: 0.965, blue: 0.97)
     }
 
     @ViewBuilder
@@ -119,18 +128,18 @@ struct NodeFrameView: View {
 
     private var topBar: some View {
         HStack(spacing: 12) {
-            Button {
-                engine.goBack()
-            } label: {
-                Label(
-                    engine.locale == .uk ? "Назад" : "Back",
-                    systemImage: "chevron.backward"
-                )
-                .font(.body.weight(.semibold))
-                .labelStyle(.titleAndIcon)
+            if engine.canGoBack {
+                Button {
+                    engine.goBack()
+                } label: {
+                    Label(
+                        engine.locale == .uk ? "Назад" : "Back",
+                        systemImage: "chevron.backward"
+                    )
+                    .font(.body.weight(.semibold))
+                    .labelStyle(.titleAndIcon)
+                }
             }
-            .disabled(!engine.canGoBack)
-            .opacity(engine.canGoBack ? 1 : 0.35)
 
             Spacer(minLength: 8)
 
@@ -150,6 +159,7 @@ struct NodeFrameView: View {
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, 10)
+        .background(screenBackground)
     }
 
     private func buttonTint(index: Int) -> Color {
@@ -220,6 +230,6 @@ struct EmergencyBar: View {
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 12)
-        .background(.bar)
+        .background(Color(red: 0.94, green: 0.945, blue: 0.95))
     }
 }
