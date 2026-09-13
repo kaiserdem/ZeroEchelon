@@ -25,6 +25,7 @@
 | id | UA | EN |
 | --- | --- | --- |
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
+| Loc-mode | Звідки взяти місце події. | How to get the incident location. |
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
 | Loc-3 | Назвіть населений пункт. Далі — вулицю. | Name the town or city. Then the street. |
@@ -33,6 +34,8 @@
 | Role-witness | Режим свідка. Спершу викличте 103, якщо можете. | Bystander mode. Call 103 first if you can. |
 | Role-casualty | Режим постраждалого. Викличте 103. Далі — що зробити для себе. | Casualty mode. Call 103. Next — what to do for yourself. |
 | Disclaimer | Це не заміна 103. Рішення — ваші. Закон автоматично не захищає. | This is not a substitute for 103. The decisions are yours. The law does not automatically protect you. |
+| Call | Викличте 103. Зачитайте текст на екрані. | Call 103. Read the text on the screen. |
+| NEXT-PHASE | Вхід завершено. Далі — допомога за роллю. | Entry done. Next — help by role. |
 
 ---
 

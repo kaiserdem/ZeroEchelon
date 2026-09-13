@@ -1,0 +1,699 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocolGraphId": "zero-echelon-core",
+  "graphVersion": "2026-09-13-s0-s5b",
+  "locale": ["uk", "en"],
+  "commercial": false,
+  "generatedFrom": {
+    "precedence": "docs/03-пріоритети-та-конфлікти.md",
+    "flow": "docs/04-блок-схеми.md",
+    "screens": "docs/12-екрани-та-специфікація.md",
+    "voice": "docs/07-голосові-скрипти-UA-EN.md",
+    "registryChecked": "2026-09-13"
+  },
+  "entry": "Start",
+  "alwaysAvailable": ["CALL-103", "CALL-101"],
+  "invariants": [
+    "call-always-visible",
+    "no-diagnosis",
+    "no-dead-word",
+    "no-reassurance",
+    "no-vitals-counting",
+    "source-required"
+  ],
+  "nodes": [
+    {
+      "id": "Start",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["A7"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Відкрито. Мережа не потрібна.",
+        "en": "Opened. No network needed."
+      },
+      "edges": [{ "when": "next", "to": "Disclaimer" }],
+      "ui": { "screenId": "Open", "template": "action" }
+    },
+    {
+      "id": "Disclaimer",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["A7"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Це не заміна 103. Рішення — ваші. Закон автоматично не захищає.",
+        "en": "This is not a substitute for 103. The decisions are yours. The law does not automatically protect you."
+      },
+      "edges": [
+        { "when": "agree", "to": "Loc-mode" },
+        { "when": "dial", "to": "CALL-103" }
+      ],
+      "ui": {
+        "screenId": "S0",
+        "template": "action",
+        "buttons": [
+          { "when": "agree", "ua": "Погоджуюсь", "en": "I agree" },
+          { "when": "dial", "ua": "Викликати 103", "en": "Call 103" }
+        ]
+      }
+    },
+    {
+      "id": "Loc-mode",
+      "type": "question",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Звідки взяти місце події.",
+        "en": "How to get the incident location."
+      },
+      "edges": [
+        { "when": "qr", "to": "Loc-1" },
+        { "when": "gnss", "to": "Loc-2" },
+        { "when": "manual", "to": "Loc-3" }
+      ],
+      "ui": {
+        "screenId": "S1",
+        "template": "question",
+        "accuracyLabel": true,
+        "buttons": [
+          { "when": "qr", "ua": "З коду", "en": "From code" },
+          { "when": "gnss", "ua": "Координати", "en": "Coordinates" },
+          { "when": "manual", "ua": "Ввести вручну", "en": "Enter manually" }
+        ],
+        "note": "Клієнт може пропустити Loc-mode і відкрити Loc-1/2/3 одразу за наявністю QR чи GNSS."
+      }
+    },
+    {
+      "id": "Loc-1",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Місце з коду: [адреса].",
+        "en": "Location from the code: [address]."
+      },
+      "edges": [
+        { "when": "next", "to": "Type" },
+        { "when": "edit", "to": "Loc-mode" }
+      ],
+      "ui": {
+        "screenId": "S1",
+        "locationLevel": 1,
+        "template": "action",
+        "buttons": [
+          { "when": "next", "ua": "Далі", "en": "Next" },
+          { "when": "edit", "ua": "Виправити", "en": "Correct" }
+        ]
+      }
+    },
+    {
+      "id": "Loc-2",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Координати на екрані. Зачитаєте їх диспетчеру.",
+        "en": "Coordinates on screen. Read them to the dispatcher."
+      },
+      "edges": [
+        { "when": "next", "to": "Type" },
+        { "when": "edit", "to": "Loc-mode" }
+      ],
+      "ui": {
+        "screenId": "S1",
+        "locationLevel": 2,
+        "template": "action",
+        "buttons": [
+          { "when": "next", "ua": "Далі", "en": "Next" },
+          { "when": "edit", "ua": "Виправити", "en": "Correct" }
+        ]
+      }
+    },
+    {
+      "id": "Loc-3",
+      "type": "report",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Назвіть населений пункт. Далі — вулицю.",
+        "en": "Name the town or city. Then the street."
+      },
+      "edges": [
+        { "when": "next", "to": "Type" },
+        { "when": "edit", "to": "Loc-mode" }
+      ],
+      "ui": {
+        "screenId": "S1",
+        "locationLevel": 3,
+        "template": "report",
+        "fields": ["settlement", "street", "building", "entrance"],
+        "buttons": [
+          { "when": "next", "ua": "Далі", "en": "Next" },
+          { "when": "edit", "ua": "Виправити", "en": "Correct" }
+        ]
+      }
+    },
+    {
+      "id": "Type",
+      "type": "question",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Що сталося. Одна картинка.",
+        "en": "What happened. One picture."
+      },
+      "edges": [
+        { "when": "explosion", "to": "Role" },
+        { "when": "collapse", "to": "Role" },
+        { "when": "fire", "to": "Role" },
+        { "when": "traffic", "to": "Role" },
+        { "when": "train", "to": "Role" },
+        { "when": "shooting", "to": "Role" },
+        { "when": "chemical", "to": "Role" },
+        { "when": "household", "to": "Role" },
+        { "when": "other", "to": "Role" }
+      ],
+      "ui": {
+        "screenId": "S2",
+        "template": "question",
+        "layout": "icon-grid",
+        "buttons": [
+          { "when": "explosion", "ua": "Вибух", "en": "Explosion" },
+          { "when": "collapse", "ua": "Обвал", "en": "Collapse" },
+          { "when": "fire", "ua": "Пожежа", "en": "Fire" },
+          { "when": "traffic", "ua": "ДТП", "en": "Road crash" },
+          { "when": "train", "ua": "Потяг", "en": "Train" },
+          { "when": "shooting", "ua": "Стрілянина", "en": "Shooting" },
+          { "when": "chemical", "ua": "Хімія", "en": "Chemical" },
+          { "when": "household", "ua": "Побутове", "en": "Household" },
+          { "when": "other", "ua": "Інше", "en": "Other" }
+        ],
+        "note": "Тап по варіанту = вибір і перехід. Клієнт пише when у журнал як поле T."
+      }
+    },
+    {
+      "id": "Role",
+      "type": "question",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["A2"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Ви допомагаєте іншим — чи допомога потрібна вам?",
+        "en": "Are you helping others — or do you need help yourself?"
+      },
+      "edges": [
+        { "when": "witness", "to": "Role-witness" },
+        { "when": "casualty", "to": "Role-casualty" }
+      ],
+      "ui": {
+        "screenId": "S3",
+        "template": "question",
+        "buttons": [
+          { "when": "witness", "ua": "Допомагаю іншим", "en": "Helping others" },
+          { "when": "casualty", "ua": "Допомога мені", "en": "I need help" }
+        ]
+      }
+    },
+    {
+      "id": "Role-witness",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness"],
+      "precedence": 2,
+      "registry": ["A2"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Режим свідка. Спершу викличте 103, якщо можете.",
+        "en": "Bystander mode. Call 103 first if you can."
+      },
+      "edges": [{ "when": "next", "to": "A1" }],
+      "ui": { "screenId": "S3", "template": "action", "sessionRole": "witness" }
+    },
+    {
+      "id": "Role-casualty",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["casualty"],
+      "precedence": 2,
+      "registry": ["A2"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Режим постраждалого. Викличте 103. Далі — що зробити для себе.",
+        "en": "Casualty mode. Call 103. Next — what to do for yourself."
+      },
+      "edges": [{ "when": "next", "to": "A1" }],
+      "ui": { "screenId": "S3", "template": "action", "sessionRole": "casualty" }
+    },
+    {
+      "id": "A1",
+      "type": "question",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "A2"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Чи бачите міну, уламок боєприпасу, дрон, підозрілий предмет?",
+        "en": "Do you see a mine, munition fragment, drone, or a suspicious object?"
+      },
+      "edges": [
+        { "when": "yes", "to": "Out" },
+        { "when": "no", "to": "A2" },
+        { "when": "cannot", "to": "A2" }
+      ],
+      "ui": {
+        "screenId": "S4",
+        "template": "question",
+        "buttons": [
+          { "when": "yes", "ua": "Так", "en": "Yes" },
+          { "when": "no", "ua": "Ні", "en": "No" },
+          { "when": "cannot", "ua": "Не бачу", "en": "Cannot see" }
+        ]
+      }
+    },
+    {
+      "id": "A2",
+      "type": "question",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "A2"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Чи тріщить будинок, сиплеться пил, чути нові обвали?",
+        "en": "Is the building cracking, dropping dust, or collapsing again?"
+      },
+      "edges": [
+        { "when": "yes", "to": "Out" },
+        { "when": "no", "to": "A3" },
+        { "when": "cannot", "to": "A3" }
+      ],
+      "ui": {
+        "screenId": "S4",
+        "template": "question",
+        "buttons": [
+          { "when": "yes", "ua": "Так", "en": "Yes" },
+          { "when": "no", "ua": "Ні", "en": "No" },
+          { "when": "cannot", "ua": "Не бачу", "en": "Cannot see" }
+        ]
+      }
+    },
+    {
+      "id": "A3",
+      "type": "question",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "A2"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Чи є вогонь, густий дим, запах газу?",
+        "en": "Is there fire, thick smoke, or a smell of gas?"
+      },
+      "edges": [
+        { "when": "yes", "to": "Out" },
+        { "when": "no", "to": "A4" },
+        { "when": "cannot", "to": "A4" }
+      ],
+      "ui": {
+        "screenId": "S4",
+        "template": "question",
+        "buttons": [
+          { "when": "yes", "ua": "Так", "en": "Yes" },
+          { "when": "no", "ua": "Ні", "en": "No" },
+          { "when": "cannot", "ua": "Не бачу", "en": "Cannot see" }
+        ]
+      }
+    },
+    {
+      "id": "A4",
+      "type": "question",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "A2"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Чи є оголені дроти або вода біля проводів?",
+        "en": "Are there bare wires, or water near wires?"
+      },
+      "edges": [
+        { "when": "yes", "to": "Out" },
+        { "when": "no", "to": "A5" },
+        { "when": "cannot", "to": "A5" }
+      ],
+      "ui": {
+        "screenId": "S4",
+        "template": "question",
+        "buttons": [
+          { "when": "yes", "ua": "Так", "en": "Yes" },
+          { "when": "no", "ua": "Ні", "en": "No" },
+          { "when": "cannot", "ua": "Не бачу", "en": "Cannot see" }
+        ]
+      }
+    },
+    {
+      "id": "A5",
+      "type": "question",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "C4"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Чи є різкий запах, невідома рідина, маслянисті плями?",
+        "en": "Is there a sharp smell, an unknown liquid, or oily stains?"
+      },
+      "edges": [
+        { "when": "yes", "to": "Cont" },
+        { "when": "no", "to": "A6" },
+        { "when": "cannot", "to": "A6" }
+      ],
+      "ui": {
+        "screenId": "S4",
+        "template": "question",
+        "buttons": [
+          { "when": "yes", "ua": "Так", "en": "Yes" },
+          { "when": "no", "ua": "Ні", "en": "No" },
+          { "when": "cannot", "ua": "Не бачу", "en": "Cannot see" }
+        ]
+      }
+    },
+    {
+      "id": "A6",
+      "type": "action",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "B3"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Не заходьте всередину завалу. Не рухайте уламки.",
+        "en": "Do not enter the collapse. Do not move rubble."
+      },
+      "edges": [{ "when": "next", "to": "Call" }],
+      "ui": {
+        "screenId": "S4",
+        "template": "action",
+        "buttons": [{ "when": "next", "ua": "Зрозумів", "en": "Got it" }],
+        "note": "A7 (повторна перевірка сцени) — у наступній редакції; цикл поки не врізано."
+      }
+    },
+    {
+      "id": "Out",
+      "type": "action",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2"],
+      "conflict": ["K6"],
+      "veto": true,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Відійдіть на сто–триста метрів. Нічого не чіпайте. Викличте 101. Не повертайтесь.",
+        "en": "Move one hundred to three hundred metres away. Touch nothing. Call 101. Do not go back."
+      },
+      "edges": [
+        { "when": "dial-101", "to": "CALL-101" },
+        { "when": "report", "to": "Form" }
+      ],
+      "ui": {
+        "screenId": "S5a",
+        "template": "veto",
+        "buttons": [
+          { "when": "dial-101", "ua": "Викликати 101", "en": "Call 101" },
+          { "when": "report", "ua": "Відкрити звіт", "en": "Open report" }
+        ],
+        "note": "Медичних ребер немає (veto). У звіті — недосяжний постраждалий."
+      }
+    },
+    {
+      "id": "Cont",
+      "type": "action",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2", "C4"],
+      "conflict": ["K6"],
+      "veto": true,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Вважайте зону небезпечною. Не дійте тут. Викличте 101.",
+        "en": "Treat the area as unsafe. Do not act here. Call 101."
+      },
+      "edges": [
+        { "when": "dial-101", "to": "CALL-101" },
+        { "when": "report", "to": "Form" }
+      ],
+      "ui": {
+        "screenId": "S5a",
+        "template": "veto",
+        "buttons": [
+          { "when": "dial-101", "ua": "Викликати 101", "en": "Call 101" },
+          { "when": "report", "ua": "Відкрити звіт", "en": "Open report" }
+        ]
+      }
+    },
+    {
+      "id": "Call",
+      "type": "report",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1", "A3"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Викличте 103. Зачитайте текст на екрані.",
+        "en": "Call 103. Read the text on the screen."
+      },
+      "edges": [
+        { "when": "dial", "to": "CALL-103" },
+        { "when": "read", "to": "CALL-read" },
+        { "when": "next", "to": "NEXT-PHASE" }
+      ],
+      "ui": {
+        "screenId": "S5b",
+        "template": "call",
+        "showDispatcherDraft": true,
+        "buttons": [
+          { "when": "dial", "ua": "Набрати 103", "en": "Dial 103" },
+          { "when": "read", "ua": "Зачитати вголос", "en": "Read aloud" },
+          { "when": "next", "ua": "Далі", "en": "Next" }
+        ],
+        "note": "Далі не скасовує виклик. Чернетка диспетчеру збирається з локації, типу, ролі."
+      }
+    },
+    {
+      "id": "CALL-read",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Зачитайте текст на екрані. Не вигадуйте.",
+        "en": "Read the text on the screen. Do not invent."
+      },
+      "edges": [{ "when": "next", "to": "Call" }],
+      "ui": { "screenId": "S5b", "template": "action", "tts": "dispatcher-draft" }
+    },
+    {
+      "id": "CALL-103",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["B1", "A3"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Викликати 103.",
+        "en": "Call 103."
+      },
+      "edges": [{ "when": "next", "to": null }],
+      "ui": {
+        "screenId": "always",
+        "template": "call",
+        "external": "tel:103",
+        "note": "alwaysAvailable: клієнт відкриває набір і лишає попередній вузол у стеку."
+      }
+    },
+    {
+      "id": "CALL-101",
+      "type": "action",
+      "branch": "A",
+      "roles": ["witness", "casualty"],
+      "precedence": 1,
+      "registry": ["B2"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Викликати 101.",
+        "en": "Call 101."
+      },
+      "edges": [{ "when": "next", "to": null }],
+      "ui": {
+        "screenId": "always",
+        "template": "call",
+        "external": "tel:101",
+        "note": "Повернення: з Out/Cont — назад на вето; з інших екранів — у попередній вузол."
+      }
+    },
+    {
+      "id": "Form",
+      "type": "handover",
+      "branch": "H",
+      "roles": ["witness", "casualty"],
+      "precedence": 9,
+      "registry": ["B1"],
+      "conflict": ["K6"],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Звіт для служб готовий.",
+        "en": "The report for responders is ready."
+      },
+      "edges": [
+        { "when": "back-out", "to": "Out" },
+        { "when": "back-cont", "to": "Cont" },
+        { "when": "erase", "to": "Erase" }
+      ],
+      "ui": {
+        "screenId": "S5a-report",
+        "template": "handover",
+        "markUnreachable": true,
+        "buttons": [
+          { "when": "back-out", "ua": "Назад", "en": "Back" },
+          { "when": "back-cont", "ua": "Назад", "en": "Back" },
+          { "when": "erase", "ua": "Стерти журнал", "en": "Erase log" }
+        ],
+        "note": "Повний S11 — у наступній редакції. Клієнт показує один back-* за тим, з якого вето зайшли (стек сесії)."
+      }
+    },
+    {
+      "id": "Erase",
+      "type": "action",
+      "branch": "H",
+      "roles": ["witness", "casualty"],
+      "precedence": 9,
+      "registry": ["B1"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Стерти журнал зараз.",
+        "en": "Erase the log now."
+      },
+      "edges": [{ "when": "next", "to": "Form" }],
+      "ui": { "screenId": "S5a-report", "template": "action", "clearsLocalLog": true }
+    },
+    {
+      "id": "NEXT-PHASE",
+      "type": "action",
+      "branch": "entry",
+      "roles": ["witness", "casualty"],
+      "precedence": 2,
+      "registry": ["A2"],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Вхід завершено. Далі — допомога за роллю.",
+        "en": "Entry done. Next — help by role."
+      },
+      "edges": [],
+      "ui": {
+        "screenId": "S5b-end",
+        "template": "action",
+        "stub": true,
+        "note": "Свідок → Count (S6); постраждалий → самодопомога (S6c). Вузли ще не в цій версії графа."
+      }
+    }
+  ]
+}

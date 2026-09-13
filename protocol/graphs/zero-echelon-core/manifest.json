@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocolGraphId": "zero-echelon-core",
+  "graphVersion": "2026-09-13-s0-s5b",
+  "locale": ["uk", "en"],
+  "commercial": false,
+  "slice": "S0-S5b",
+  "entry": "Start",
+  "graphFile": "graph.json",
+  "generatedFrom": {
+    "precedence": "docs/03-пріоритети-та-конфлікти.md",
+    "flow": "docs/04-блок-схеми.md",
+    "screens": "docs/12-екрани-та-специфікація.md",
+    "voice": "docs/07-голосові-скрипти-UA-EN.md",
+    "registryChecked": "2026-09-13"
+  },
+  "deferred": [
+    "Count",
+    "casualty self-help menu",
+    "S6–S12 medical branches",
+    "A7 scene re-check loop"
+  ],
+  "notes": "Перша машиночитана редакція: дисклеймер → локація → тип → роль → безпека → вето/103. Після Call клієнт зупиняється на NEXT-PHASE до наступної версії графа."
+}

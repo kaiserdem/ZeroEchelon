@@ -13,7 +13,7 @@
 | Шлях | Що буде |
 | --- | --- |
 | `schema/` | JSON Schema формату вузла (за docs/06) |
-| `graphs/zero-echelon-core/` | `manifest.json` + вузли графа |
+| `graphs/zero-echelon-core/` | `manifest.json` + `graph.json` (зараз зріз S0–S5b) |
 | `locales/` | винесені рядки uk/en, якщо не вшиті в вузли |
 | `fixtures/` | короткі сценарії для автоперевірки рушія |
 

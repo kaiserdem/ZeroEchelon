@@ -1,0 +1,20 @@
+{
+  "id": "veto-path-s5a",
+  "title": "Міна в полі зору → вето Out",
+  "graphVersion": "2026-09-13-s0-s5b",
+  "steps": [
+    { "nodeId": "Start", "edge": "next" },
+    { "nodeId": "Disclaimer", "edge": "agree" },
+    { "nodeId": "Loc-mode", "edge": "gnss" },
+    { "nodeId": "Loc-2", "edge": "next" },
+    { "nodeId": "Type", "edge": "collapse" },
+    { "nodeId": "Role", "edge": "casualty" },
+    { "nodeId": "Role-casualty", "edge": "next" },
+    { "nodeId": "A1", "edge": "yes" },
+    { "nodeId": "Out", "edge": "report" },
+    { "nodeId": "Form", "edge": "back-out" },
+    { "nodeId": "Out", "edge": null }
+  ],
+  "expectTerminal": "Out",
+  "expectVeto": true
+}

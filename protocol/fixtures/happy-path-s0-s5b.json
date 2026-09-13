@@ -1,0 +1,23 @@
+{
+  "id": "happy-path-s0-s5b",
+  "title": "Безпечна сцена → виклик 103",
+  "graphVersion": "2026-09-13-s0-s5b",
+  "steps": [
+    { "nodeId": "Start", "edge": "next" },
+    { "nodeId": "Disclaimer", "edge": "agree" },
+    { "nodeId": "Loc-mode", "edge": "qr" },
+    { "nodeId": "Loc-1", "edge": "next" },
+    { "nodeId": "Type", "edge": "explosion" },
+    { "nodeId": "Role", "edge": "witness" },
+    { "nodeId": "Role-witness", "edge": "next" },
+    { "nodeId": "A1", "edge": "no" },
+    { "nodeId": "A2", "edge": "no" },
+    { "nodeId": "A3", "edge": "no" },
+    { "nodeId": "A4", "edge": "no" },
+    { "nodeId": "A5", "edge": "no" },
+    { "nodeId": "A6", "edge": "next" },
+    { "nodeId": "Call", "edge": "next" },
+    { "nodeId": "NEXT-PHASE", "edge": null }
+  ],
+  "expectTerminal": "NEXT-PHASE"
+}
