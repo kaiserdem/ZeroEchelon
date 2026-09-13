@@ -9,8 +9,8 @@ final class AppModel {
 
     func load() {
         do {
-            let graph = try GraphLoader.loadBundledGraph()
-            let engine = try ProtocolEngine(graph: graph, locale: .uk)
+            let package = try GraphLoader.loadBundledPackage()
+            let engine = try ProtocolEngine(package: package, locale: .uk)
             try engine.skipEntrySplashIfNeeded()
             self.engine = engine
             loadError = nil

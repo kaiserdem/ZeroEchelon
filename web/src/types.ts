@@ -30,6 +30,8 @@ export interface ProtocolNodeUI {
   locationLevel?: number;
   sessionRole?: string;
   note?: string;
+  /** Ordered address fields for Loc-3 (settlement → street → …). */
+  fields?: string[];
 }
 
 export interface ProtocolNode {

@@ -71,6 +71,8 @@ struct ProtocolNodeUI: Codable, Hashable, Sendable {
     var locationLevel: Int?
     var sessionRole: String?
     var note: String?
+    /// Ordered address fields for Loc-3 (settlement → street → …).
+    var fields: [String]?
 }
 
 struct ProtocolNode: Codable, Hashable, Sendable, Identifiable {

@@ -10,6 +10,7 @@
   "slice": "S0-S12",
   "entry": "Start",
   "graphFile": "graph.json",
+  "engineRulesFile": "engine-rules.json",
   "generatedFrom": {
     "precedence": "docs/03-пріоритети-та-конфлікти.md",
     "flow": "docs/04-блок-схеми.md",

@@ -4,3 +4,4 @@
 | --- | --- | --- |
 | [ios/protocol_engine.md](specs/ios/protocol_engine.md) | iOS | done (ZeroEchelon/) |
 | [web/clickable_demo.md](specs/web/clickable_demo.md) | web | done (civic demo) |
+| [protocol/shared_engine_rules.md](specs/protocol/shared_engine_rules.md) | protocol | done |

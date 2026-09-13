@@ -11,6 +11,7 @@ import {
   primaryButtons,
   textFor,
 } from "./types";
+import { type EngineRules, safetyQueue } from "./rules";
 
 function newStep(nodeId: string, edge: string | null): ProtocolLogStep {
   return {
@@ -21,22 +22,28 @@ function newStep(nodeId: string, edge: string | null): ProtocolLogStep {
   };
 }
 
-const CARE_BRANCHES = new Set(["B", "C", "D", "E", "F", "G"]);
-
-/** Pure navigation over the protocol graph. No clinical branching outside edges. */
+/** Pure navigation over the protocol graph. Policy remaps from shared EngineRules. */
 export class ProtocolEngine {
   graph: ProtocolGraph;
+  rules: EngineRules;
   currentNode: ProtocolNode;
   locale: ContentLocale;
   sessionRole: SessionRole | null = null;
   incidentType: string | null = null;
+  locationLine: string | null = null;
+  locationLevel: number | null = null;
+  /** Draft text for the current Loc-3 field. */
+  manualLocationDraft = "";
+  /** Index into manual location field keys while on Loc-3. */
+  manualLocationFieldIndex = 0;
+  private manualLocationValues: Record<string, string> = {};
   steps: ProtocolLogStep[] = [];
   unreachableMarked = false;
   lastVetoNodeId: string | null = null;
   multipleCasualties = false;
 
-  /** Seconds between scene re-checks while in care branches B–G (default 3 min). */
-  sceneRecheckInterval = 180;
+  /** Seconds between scene re-checks (overridable in tests). */
+  sceneRecheckInterval: number;
   lastSceneCheckAt: number | null = null;
   now: () => number = () => Date.now();
 
@@ -45,7 +52,18 @@ export class ProtocolEngine {
   private pendingRecheckEdge: string | null = null;
   private suppressSceneRecheck = false;
 
-  constructor(graph: ProtocolGraph, locale: ContentLocale = "uk") {
+  private static readonly defaultManualFields = [
+    "settlement",
+    "street",
+    "building",
+    "entrance",
+  ];
+
+  constructor(
+    graph: ProtocolGraph,
+    rules: EngineRules,
+    locale: ContentLocale = "uk",
+  ) {
     if (graph.commercial) {
       throw new Error("commercial must be false");
     }
@@ -54,7 +72,9 @@ export class ProtocolEngine {
       throw new Error(`Missing entry node: ${graph.entry}`);
     }
     this.graph = graph;
+    this.rules = rules;
     this.locale = locale;
+    this.sceneRecheckInterval = rules.sceneRecheck.intervalSeconds;
     this.currentNode = entry;
   }
 
@@ -71,6 +91,10 @@ export class ProtocolEngine {
         return this.locale === "uk"
           ? "Місце з QR-коду на стіні:"
           : "Location from the wall QR code:";
+      case "Loc-3":
+        return this.manualLocationPrompt;
+      case "A6":
+        return this.a6VoiceForIncidentType();
       case "NoCpr":
         if (this.sessionRole === "casualty" || !this.multipleCasualties) {
           return this.locale === "uk"
@@ -78,6 +102,99 @@ export class ProtocolEngine {
             : "CPR will not help here. Stay. Tap 103 below.";
         }
         return textFor(this.currentNode.voice, this.locale);
+      default:
+        return textFor(this.currentNode.voice, this.locale);
+    }
+  }
+
+  get isManualLocationEntry(): boolean {
+    return this.currentNode.id === "Loc-3";
+  }
+
+  get manualLocationFieldKey(): string {
+    const keys = this.manualLocationFieldKeys;
+    return keys[this.manualLocationFieldIndex] ?? keys[0] ?? "settlement";
+  }
+
+  get manualLocationPrompt(): string {
+    switch (this.manualLocationFieldKey) {
+      case "settlement":
+        return this.locale === "uk"
+          ? "Назвіть населений пункт."
+          : "Name the town or city.";
+      case "street":
+        return this.locale === "uk" ? "Вулиця." : "Street.";
+      case "building":
+        return this.locale === "uk" ? "Номер будинку." : "Building number.";
+      case "entrance":
+        return this.locale === "uk"
+          ? "Підʼїзд, поверх чи орієнтир."
+          : "Entrance, floor, or landmark.";
+      default:
+        return textFor(this.currentNode.voice, this.locale);
+    }
+  }
+
+  get manualLocationPlaceholder(): string {
+    switch (this.manualLocationFieldKey) {
+      case "settlement":
+        return this.locale === "uk" ? "наприклад, Бровари" : "e.g. Brovary";
+      case "street":
+        return this.locale === "uk"
+          ? "наприклад, вул. Київська"
+          : "e.g. Kyivska St.";
+      case "building":
+        return this.locale === "uk" ? "наприклад, 12" : "e.g. 12";
+      case "entrance":
+        return this.locale === "uk"
+          ? "підʼїзд 3, поверх 2"
+          : "entrance 3, floor 2";
+      default:
+        return "";
+    }
+  }
+
+  get manualLocationSummary(): string | null {
+    if (!this.isManualLocationEntry) return null;
+    const parts = this.manualLocationFieldKeys
+      .map((key) => this.manualLocationValues[key]?.trim())
+      .filter((value): value is string => Boolean(value));
+    return parts.length > 0 ? parts.join(", ") : null;
+  }
+
+  private get manualLocationFieldKeys(): string[] {
+    const fromGraph = this.graph.nodes.find((n) => n.id === "Loc-3")?.ui
+      ?.fields;
+    return fromGraph && fromGraph.length > 0
+      ? fromGraph
+      : ProtocolEngine.defaultManualFields;
+  }
+
+  private a6VoiceForIncidentType(): string {
+    switch (this.incidentType) {
+      case "traffic":
+        return this.locale === "uk"
+          ? "Не стійте на проїзджій частині. Увімкніть аварійку. Не чіпайте проводи."
+          : "Do not stand in the roadway. Turn on hazard lights. Do not touch wires.";
+      case "fire":
+        return this.locale === "uk"
+          ? "Не заходьте в дим і полумʼя. Тримайтеся з навітряного боку. Не відкривайте гарячі двері."
+          : "Do not enter smoke or flames. Stay upwind. Do not open hot doors.";
+      case "chemical":
+        return this.locale === "uk"
+          ? "Не чіпайте рідину і плями. Не нюхайте. Відійдіть проти вітру, якщо можете."
+          : "Do not touch liquid or stains. Do not smell it. Move upwind if you can.";
+      case "household":
+        return this.locale === "uk"
+          ? "Вимкніть джерело небезпеки, якщо це безпечно. Не ризикуйте зайвий раз."
+          : "Turn off the hazard source if it is safe. Do not take extra risks.";
+      case "collapse":
+      case "explosion":
+      case "train":
+      case "shooting":
+        return this.locale === "uk"
+          ? "Не заходьте всередину завалу. Не рухайте уламки."
+          : "Do not enter the collapse. Do not move rubble.";
       default:
         return textFor(this.currentNode.voice, this.locale);
     }
@@ -96,11 +213,11 @@ export class ProtocolEngine {
   get detailBlock(): string | null {
     switch (this.currentNode.id) {
       case "Loc-1":
-        return this.locale === "uk"
-          ? "Київська обл., м. Бровари, вул. Демо 12, підʼїзд 3"
-          : "Kyiv region, Brovary, Demo St. 12, entrance 3";
+        return this.demoAddressLine();
       case "Loc-2":
-        return "50.51120° N\n30.79090° E";
+        return this.demoCoordinatesDisplay;
+      case "Loc-3":
+        return this.manualLocationSummary;
       case "Call":
       case "CALL-read":
         return this.dispatcherDraft;
@@ -110,6 +227,20 @@ export class ProtocolEngine {
         }
         return null;
     }
+  }
+
+  private demoAddressLine(): string {
+    return this.locale === "uk"
+      ? "Київська обл., м. Бровари, вул. Демо 12, підʼїзд 3"
+      : "Kyiv region, Brovary, Demo St. 12, entrance 3";
+  }
+
+  private get demoCoordinatesDisplay(): string {
+    return "50.51120° N\n30.79090° E";
+  }
+
+  private get demoCoordinatesDraft(): string {
+    return "50.51120° N, 30.79090° E";
   }
 
   get screenBadge(): string {
@@ -158,24 +289,16 @@ export class ProtocolEngine {
       }
     }
 
-    if (this.currentNode.id === "Loc-mode") {
-      buttons = [
-        {
-          when: "qr",
-          ua: "З QR на стіні (демо)",
-          en: "From wall QR (demo)",
-        },
-        {
-          when: "gnss",
-          ua: "Мої координати (GPS)",
-          en: "My coordinates (GPS)",
-        },
-        {
-          when: "manual",
-          ua: "Введу адресу сам",
-          en: "I will type the address",
-        },
-      ];
+    if (this.currentNode.id === "Loc-3") {
+      const isLast =
+        this.manualLocationFieldIndex >=
+        this.manualLocationFieldKeys.length - 1;
+      buttons = buttons.map((button) => {
+        if (button.when !== "next") return button;
+        return isLast
+          ? { when: "next", ua: "Далі", en: "Next" }
+          : { when: "next", ua: "Наступне поле", en: "Next field" };
+      });
     }
 
     return buttons;
@@ -194,15 +317,14 @@ export class ProtocolEngine {
     return (
       this.currentNode.veto ||
       this.currentNode.id === "CanLeave" ||
-      this.currentNode.id === "A7"
+      this.currentNode.id === this.rules.sceneRecheck.nodeId
     );
   }
 
   get dispatcherDraft(): string {
     const place =
-      this.locale === "uk"
-        ? "місце вже на екрані локації"
-        : "place already on the location screen";
+      this.locationLine ??
+      (this.locale === "uk" ? "місце ще не вказано" : "place not set");
     const type = this.localizedIncidentTypeLabel();
     let role: string;
     if (this.sessionRole === "witness") {
@@ -253,11 +375,15 @@ export class ProtocolEngine {
 
     if (this.shouldInterceptForSceneRecheck) {
       this.pendingRecheckEdge = edgeWhen;
-      return this.navigate("A7", "recheck", true, true);
+      return this.navigate(this.rules.sceneRecheck.nodeId, "recheck", true, true);
     }
 
-    if (this.currentNode.id === "A7") {
-      return this.handleA7(edgeWhen);
+    if (this.currentNode.id === this.rules.sceneRecheck.nodeId) {
+      return this.handleSceneRecheck(edgeWhen);
+    }
+
+    if (this.currentNode.id === "Loc-3" && edgeWhen === "next") {
+      return this.handleManualLocationNext();
     }
 
     const edge = this.currentNode.edges.find((e) => e.when === edgeWhen);
@@ -315,42 +441,47 @@ export class ProtocolEngine {
       this.suppressSceneRecheck = false;
       return false;
     }
-    if (this.currentNode.id === "A7") return false;
-    if (!CARE_BRANCHES.has(this.currentNode.branch)) return false;
+    const recheck = this.rules.sceneRecheck;
+    if (this.currentNode.id === recheck.nodeId) return false;
+    if (!recheck.careBranches.includes(this.currentNode.branch)) return false;
     if (this.lastSceneCheckAt == null) return false;
     return (
       (this.now() - this.lastSceneCheckAt) / 1000 >= this.sceneRecheckInterval
     );
   }
 
-  private handleA7(edgeWhen: string): EdgeSelectionResult {
+  private handleSceneRecheck(edgeWhen: string): EdgeSelectionResult {
+    const recheck = this.rules.sceneRecheck;
     if (!this.currentNode.edges.some((e) => e.when === edgeWhen)) {
-      throw new Error(`Missing edge ${edgeWhen} on A7`);
+      throw new Error(`Missing edge ${edgeWhen} on ${recheck.nodeId}`);
     }
-    switch (edgeWhen) {
-      case "safe": {
-        this.lastSceneCheckAt = this.now();
-        const pending = this.pendingRecheckEdge;
-        this.pendingRecheckEdge = null;
-        this.steps.push(newStep("A7", "safe"));
-        const resumeId = this.returnStack.pop();
-        if (resumeId) {
-          const resumeNode = nodeById(this.graph, resumeId);
-          if (resumeNode) this.currentNode = resumeNode;
-        }
-        this.suppressSceneRecheck = true;
-        if (pending) {
-          return this.select(pending);
-        }
-        return { didNavigate: true, externalURL: null, clearedLog: false };
+    if (edgeWhen === recheck.safeEdge) {
+      this.lastSceneCheckAt = this.now();
+      const pending = this.pendingRecheckEdge;
+      this.pendingRecheckEdge = null;
+      this.steps.push(newStep(recheck.nodeId, recheck.safeEdge));
+      const resumeId = this.returnStack.pop();
+      if (resumeId) {
+        const resumeNode = nodeById(this.graph, resumeId);
+        if (resumeNode) this.currentNode = resumeNode;
       }
-      case "threat":
-        this.pendingRecheckEdge = null;
-        this.lastSceneCheckAt = this.now();
-        return this.navigate("CanLeave", "threat", false, true);
-      default:
-        throw new Error(`Missing edge ${edgeWhen} on A7`);
+      this.suppressSceneRecheck = true;
+      if (pending) {
+        return this.select(pending);
+      }
+      return { didNavigate: true, externalURL: null, clearedLog: false };
     }
+    if (edgeWhen === recheck.threatEdge) {
+      this.pendingRecheckEdge = null;
+      this.lastSceneCheckAt = this.now();
+      return this.navigate(
+        recheck.threatTarget,
+        recheck.threatEdge,
+        false,
+        true,
+      );
+    }
+    throw new Error(`Missing edge ${edgeWhen} on ${recheck.nodeId}`);
   }
 
   finishExternalAndReturn(): void {
@@ -367,6 +498,9 @@ export class ProtocolEngine {
     this.currentNode = entry;
     this.sessionRole = null;
     this.incidentType = null;
+    this.locationLine = null;
+    this.locationLevel = null;
+    this.resetManualLocationWizard();
     this.steps = [];
     this.unreachableMarked = false;
     this.lastVetoNodeId = null;
@@ -379,6 +513,48 @@ export class ProtocolEngine {
     this.skipEntrySplashIfNeeded();
   }
 
+  private handleManualLocationNext(): EdgeSelectionResult {
+    const trimmed = this.manualLocationDraft.trim();
+    if (this.manualLocationFieldIndex === 0 && trimmed.length === 0) {
+      return { didNavigate: false, externalURL: null, clearedLog: false };
+    }
+    const key = this.manualLocationFieldKey;
+    if (trimmed.length === 0) {
+      delete this.manualLocationValues[key];
+    } else {
+      this.manualLocationValues[key] = trimmed;
+    }
+
+    const keys = this.manualLocationFieldKeys;
+    if (this.manualLocationFieldIndex + 1 < keys.length) {
+      this.manualLocationFieldIndex += 1;
+      const nextKey = keys[this.manualLocationFieldIndex];
+      this.manualLocationDraft = this.manualLocationValues[nextKey] ?? "";
+      return { didNavigate: false, externalURL: null, clearedLog: false };
+    }
+
+    const line = this.composeManualLocationLine();
+    if (!line) {
+      return { didNavigate: false, externalURL: null, clearedLog: false };
+    }
+    this.locationLevel = 3;
+    this.locationLine = line;
+    return this.navigate("Type", "next", false, true);
+  }
+
+  private composeManualLocationLine(): string {
+    return this.manualLocationFieldKeys
+      .map((key) => this.manualLocationValues[key]?.trim())
+      .filter((value): value is string => Boolean(value))
+      .join(", ");
+  }
+
+  private resetManualLocationWizard(): void {
+    this.manualLocationFieldIndex = 0;
+    this.manualLocationValues = {};
+    this.manualLocationDraft = "";
+  }
+
   private navigate(
     id: string,
     edgeWhen: string,
@@ -387,23 +563,7 @@ export class ProtocolEngine {
   ): EdgeSelectionResult {
     let targetId = this.remapSafetyTarget(id, edgeWhen);
     if (this.sessionRole === "casualty") {
-      if (targetId === "Count" || this.nextIsBranchB(targetId)) {
-        targetId = "Casualty-menu";
-      } else {
-        switch (targetId) {
-          case "Hands":
-            targetId = "Hold";
-            break;
-          case "D2":
-            targetId = "Sup";
-            break;
-          case "NoCpr":
-            targetId = "E0";
-            break;
-          default:
-            break;
-        }
-      }
+      targetId = this.remapCasualtyTarget(targetId);
     }
 
     const next = nodeById(this.graph, targetId);
@@ -415,7 +575,8 @@ export class ProtocolEngine {
     if (pushReturn) this.returnStack.push(leavingId);
     if (recordHistory) this.history.push(leavingId);
     this.currentNode = next;
-    if (leavingId === "A6") {
+    this.captureLocationIfNeeded(next.id);
+    if (leavingId === this.rules.sceneRecheck.armAfterLeavingNodeId) {
       this.lastSceneCheckAt = this.now();
     }
     const role = next.ui?.sessionRole;
@@ -429,60 +590,53 @@ export class ProtocolEngine {
     };
   }
 
-  private nextIsBranchB(id: string): boolean {
-    return nodeById(this.graph, id)?.branch === "B";
+  private captureLocationIfNeeded(id: string): void {
+    switch (id) {
+      case "Loc-1":
+        this.locationLevel = 1;
+        this.locationLine = this.demoAddressLine();
+        break;
+      case "Loc-2":
+        this.locationLevel = 2;
+        this.locationLine = this.demoCoordinatesDraft;
+        break;
+      case "Loc-3":
+        this.locationLevel = 3;
+        this.resetManualLocationWizard();
+        break;
+      default:
+        break;
+    }
   }
 
-  private static readonly safetyThreatIds = new Set([
-    "A1",
-    "A2",
-    "A3",
-    "A4",
-    "A5",
-  ]);
-
-  /** Threat checks A1–A5 relevant to incidentType (docs/01 A0). A6 always last. */
-  private safetyThreatQueue(type: string | null): string[] {
-    switch (type) {
-      case "explosion":
-      case "shooting":
-      case "train":
-        return ["A1", "A2", "A3", "A4", "A5", "A6"];
-      case "collapse":
-        return ["A2", "A1", "A3", "A4", "A5", "A6"];
-      case "fire":
-        return ["A3", "A4", "A5", "A2", "A6"];
-      case "traffic":
-        return ["A4", "A3", "A5", "A6"];
-      case "chemical":
-        return ["A5", "A3", "A4", "A6"];
-      case "household":
-        return ["A3", "A4", "A5", "A6"];
-      default:
-        return ["A1", "A2", "A3", "A4", "A5", "A6"];
-    }
+  private remapCasualtyTarget(targetId: string): string {
+    const c = this.rules.casualty;
+    if (c.redirectNodeIds.includes(targetId)) return c.redirectTo;
+    const branch = nodeById(this.graph, targetId)?.branch;
+    if (branch && c.redirectBranches.includes(branch)) return c.redirectTo;
+    return c.targetRemaps[targetId] ?? targetId;
   }
 
   private remapSafetyTarget(targetId: string, edgeWhen: string): string {
-    const queue = this.safetyThreatQueue(this.incidentType);
+    const queue = safetyQueue(this.rules, this.incidentType);
+    const safety = this.rules.safety;
 
     if (
-      targetId === "A1" &&
-      (this.currentNode.id === "Role-witness" ||
-        this.currentNode.id === "Role-casualty")
+      targetId === safety.entryTarget &&
+      safety.roleEntryNodeIds.includes(this.currentNode.id)
     ) {
-      return queue[0] ?? "A1";
+      return queue[0] ?? safety.entryTarget;
     }
 
     if (
-      ProtocolEngine.safetyThreatIds.has(this.currentNode.id) &&
-      (edgeWhen === "no" || edgeWhen === "cannot")
+      safety.threatIds.includes(this.currentNode.id) &&
+      safety.advanceOnEdges.includes(edgeWhen)
     ) {
       const idx = queue.indexOf(this.currentNode.id);
       if (idx >= 0 && idx + 1 < queue.length) {
         return queue[idx + 1]!;
       }
-      return "A6";
+      return safety.fallbackNext;
     }
 
     return targetId;

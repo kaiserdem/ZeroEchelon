@@ -28,8 +28,8 @@ npm run build
 ## Стек
 
 - Vite + TypeScript
-- `ProtocolEngine` у `src/engine.ts` (порт Swift)
-- Граф: `@protocol/graphs/zero-echelon-core/graph.json`
+- `ProtocolEngine` у `src/engine.ts` (тонкий інтерпретатор)
+- Граф + правила: `@protocol/graphs/zero-echelon-core/{graph,engine-rules}.json`
 - Web Speech API (опційно)
 
 ## Чого ще немає

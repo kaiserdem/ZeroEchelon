@@ -119,10 +119,6 @@
       },
       "edges": [
         {
-          "when": "qr",
-          "to": "Loc-1"
-        },
-        {
           "when": "gnss",
           "to": "Loc-2"
         },
@@ -137,11 +133,6 @@
         "accuracyLabel": true,
         "buttons": [
           {
-            "when": "qr",
-            "ua": "З QR на стіні (демо)",
-            "en": "From wall QR (demo)"
-          },
-          {
             "when": "gnss",
             "ua": "Мої координати (GPS)",
             "en": "My coordinates (GPS)"
@@ -152,7 +143,7 @@
             "en": "I will type the address"
           }
         ],
-        "note": "Клієнт може пропустити Loc-mode і відкрити Loc-1/2/3 одразу за наявністю QR чи GNSS."
+        "note": "Loc-1 лишається для deep link з QR на стіні (клієнт пропускає Loc-mode). Тут лише GPS або ручне введення."
       }
     },
     {

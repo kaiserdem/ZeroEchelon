@@ -78,6 +78,10 @@ struct NodeFrameView: View {
                             }
                     }
 
+                    if engine.isManualLocationEntry {
+                        manualLocationInput
+                    }
+
                     Group {
                         if engine.currentNode.id == "Type" {
                             LazyVGrid(
@@ -121,10 +125,71 @@ struct NodeFrameView: View {
         .ignoresSafeArea(edges: .bottom)
         .onAppear { speakCurrent() }
         .onChange(of: engine.currentNode.id) { _, _ in
+            speech.stopDictation()
             speakCurrent()
+        }
+        .onChange(of: engine.manualLocationFieldIndex) { _, _ in
+            if engine.isManualLocationEntry {
+                speakCurrent()
+            }
         }
         .onChange(of: engine.locale) { _, _ in
             speakCurrent()
+        }
+    }
+
+    private var manualLocationInput: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                TextField(engine.manualLocationPlaceholder, text: Binding(
+                    get: { engine.manualLocationDraft },
+                    set: { engine.manualLocationDraft = $0 }
+                ))
+                .font(.title3.weight(.semibold))
+                .textInputAutocapitalization(.words)
+                .submitLabel(.next)
+                .onSubmit { handle("next") }
+                .padding(14)
+                .background(
+                    CivicTheme.surface,
+                    in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: CivicTheme.corner)
+                        .stroke(CivicTheme.accent.opacity(0.35), lineWidth: 1.5)
+                }
+
+                Button {
+                    toggleDictation()
+                } label: {
+                    Image(systemName: speech.isListening ? "mic.fill" : "mic")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(speech.isListening ? Color.white : CivicTheme.accent)
+                        .frame(width: 52, height: 52)
+                        .background(
+                            speech.isListening ? CivicTheme.danger : CivicTheme.secondaryFill,
+                            in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                        )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(engine.locale == .uk ? "Диктовка" : "Dictate")
+            }
+
+            if let error = speech.lastError {
+                Text(error)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(CivicTheme.danger)
+            }
+        }
+    }
+
+    private func toggleDictation() {
+        if speech.isListening {
+            speech.stopDictation()
+            return
+        }
+        speech.startDictation(locale: engine.locale) { partial in
+            engine.manualLocationDraft = partial
         }
     }
 
@@ -249,6 +314,7 @@ struct NodeFrameView: View {
     }
 
     private func handle(_ when: String) {
+        speech.stopDictation()
         do {
             let result = try engine.select(edgeWhen: when)
             if let url = result.externalURL {

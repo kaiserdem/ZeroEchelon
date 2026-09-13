@@ -1,25 +1,36 @@
 import graphJson from "@protocol/graphs/zero-echelon-core/graph.json";
+import rulesJson from "@protocol/graphs/zero-echelon-core/engine-rules.json";
 import { ProtocolEngine } from "./engine";
-import { speak, stopSpeaking } from "./speech";
+import {
+  canDictate,
+  isDictating,
+  speak,
+  startDictation,
+  stopDictation,
+  stopSpeaking,
+} from "./speech";
+import type { EngineRules } from "./rules";
 import type { ContentLocale, ProtocolGraph } from "./types";
 import { buttonTitle } from "./types";
 import "./styles.css";
 
 const graph = graphJson as ProtocolGraph;
+const rules = rulesJson as EngineRules;
 const appRoot = document.querySelector<HTMLDivElement>("#app");
 if (!appRoot) throw new Error("#app missing");
 const root: HTMLDivElement = appRoot;
 
-const engine = new ProtocolEngine(graph, "uk");
+const engine = new ProtocolEngine(graph, rules, "uk");
 engine.skipEntrySplashIfNeeded();
 
 let speakOnAppear = true;
+let lastSpokenKey = "";
 
 function dial(number: string): void {
   window.location.href = `tel:${number}`;
 }
 
-function render(): void {
+function render(options?: { keepFocus?: boolean }): void {
   const isVeto = engine.currentNode.veto;
   const locale = engine.locale;
   const buttons = engine.visibleButtons;
@@ -27,6 +38,7 @@ function render(): void {
   const prioritize101 = engine.prioritize101;
   const show101 = engine.showsRescue101;
   const emphasizeCall = engine.currentNode.id === "Call";
+  const listening = isDictating();
 
   const actionsClass = isType ? "actions grid" : "actions";
   const actionHtml = buttons
@@ -61,6 +73,26 @@ function render(): void {
   const anti = engine.antiPatternText;
   const detail = engine.detailBlock;
   const helper = engine.helperText;
+  const manual = engine.isManualLocationEntry
+    ? `
+      <div class="loc-input-row">
+        <input
+          type="text"
+          class="loc-input"
+          data-loc-input
+          autocomplete="street-address"
+          enterkeyhint="next"
+          placeholder="${escapeAttr(engine.manualLocationPlaceholder)}"
+          value="${escapeAttr(engine.manualLocationDraft)}"
+        />
+        ${
+          canDictate()
+            ? `<button type="button" class="mic-btn${listening ? " listening" : ""}" data-mic aria-label="${locale === "uk" ? "Диктовка" : "Dictate"}">${listening ? "⏹" : "🎤"}</button>`
+            : ""
+        }
+      </div>
+    `
+    : "";
 
   root.innerHTML = `
     <div class="frame${isVeto ? " is-veto" : ""}">
@@ -96,6 +128,7 @@ function render(): void {
             ? `<div class="detail${engine.currentNode.id === "Loc-2" ? " coords" : ""}">${escapeHtml(detail)}</div>`
             : ""
         }
+        ${manual}
         <div class="${actionsClass}">${actionHtml}</div>
       </main>
       <footer class="emergency">${emergencyHtml}</footer>
@@ -103,7 +136,18 @@ function render(): void {
   `;
 
   bind();
-  if (speakOnAppear) speak(engine.voiceText, locale);
+  if (options?.keepFocus) {
+    const input = root.querySelector<HTMLInputElement>("[data-loc-input]");
+    input?.focus();
+    const len = input?.value.length ?? 0;
+    input?.setSelectionRange(len, len);
+  }
+
+  const spokenKey = `${engine.currentNode.id}:${engine.manualLocationFieldIndex}:${engine.voiceText}`;
+  if (speakOnAppear && spokenKey !== lastSpokenKey) {
+    lastSpokenKey = spokenKey;
+    speak(engine.voiceText, locale);
+  }
 }
 
 function hint(locale: ContentLocale, prioritize101: boolean): string {
@@ -119,6 +163,7 @@ function hint(locale: ContentLocale, prioritize101: boolean): string {
 
 function bind(): void {
   root.querySelector("[data-back]")?.addEventListener("click", () => {
+    stopDictation();
     engine.goBack();
     render();
   });
@@ -139,16 +184,43 @@ function bind(): void {
     render();
   });
 
+  const locInput = root.querySelector<HTMLInputElement>("[data-loc-input]");
+  locInput?.addEventListener("input", () => {
+    engine.manualLocationDraft = locInput.value;
+  });
+  locInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      stopDictation();
+      engine.select("next");
+      render({ keepFocus: engine.isManualLocationEntry });
+    }
+  });
+
+  root.querySelector("[data-mic]")?.addEventListener("click", () => {
+    if (isDictating()) {
+      stopDictation();
+      render({ keepFocus: true });
+      return;
+    }
+    const started = startDictation(engine.locale, (text) => {
+      engine.manualLocationDraft = text;
+      render({ keepFocus: true });
+    });
+    if (started) render({ keepFocus: true });
+  });
+
   root.querySelectorAll<HTMLButtonElement>("[data-when]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const when = btn.dataset.when;
       if (!when) return;
       try {
+        stopDictation();
         const result = engine.select(when);
         if (result.externalURL) {
           window.location.href = result.externalURL;
         }
-        render();
+        render({ keepFocus: engine.isManualLocationEntry });
       } catch (error) {
         console.error(error);
       }

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocolGraphId": "zero-echelon-core",
+  "notes": "Shared engine policy for all clients (iOS / web / future Android). No clinical branching outside graph edges + these remaps.",
+  "sceneRecheck": {
+    "nodeId": "A7",
+    "intervalSeconds": 180,
+    "careBranches": ["B", "C", "D", "E", "F", "G"],
+    "armAfterLeavingNodeId": "A6",
+    "safeEdge": "safe",
+    "threatEdge": "threat",
+    "threatTarget": "CanLeave"
+  },
+  "safety": {
+    "entryTarget": "A1",
+    "roleEntryNodeIds": ["Role-witness", "Role-casualty"],
+    "threatIds": ["A1", "A2", "A3", "A4", "A5"],
+    "advanceOnEdges": ["no", "cannot"],
+    "fallbackNext": "A6",
+    "queuesByIncidentType": {
+      "explosion": ["A1", "A2", "A3", "A4", "A5", "A6"],
+      "shooting": ["A1", "A2", "A3", "A4", "A5", "A6"],
+      "train": ["A1", "A2", "A3", "A4", "A5", "A6"],
+      "collapse": ["A2", "A1", "A3", "A4", "A5", "A6"],
+      "fire": ["A3", "A4", "A5", "A2", "A6"],
+      "traffic": ["A4", "A3", "A5", "A6"],
+      "chemical": ["A5", "A3", "A4", "A6"],
+      "household": ["A3", "A4", "A5", "A6"],
+      "default": ["A1", "A2", "A3", "A4", "A5", "A6"]
+    }
+  },
+  "casualty": {
+    "redirectNodeIds": ["Count"],
+    "redirectBranches": ["B"],
+    "redirectTo": "Casualty-menu",
+    "targetRemaps": {
+      "Hands": "Hold",
+      "D2": "Sup",
+      "NoCpr": "E0"
+    }
+  }
+}

@@ -20,22 +20,31 @@ struct EdgeSelectionResult: Sendable {
     var clearedLog: Bool
 }
 
-/// Pure navigation over the protocol graph. No clinical branching outside edges.
+/// Pure navigation over the protocol graph. Policy remaps come from shared `EngineRules`.
 @Observable
 final class ProtocolEngine {
     private(set) var graph: ProtocolGraph
+    private(set) var rules: EngineRules
     private(set) var currentNode: ProtocolNode
     var locale: ContentLocale
     private(set) var sessionRole: SessionRole?
     private(set) var incidentType: String?
+    /// Location line captured from Loc-1 / Loc-2 / Loc-3 for the 103 draft.
+    private(set) var locationLine: String?
+    private(set) var locationLevel: Int?
+    /// Draft text for the current Loc-3 field (bound to the text field).
+    var manualLocationDraft: String = ""
+    /// Index into `manualLocationFieldKeys` while on Loc-3.
+    private(set) var manualLocationFieldIndex: Int = 0
+    private var manualLocationValues: [String: String] = [:]
     private(set) var steps: [ProtocolLogStep]
     private(set) var unreachableMarked: Bool
     private(set) var lastVetoNodeId: String?
     /// True after Count→many/unknown (SALT multi-casualty context).
     private(set) var multipleCasualties: Bool
 
-    /// Seconds between scene re-checks while in care branches B–G (default 3 min).
-    var sceneRecheckInterval: TimeInterval = 180
+    /// Seconds between scene re-checks while in care branches (overridable in tests).
+    var sceneRecheckInterval: TimeInterval
     /// Clock injection for tests.
     var now: () -> Date = { Date() }
     private(set) var lastSceneCheckAt: Date?
@@ -45,17 +54,24 @@ final class ProtocolEngine {
     private var pendingRecheckEdge: String?
     private var suppressSceneRecheck = false
 
-    private static let careBranches: Set<String> = ["B", "C", "D", "E", "F", "G"]
+    private static let defaultManualFields = ["settlement", "street", "building", "entrance"]
 
-    init(graph: ProtocolGraph, locale: ContentLocale = .uk) throws {
+    init(graph: ProtocolGraph, rules: EngineRules, locale: ContentLocale = .uk) throws {
         guard graph.commercial == false else {
             throw ProtocolGraphError.commercialInvariant
         }
         self.graph = graph
+        self.rules = rules
         self.locale = locale
+        self.sceneRecheckInterval = rules.sceneRecheck.intervalSeconds
         self.currentNode = try graph.entryNode
         self.sessionRole = nil
         self.incidentType = nil
+        self.locationLine = nil
+        self.locationLevel = nil
+        self.manualLocationDraft = ""
+        self.manualLocationFieldIndex = 0
+        self.manualLocationValues = [:]
         self.steps = []
         self.unreachableMarked = false
         self.lastVetoNodeId = nil
@@ -65,6 +81,10 @@ final class ProtocolEngine {
         self.suppressSceneRecheck = false
         self.returnStack = []
         self.history = []
+    }
+
+    convenience init(package: ProtocolPackage, locale: ContentLocale = .uk) throws {
+        try self.init(graph: package.graph, rules: package.rules, locale: locale)
     }
 
     /// Test helper: mark the last scene check at an absolute time.
@@ -86,11 +106,99 @@ final class ProtocolEngine {
             return locale == .uk
                 ? "Місце з QR-коду на стіні:"
                 : "Location from the wall QR code:"
+        case "Loc-3":
+            return manualLocationPrompt
+        case "A6":
+            return a6VoiceForIncidentType()
         case "NoCpr" where sessionRole == .casualty || !multipleCasualties:
             // P0 from audit: do not order "go to the next person" when there is no next / cannot leave
             return locale == .uk
                 ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 103 внизу."
                 : "CPR will not help here. Stay. Tap 103 below."
+        default:
+            return currentNode.voice.text(for: locale)
+        }
+    }
+
+    var isManualLocationEntry: Bool { currentNode.id == "Loc-3" }
+
+    var manualLocationFieldKey: String {
+        let keys = manualLocationFieldKeys
+        guard keys.indices.contains(manualLocationFieldIndex) else {
+            return keys.first ?? "settlement"
+        }
+        return keys[manualLocationFieldIndex]
+    }
+
+    var manualLocationPrompt: String {
+        switch manualLocationFieldKey {
+        case "settlement":
+            return locale == .uk ? "Назвіть населений пункт." : "Name the town or city."
+        case "street":
+            return locale == .uk ? "Вулиця." : "Street."
+        case "building":
+            return locale == .uk ? "Номер будинку." : "Building number."
+        case "entrance":
+            return locale == .uk ? "Підʼїзд, поверх чи орієнтир." : "Entrance, floor, or landmark."
+        default:
+            return currentNode.voice.text(for: locale)
+        }
+    }
+
+    var manualLocationPlaceholder: String {
+        switch manualLocationFieldKey {
+        case "settlement":
+            return locale == .uk ? "наприклад, Бровари" : "e.g. Brovary"
+        case "street":
+            return locale == .uk ? "наприклад, вул. Київська" : "e.g. Kyivska St."
+        case "building":
+            return locale == .uk ? "наприклад, 12" : "e.g. 12"
+        case "entrance":
+            return locale == .uk ? "підʼїзд 3, поверх 2" : "entrance 3, floor 2"
+        default:
+            return ""
+        }
+    }
+
+    /// Already confirmed fields, shown under the input on Loc-3.
+    var manualLocationSummary: String? {
+        guard isManualLocationEntry else { return nil }
+        let parts = manualLocationFieldKeys.compactMap { key -> String? in
+            guard let value = manualLocationValues[key], !value.isEmpty else { return nil }
+            return value
+        }
+        guard !parts.isEmpty else { return nil }
+        return parts.joined(separator: ", ")
+    }
+
+    private var manualLocationFieldKeys: [String] {
+        let fromGraph = graph.node(id: "Loc-3")?.ui?.fields ?? []
+        return fromGraph.isEmpty ? Self.defaultManualFields : fromGraph
+    }
+
+    /// Closing safety order before Call — wording depends on incident type.
+    private func a6VoiceForIncidentType() -> String {
+        switch incidentType {
+        case "traffic":
+            return locale == .uk
+                ? "Не стійте на проїзджій частині. Увімкніть аварійку. Не чіпайте проводи."
+                : "Do not stand in the roadway. Turn on hazard lights. Do not touch wires."
+        case "fire":
+            return locale == .uk
+                ? "Не заходьте в дим і полумʼя. Тримайтеся з навітряного боку. Не відкривайте гарячі двері."
+                : "Do not enter smoke or flames. Stay upwind. Do not open hot doors."
+        case "chemical":
+            return locale == .uk
+                ? "Не чіпайте рідину і плями. Не нюхайте. Відійдіть проти вітру, якщо можете."
+                : "Do not touch liquid or stains. Do not smell it. Move upwind if you can."
+        case "household":
+            return locale == .uk
+                ? "Вимкніть джерело небезпеки, якщо це безпечно. Не ризикуйте зайвий раз."
+                : "Turn off the hazard source if it is safe. Do not take extra risks."
+        case "collapse", "explosion", "train", "shooting":
+            return locale == .uk
+                ? "Не заходьте всередину завалу. Не рухайте уламки."
+                : "Do not enter the collapse. Do not move rubble."
         default:
             return currentNode.voice.text(for: locale)
         }
@@ -106,11 +214,11 @@ final class ProtocolEngine {
     var detailBlock: String? {
         switch currentNode.id {
         case "Loc-1":
-            return locale == .uk
-                ? "Київська обл., м. Бровари, вул. Демо 12, підʼїзд 3"
-                : "Kyiv region, Brovary, Demo St. 12, entrance 3"
+            return demoAddressLine(for: locale)
         case "Loc-2":
-            return "50.51120° N\n30.79090° E"
+            return demoCoordinatesDisplay
+        case "Loc-3":
+            return manualLocationSummary
         case "Call", "CALL-read":
             return dispatcherDraft
         default:
@@ -120,6 +228,16 @@ final class ProtocolEngine {
             return nil
         }
     }
+
+    private func demoAddressLine(for locale: ContentLocale) -> String {
+        switch locale {
+        case .uk: "Київська обл., м. Бровари, вул. Демо 12, підʼїзд 3"
+        case .en: "Kyiv region, Brovary, Demo St. 12, entrance 3"
+        }
+    }
+
+    private var demoCoordinatesDisplay: String { "50.51120° N\n30.79090° E" }
+    private var demoCoordinatesDraft: String { "50.51120° N, 30.79090° E" }
 
     var screenBadge: String {
         currentNode.ui?.screenId ?? currentNode.id
@@ -166,13 +284,15 @@ final class ProtocolEngine {
             }
         }
 
-        // Casualty: hide witness-only delegation question labels already in graph via roles filter in primaryButtons? edges still show Hands for both if roles include both — Hands is witness-only in roles
-        if currentNode.id == "Loc-mode" {
-            buttons = [
-                ProtocolButton(when: "qr", ua: "З QR на стіні (демо)", en: "From wall QR (demo)"),
-                ProtocolButton(when: "gnss", ua: "Мої координати (GPS)", en: "My coordinates (GPS)"),
-                ProtocolButton(when: "manual", ua: "Введу адресу сам", en: "I will type the address"),
-            ]
+        if currentNode.id == "Loc-3" {
+            let isLast = manualLocationFieldIndex >= manualLocationFieldKeys.count - 1
+            buttons = buttons.map { button in
+                guard button.when == "next" else { return button }
+                if isLast {
+                    return ProtocolButton(when: "next", ua: "Далі", en: "Next")
+                }
+                return ProtocolButton(when: "next", ua: "Наступне поле", en: "Next field")
+            }
         }
 
         return buttons
@@ -187,16 +307,14 @@ final class ProtocolEngine {
 
     /// On veto screens, 101 is the primary emergency action.
     var prioritize101: Bool {
-        currentNode.veto || currentNode.id == "CanLeave" || currentNode.id == "A7"
+        currentNode.veto
+            || currentNode.id == "CanLeave"
+            || currentNode.id == rules.sceneRecheck.nodeId
     }
 
     var dispatcherDraft: String {
-        let place: String = {
-            switch locale {
-            case .uk: "місце вже на екрані локації"
-            case .en: "place already on the location screen"
-            }
-        }()
+        let place = locationLine
+            ?? (locale == .uk ? "місце ще не вказано" : "place not set")
         let type = localizedIncidentTypeLabel()
         let role: String = {
             switch sessionRole {
@@ -243,14 +361,23 @@ final class ProtocolEngine {
             return try navigate(to: targetId, edgeWhen: edgeWhen, pushReturn: false, recordHistory: true)
         }
 
-        // A7 interrupt: pause care tap, show scene re-check, then resume or CanLeave.
+        // Scene re-check interrupt (node id from shared engine-rules).
         if shouldInterceptForSceneRecheck {
             pendingRecheckEdge = edgeWhen
-            return try navigate(to: "A7", edgeWhen: "recheck", pushReturn: true, recordHistory: true)
+            return try navigate(
+                to: rules.sceneRecheck.nodeId,
+                edgeWhen: "recheck",
+                pushReturn: true,
+                recordHistory: true
+            )
         }
 
-        if currentNode.id == "A7" {
-            return try handleA7(edgeWhen: edgeWhen)
+        if currentNode.id == rules.sceneRecheck.nodeId {
+            return try handleSceneRecheck(edgeWhen: edgeWhen)
+        }
+
+        if currentNode.id == "Loc-3", edgeWhen == "next" {
+            return try handleManualLocationNext()
         }
 
         guard let edge = currentNode.edges.first(where: { $0.when == edgeWhen }) else {
@@ -301,22 +428,23 @@ final class ProtocolEngine {
             suppressSceneRecheck = false
             return false
         }
-        guard currentNode.id != "A7" else { return false }
-        guard Self.careBranches.contains(currentNode.branch) else { return false }
+        let recheck = rules.sceneRecheck
+        guard currentNode.id != recheck.nodeId else { return false }
+        guard rules.careBranchSet.contains(currentNode.branch) else { return false }
         guard let last = lastSceneCheckAt else { return false }
         return now().timeIntervalSince(last) >= sceneRecheckInterval
     }
 
-    private func handleA7(edgeWhen: String) throws -> EdgeSelectionResult {
+    private func handleSceneRecheck(edgeWhen: String) throws -> EdgeSelectionResult {
+        let recheck = rules.sceneRecheck
         guard currentNode.edges.contains(where: { $0.when == edgeWhen }) else {
-            throw ProtocolGraphError.missingEdge(node: "A7", when: edgeWhen)
+            throw ProtocolGraphError.missingEdge(node: recheck.nodeId, when: edgeWhen)
         }
-        switch edgeWhen {
-        case "safe":
+        if edgeWhen == recheck.safeEdge {
             lastSceneCheckAt = now()
             let pending = pendingRecheckEdge
             pendingRecheckEdge = nil
-            steps.append(ProtocolLogStep(nodeId: "A7", edge: "safe"))
+            steps.append(ProtocolLogStep(nodeId: recheck.nodeId, edge: recheck.safeEdge))
             if let resumeId = returnStack.popLast(),
                let resumeNode = graph.node(id: resumeId)
             {
@@ -327,13 +455,18 @@ final class ProtocolEngine {
                 return try select(edgeWhen: pending)
             }
             return EdgeSelectionResult(didNavigate: true, externalURL: nil, clearedLog: false)
-        case "threat":
+        }
+        if edgeWhen == recheck.threatEdge {
             pendingRecheckEdge = nil
             lastSceneCheckAt = now()
-            return try navigate(to: "CanLeave", edgeWhen: "threat", pushReturn: false, recordHistory: true)
-        default:
-            throw ProtocolGraphError.missingEdge(node: "A7", when: edgeWhen)
+            return try navigate(
+                to: recheck.threatTarget,
+                edgeWhen: recheck.threatEdge,
+                pushReturn: false,
+                recordHistory: true
+            )
         }
+        throw ProtocolGraphError.missingEdge(node: recheck.nodeId, when: edgeWhen)
     }
 
     func finishExternalAndReturn() {
@@ -347,6 +480,9 @@ final class ProtocolEngine {
         currentNode = try graph.entryNode
         sessionRole = nil
         incidentType = nil
+        locationLine = nil
+        locationLevel = nil
+        resetManualLocationWizard()
         steps = []
         unreachableMarked = false
         lastVetoNodeId = nil
@@ -359,6 +495,50 @@ final class ProtocolEngine {
         try skipEntrySplashIfNeeded()
     }
 
+    private func handleManualLocationNext() throws -> EdgeSelectionResult {
+        let trimmed = manualLocationDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        if manualLocationFieldIndex == 0, trimmed.isEmpty {
+            return EdgeSelectionResult(didNavigate: false, externalURL: nil, clearedLog: false)
+        }
+        let key = manualLocationFieldKey
+        if trimmed.isEmpty {
+            manualLocationValues.removeValue(forKey: key)
+        } else {
+            manualLocationValues[key] = trimmed
+        }
+
+        let keys = manualLocationFieldKeys
+        if manualLocationFieldIndex + 1 < keys.count {
+            manualLocationFieldIndex += 1
+            let nextKey = keys[manualLocationFieldIndex]
+            manualLocationDraft = manualLocationValues[nextKey] ?? ""
+            return EdgeSelectionResult(didNavigate: false, externalURL: nil, clearedLog: false)
+        }
+
+        let line = composeManualLocationLine()
+        guard !line.isEmpty else {
+            return EdgeSelectionResult(didNavigate: false, externalURL: nil, clearedLog: false)
+        }
+        locationLevel = 3
+        locationLine = line
+        return try navigate(to: "Type", edgeWhen: "next", pushReturn: false, recordHistory: true)
+    }
+
+    private func composeManualLocationLine() -> String {
+        manualLocationFieldKeys.compactMap { key in
+            let value = manualLocationValues[key]?.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let value, !value.isEmpty else { return nil }
+            return value
+        }
+        .joined(separator: ", ")
+    }
+
+    private func resetManualLocationWizard() {
+        manualLocationFieldIndex = 0
+        manualLocationValues = [:]
+        manualLocationDraft = ""
+    }
+
     private func navigate(
         to id: String,
         edgeWhen: String,
@@ -366,19 +546,8 @@ final class ProtocolEngine {
         recordHistory: Bool
     ) throws -> EdgeSelectionResult {
         var targetId = remapSafetyTarget(id, edgeWhen: edgeWhen)
-        // Role-aware remaps (same class as CanLeave: avoid absurd orders)
         if sessionRole == .casualty {
-            // Entire SALT branch B is witness-only
-            if targetId == "Count" || nextIsBranchB(targetId) {
-                targetId = "Casualty-menu"
-            } else {
-                switch targetId {
-                case "Hands": targetId = "Hold"
-                case "D2": targetId = "Sup"
-                case "NoCpr": targetId = "E0"
-                default: break
-                }
-            }
+            targetId = remapCasualtyTarget(targetId)
         }
 
         guard let next = graph.node(id: targetId) else {
@@ -393,7 +562,8 @@ final class ProtocolEngine {
             history.append(leavingId)
         }
         currentNode = next
-        if leavingId == "A6" {
+        captureLocationIfNeeded(arrivedAt: next.id)
+        if leavingId == rules.sceneRecheck.armAfterLeavingNodeId {
             lastSceneCheckAt = now()
         }
         if let role = next.ui?.sessionRole {
@@ -406,52 +576,52 @@ final class ProtocolEngine {
         )
     }
 
-    private func nextIsBranchB(_ id: String) -> Bool {
-        graph.node(id: id)?.branch == "B"
-    }
-
-    /// Threat checks A1–A5 relevant to `incidentType` (docs/01 A0). A6 always last.
-    private static let safetyThreatIds: Set<String> = ["A1", "A2", "A3", "A4", "A5"]
-
-    private func safetyThreatQueue(for type: String?) -> [String] {
-        switch type {
-        case "explosion", "shooting", "train":
-            ["A1", "A2", "A3", "A4", "A5", "A6"]
-        case "collapse":
-            ["A2", "A1", "A3", "A4", "A5", "A6"]
-        case "fire":
-            ["A3", "A4", "A5", "A2", "A6"]
-        case "traffic":
-            ["A4", "A3", "A5", "A6"]
-        case "chemical":
-            ["A5", "A3", "A4", "A6"]
-        case "household":
-            ["A3", "A4", "A5", "A6"]
+    private func captureLocationIfNeeded(arrivedAt id: String) {
+        switch id {
+        case "Loc-1":
+            locationLevel = 1
+            locationLine = demoAddressLine(for: locale)
+        case "Loc-2":
+            locationLevel = 2
+            locationLine = demoCoordinatesDraft
+        case "Loc-3":
+            locationLevel = 3
+            resetManualLocationWizard()
         default:
-            // other / unknown — full chain
-            ["A1", "A2", "A3", "A4", "A5", "A6"]
+            break
         }
     }
 
-    /// Remap graph A1→A2… chain onto the type-specific queue.
-    private func remapSafetyTarget(_ targetId: String, edgeWhen: String) -> String {
-        let queue = safetyThreatQueue(for: incidentType)
-
-        // Role → A1 in graph: land on first relevant threat instead.
-        if targetId == "A1",
-           currentNode.id == "Role-witness" || currentNode.id == "Role-casualty"
+    private func remapCasualtyTarget(_ targetId: String) -> String {
+        if rules.casualtyRedirectNodeSet.contains(targetId) {
+            return rules.casualty.redirectTo
+        }
+        if let branch = graph.node(id: targetId)?.branch,
+           rules.casualtyRedirectBranchSet.contains(branch)
         {
-            return queue.first ?? "A1"
+            return rules.casualty.redirectTo
+        }
+        return rules.casualty.targetRemaps[targetId] ?? targetId
+    }
+
+    /// Remap graph safety chain onto the type-specific queue from shared rules.
+    private func remapSafetyTarget(_ targetId: String, edgeWhen: String) -> String {
+        let queue = rules.safetyQueue(for: incidentType)
+        let safety = rules.safety
+
+        if targetId == safety.entryTarget,
+           rules.roleEntrySet.contains(currentNode.id)
+        {
+            return queue.first ?? safety.entryTarget
         }
 
-        // «Ні» / «Не бачу» on a threat → next in this type's queue (may skip A*).
-        if Self.safetyThreatIds.contains(currentNode.id),
-           edgeWhen == "no" || edgeWhen == "cannot"
+        if rules.threatIdSet.contains(currentNode.id),
+           rules.advanceEdgeSet.contains(edgeWhen)
         {
             if let idx = queue.firstIndex(of: currentNode.id), idx + 1 < queue.count {
                 return queue[idx + 1]
             }
-            return "A6"
+            return safety.fallbackNext
         }
 
         return targetId
