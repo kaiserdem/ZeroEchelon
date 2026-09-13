@@ -32,9 +32,20 @@ enum LocalEventStore {
 
     static func load(now: Date = Date()) -> LocalEventRecord? {
         guard let data = try? Data(contentsOf: fileURL) else { return nil }
-        guard let record = try? JSONDecoder().decode(LocalEventRecord.self, from: data) else {
-            clear()
-            return nil
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let record = try? decoder.decode(LocalEventRecord.self, from: data) else {
+            // Fallback for records written with the default Date encoding.
+            guard let legacy = try? JSONDecoder().decode(LocalEventRecord.self, from: data) else {
+                clear()
+                return nil
+            }
+            if legacy.isExpired(now: now) {
+                clear()
+                return nil
+            }
+            save(legacy)
+            return legacy
         }
         if record.isExpired(now: now) {
             clear()
@@ -44,8 +55,14 @@ enum LocalEventStore {
     }
 
     static func save(_ record: LocalEventRecord) {
-        guard let data = try? JSONEncoder().encode(record) else { return }
-        try? data.write(to: fileURL, options: [.atomic])
+        do {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            let data = try encoder.encode(record)
+            try data.write(to: fileURL, options: [.atomic])
+        } catch {
+            assertionFailure("LocalEventStore.save failed: \(error)")
+        }
     }
 
     static func clear() {
@@ -54,14 +71,18 @@ enum LocalEventStore {
 
     /// Test helper — write/read against an explicit URL.
     static func save(_ record: LocalEventRecord, to url: URL) throws {
-        let data = try JSONEncoder().encode(record)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let data = try encoder.encode(record)
         try data.write(to: url, options: [.atomic])
     }
 
     static func load(from url: URL, now: Date = Date()) throws -> LocalEventRecord? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         let data = try Data(contentsOf: url)
-        let record = try JSONDecoder().decode(LocalEventRecord.self, from: data)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let record = try decoder.decode(LocalEventRecord.self, from: data)
         if record.isExpired(now: now) { return nil }
         return record
     }

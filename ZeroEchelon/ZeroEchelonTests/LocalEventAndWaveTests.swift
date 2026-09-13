@@ -117,4 +117,13 @@ struct LocalEventAndWaveTests {
         try engine.openWaveChecklist()
         #expect(engine.currentNode.id == "I0")
     }
+
+    @Test func openLastReportResumesForm() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "incident")
+        #expect(engine.lastEventSummaryLine != nil)
+        try engine.openLastReport()
+        #expect(engine.currentNode.id == "Form")
+    }
 }

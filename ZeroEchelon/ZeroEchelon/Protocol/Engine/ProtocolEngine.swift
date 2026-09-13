@@ -587,6 +587,34 @@ final class ProtocolEngine {
         currentNode = node
     }
 
+    /// Resume the handover screen for the persisted single event (Home → last report).
+    func openLastReport() throws {
+        guard hasPersistableEvent else { return }
+        guard let node = graph.node(id: "Form") else {
+            throw ProtocolGraphError.missingNode("Form")
+        }
+        history.removeAll()
+        returnStack.removeAll()
+        currentNode = node
+    }
+
+    /// Short line for Home: when the last event started.
+    var lastEventSummaryLine: String? {
+        guard let eventStartedAt else { return nil }
+        let formatted = Self.eventDateFormatter(locale: locale).string(from: eventStartedAt)
+        return locale == .uk
+            ? "Остання подія: \(formatted)"
+            : "Last event: \(formatted)"
+    }
+
+    private static func eventDateFormatter(locale: ContentLocale) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: locale == .uk ? "uk_UA" : "en_GB")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter
+    }
+
     private func beginEventIfNeeded() {
         guard eventStartedAt == nil else { return }
         eventId = UUID()

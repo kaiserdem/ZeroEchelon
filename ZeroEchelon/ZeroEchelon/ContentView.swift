@@ -41,29 +41,49 @@ final class AppModel {
             if let url = result.externalURL {
                 UIApplication.shared.open(url)
             }
-            Task { await applyPersistence(after: result) }
+            persistAfterSelection(result)
         } catch {
             assertionFailure(String(describing: error))
         }
     }
 
-    private func applyPersistence(after result: EdgeSelectionResult) async {
+    func openLastReport() {
+        guard let engine else { return }
+        do {
+            try engine.openLastReport()
+        } catch {
+            assertionFailure(String(describing: error))
+        }
+    }
+
+    /// Flush journal before suspension — do not wait on notification permission.
+    func persistNow() {
+        guard let engine, let snapshot = engine.makeEventSnapshot() else { return }
+        LocalEventStore.save(snapshot)
+    }
+
+    private func persistAfterSelection(_ result: EdgeSelectionResult) {
         guard let engine else { return }
 
         if result.clearedLog {
             LocalEventStore.clear()
-            await waveScheduler.cancelWaveReminders()
+            Task { await waveScheduler.cancelWaveReminders() }
             try? engine.reset()
             return
         }
 
-        if result.shouldScheduleWaveReminders, let startedAt = engine.eventStartedAt {
-            await waveScheduler.scheduleWaveReminders(startedAt: startedAt, locale: engine.locale)
-            engine.markWaveRemindersScheduled()
-        }
-
+        // Save first (sync). Notification permission must not block the journal.
         if let snapshot = engine.makeEventSnapshot() {
             LocalEventStore.save(snapshot)
+        }
+
+        guard result.shouldScheduleWaveReminders, let startedAt = engine.eventStartedAt else { return }
+        Task {
+            await waveScheduler.scheduleWaveReminders(startedAt: startedAt, locale: engine.locale)
+            engine.markWaveRemindersScheduled()
+            if let snapshot = engine.makeEventSnapshot() {
+                LocalEventStore.save(snapshot)
+            }
         }
     }
 
@@ -79,6 +99,7 @@ final class AppModel {
 
 struct ContentView: View {
     @State private var model = AppModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -87,7 +108,8 @@ struct ContentView: View {
                     engine: engine,
                     speech: model.speech,
                     speakOnAppear: $model.speakOnAppear,
-                    onSelect: { model.handleEdge($0) }
+                    onSelect: { model.handleEdge($0) },
+                    onOpenLastReport: { model.openLastReport() }
                 )
             } else if let loadError = model.loadError {
                 ContentUnavailableView(
@@ -101,6 +123,11 @@ struct ContentView: View {
             }
         }
         .task { model.load() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background || phase == .inactive {
+                model.persistNow()
+            }
+        }
     }
 }
 

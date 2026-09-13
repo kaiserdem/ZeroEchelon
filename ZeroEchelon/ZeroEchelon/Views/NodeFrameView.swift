@@ -31,6 +31,7 @@ struct NodeFrameView: View {
     var speech: SpeechController
     @Binding var speakOnAppear: Bool
     var onSelect: ((String) -> Void)?
+    var onOpenLastReport: (() -> Void)?
 
     private var isVeto: Bool { engine.currentNode.veto }
 
@@ -48,6 +49,12 @@ struct NodeFrameView: View {
                         .foregroundStyle(CivicTheme.ink)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
+
+                    if engine.currentNode.id == "Home",
+                       let summary = engine.lastEventSummaryLine
+                    {
+                        lastEventCard(summary)
+                    }
 
                     if let anti = engine.antiPatternText {
                         Label(anti, systemImage: "exclamationmark.triangle.fill")
@@ -352,6 +359,46 @@ struct NodeFrameView: View {
                 }
         }
         .buttonStyle(.plain)
+    }
+
+    private func lastEventCard(_ summary: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(summary)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(CivicTheme.ink)
+
+            if let line = engine.locationLine, !line.isEmpty {
+                Text(line)
+                    .font(CivicTheme.helperFont)
+                    .foregroundStyle(CivicTheme.muted)
+            }
+
+            Button {
+                onOpenLastReport?()
+            } label: {
+                Text(engine.locale == .uk ? "Відкрити звіт" : "Open report")
+                    .font(CivicTheme.buttonFont)
+                    .foregroundStyle(CivicTheme.accent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        CivicTheme.secondaryFill,
+                        in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            CivicTheme.surface,
+            in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: CivicTheme.corner)
+                .stroke(CivicTheme.secondaryFill, lineWidth: 1)
+        }
+        .accessibilityElement(children: .contain)
     }
 
     private func speakCurrent() {
