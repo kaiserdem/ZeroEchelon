@@ -18,6 +18,19 @@ struct EdgeSelectionResult: Sendable {
     var didNavigate: Bool
     var externalURL: URL?
     var clearedLog: Bool
+    var shouldScheduleWaveReminders: Bool
+
+    init(
+        didNavigate: Bool,
+        externalURL: URL? = nil,
+        clearedLog: Bool = false,
+        shouldScheduleWaveReminders: Bool = false
+    ) {
+        self.didNavigate = didNavigate
+        self.externalURL = externalURL
+        self.clearedLog = clearedLog
+        self.shouldScheduleWaveReminders = shouldScheduleWaveReminders
+    }
 }
 
 /// Pure navigation over the protocol graph. Policy remaps come from shared `EngineRules`.
@@ -42,6 +55,12 @@ final class ProtocolEngine {
     private(set) var lastVetoNodeId: String?
     /// True after Count→many/unknown (SALT multi-casualty context).
     private(set) var multipleCasualties: Bool
+
+    /// Single offline event (docs/06). Nil until Home → incident.
+    private(set) var eventId: UUID?
+    private(set) var eventStartedAt: Date?
+    private(set) var reachedFormAt: Date?
+    private(set) var waveRemindersScheduled: Bool
 
     /// Seconds between scene re-checks while in care branches (overridable in tests).
     var sceneRecheckInterval: TimeInterval
@@ -76,6 +95,10 @@ final class ProtocolEngine {
         self.unreachableMarked = false
         self.lastVetoNodeId = nil
         self.multipleCasualties = false
+        self.eventId = nil
+        self.eventStartedAt = nil
+        self.reachedFormAt = nil
+        self.waveRemindersScheduled = false
         self.lastSceneCheckAt = nil
         self.pendingRecheckEdge = nil
         self.suppressSceneRecheck = false
@@ -90,6 +113,14 @@ final class ProtocolEngine {
     /// Test helper: mark the last scene check at an absolute time.
     func setLastSceneCheckAtForTesting(_ date: Date?) {
         lastSceneCheckAt = date
+    }
+
+    /// Test helper: move the cursor without recording a step.
+    func setCurrentNodeForTesting(_ id: String) throws {
+        guard let node = graph.node(id: id) else {
+            throw ProtocolGraphError.missingNode(id)
+        }
+        currentNode = node
     }
 
     /// Skip the silent Start splash — land on Home.
@@ -392,14 +423,15 @@ final class ProtocolEngine {
 
         captureSideEffects(edgeWhen: edgeWhen)
 
-        var cleared = false
-        if edgeWhen == "erase" {
-            steps.removeAll()
-            cleared = true
+        if currentNode.id == "Home", edgeWhen == "incident" {
+            beginEventIfNeeded()
         }
+
+        var scheduleWave = false
+        // Confirm on Erase → next only (do not wipe when opening the confirm screen).
         if currentNode.id == "Erase", edgeWhen == "next" {
-            steps.removeAll()
-            cleared = true
+            clearEventFields()
+            return EdgeSelectionResult(didNavigate: false, clearedLog: true)
         }
         if edgeWhen == "report" {
             unreachableMarked = true
@@ -411,13 +443,23 @@ final class ProtocolEngine {
             // Prefer opening tel from the bar; if an edge still points at CALL-*, open URL without trapping UI.
             if isCall, let url = externalURL(for: graph.node(id: to)) {
                 steps.append(ProtocolLogStep(nodeId: currentNode.id, edge: edgeWhen))
-                return EdgeSelectionResult(didNavigate: false, externalURL: url, clearedLog: cleared)
+                return EdgeSelectionResult(didNavigate: false, externalURL: url)
             }
             let result = try navigate(to: to, edgeWhen: edgeWhen, pushReturn: false, recordHistory: true)
+            if currentNode.id == "Form",
+               reachedFormAt == nil,
+               eventStartedAt != nil
+            {
+                reachedFormAt = now()
+                if !waveRemindersScheduled {
+                    scheduleWave = true
+                }
+            }
             return EdgeSelectionResult(
                 didNavigate: result.didNavigate,
                 externalURL: nil,
-                clearedLog: cleared
+                clearedLog: false,
+                shouldScheduleWaveReminders: scheduleWave
             )
         }
 
@@ -425,7 +467,7 @@ final class ProtocolEngine {
         return EdgeSelectionResult(
             didNavigate: false,
             externalURL: externalURL(for: currentNode),
-            clearedLog: cleared
+            clearedLog: false
         )
     }
 
@@ -489,7 +531,7 @@ final class ProtocolEngine {
         locationLine = nil
         locationLevel = nil
         resetManualLocationWizard()
-        steps = []
+        clearEventFields()
         unreachableMarked = false
         lastVetoNodeId = nil
         multipleCasualties = false
@@ -499,6 +541,74 @@ final class ProtocolEngine {
         returnStack = []
         history = []
         try skipEntrySplashIfNeeded()
+    }
+
+    var hasPersistableEvent: Bool {
+        eventStartedAt != nil
+    }
+
+    func makeEventSnapshot() -> LocalEventRecord? {
+        guard let eventId, let eventStartedAt else { return nil }
+        return LocalEventRecord(
+            eventId: eventId,
+            startedAt: eventStartedAt,
+            reachedFormAt: reachedFormAt,
+            sessionRole: sessionRole?.rawValue,
+            incidentType: incidentType,
+            locationLine: locationLine,
+            locationLevel: locationLevel,
+            steps: steps,
+            waveRemindersScheduled: waveRemindersScheduled
+        )
+    }
+
+    func hydrate(from record: LocalEventRecord) {
+        eventId = record.eventId
+        eventStartedAt = record.startedAt
+        reachedFormAt = record.reachedFormAt
+        sessionRole = record.sessionRole.flatMap(SessionRole.init(rawValue:))
+        incidentType = record.incidentType
+        locationLine = record.locationLine
+        locationLevel = record.locationLevel
+        steps = record.steps
+        waveRemindersScheduled = record.waveRemindersScheduled
+    }
+
+    func markWaveRemindersScheduled() {
+        waveRemindersScheduled = true
+    }
+
+    func openWaveChecklist() throws {
+        guard let node = graph.node(id: "I0") else {
+            throw ProtocolGraphError.missingNode("I0")
+        }
+        history.removeAll()
+        returnStack.removeAll()
+        currentNode = node
+    }
+
+    private func beginEventIfNeeded() {
+        guard eventStartedAt == nil else { return }
+        eventId = UUID()
+        eventStartedAt = now()
+        waveRemindersScheduled = false
+        reachedFormAt = nil
+    }
+
+    private func clearEventFields() {
+        eventId = nil
+        eventStartedAt = nil
+        reachedFormAt = nil
+        waveRemindersScheduled = false
+        steps = []
+        locationLine = nil
+        locationLevel = nil
+        incidentType = nil
+        sessionRole = nil
+        unreachableMarked = false
+        lastVetoNodeId = nil
+        multipleCasualties = false
+        resetManualLocationWizard()
     }
 
     private func handleManualLocationNext() throws -> EdgeSelectionResult {

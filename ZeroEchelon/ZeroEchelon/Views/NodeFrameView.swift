@@ -30,6 +30,7 @@ struct NodeFrameView: View {
     @Bindable var engine: ProtocolEngine
     var speech: SpeechController
     @Binding var speakOnAppear: Bool
+    var onSelect: ((String) -> Void)?
 
     private var isVeto: Bool { engine.currentNode.veto }
 
@@ -360,6 +361,10 @@ struct NodeFrameView: View {
 
     private func handle(_ when: String) {
         speech.stopDictation()
+        if let onSelect {
+            onSelect(when)
+            return
+        }
         do {
             let result = try engine.select(edgeWhen: when)
             if let url = result.externalURL {

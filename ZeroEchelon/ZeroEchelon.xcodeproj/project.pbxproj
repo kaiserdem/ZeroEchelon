@@ -7,18 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E6D30685EC26A816EA36A93 /* DesignPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CCCEA520DA6C1C7787F8085 /* DesignPreviewView.swift */; };
 		14FA8F2A9C6B249649B89B2B /* ZeroEchelonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9741DE836F554912D633B8 /* ZeroEchelonApp.swift */; };
 		1CB8B6C8E7C7BE038173C559 /* ProtocolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6581B8E795C178CCB74238 /* ProtocolEngine.swift */; };
 		2C34FDBE3F347C3725A93B8F /* GraphLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77966F0DA2E496609176DF0 /* GraphLoader.swift */; };
+		367B95461D502F6985504D1C /* LocalEventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02115DB8354D8BCF88B3FAA0 /* LocalEventStore.swift */; };
+		5AEBBCB13AC344BEA68CE3E4 /* LocalEventAndWaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F671AF299A79301531594B /* LocalEventAndWaveTests.swift */; };
 		7F3E4BFF52FF5C726A3AA76B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5384EB3853BB57753C3752D /* ContentView.swift */; };
+		88FD530450935033CEFC861A /* EngineRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB404C6811F8117B8621FA4D /* EngineRules.swift */; };
+		96A7B8FAB12533F5695165D1 /* engine-rules.json in Resources */ = {isa = PBXBuildFile; fileRef = C4BBC84C4C5E72D276FA46C8 /* engine-rules.json */; };
 		A711345F86E5B2681B08D639 /* ProtocolGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73753821593CD3C4794C04D /* ProtocolGraph.swift */; };
-		E1F2A3B4C5D6E7F8091A2B3C /* EngineRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E1F2A3B4C5D6E708192A3B /* EngineRules.swift */; };
 		B7B80B7DC66653CDE28C7D63 /* ProtocolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D186E2830D573480F3E169 /* ProtocolEngineTests.swift */; };
 		C1CC82365982E84AA3D2BAC3 /* graph.json in Resources */ = {isa = PBXBuildFile; fileRef = F97E8BF0BAFCB12E325D0110 /* graph.json */; };
-		A9B8C7D6E5F403021A1B2C3D /* engine-rules.json in Resources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6C /* engine-rules.json */; };
 		CD771ACBDDC91B1E85132644 /* SpeechController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA872A1E77683B9B04E506 /* SpeechController.swift */; };
+		DB8BBF1A8BBA0D3D45E365E0 /* WaveReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4786387513041387C635F8A /* WaveReminderScheduler.swift */; };
 		E9725F650A52EDB6EE63B51B /* NodeFrameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B3A9AA135930F69227B747 /* NodeFrameView.swift */; };
-		F1A2B3C4D5E6F708192A3B4C /* DesignPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* DesignPreviewView.swift */; };
 		F6A1AB9276CA3AA7C6A19492 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2E7825F10BD05C185A3DFE6 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -33,21 +36,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		02115DB8354D8BCF88B3FAA0 /* LocalEventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEventStore.swift; sourceTree = "<group>"; };
 		06FA872A1E77683B9B04E506 /* SpeechController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechController.swift; sourceTree = "<group>"; };
 		0C6581B8E795C178CCB74238 /* ProtocolEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolEngine.swift; sourceTree = "<group>"; };
 		33D186E2830D573480F3E169 /* ProtocolEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolEngineTests.swift; sourceTree = "<group>"; };
+		78F671AF299A79301531594B /* LocalEventAndWaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEventAndWaveTests.swift; sourceTree = "<group>"; };
+		8CCCEA520DA6C1C7787F8085 /* DesignPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignPreviewView.swift; sourceTree = "<group>"; };
 		92FDA6C03FF503AA02360C4E /* ZeroEchelon.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ZeroEchelon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A77966F0DA2E496609176DF0 /* GraphLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphLoader.swift; sourceTree = "<group>"; };
 		B2E7825F10BD05C185A3DFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C4786387513041387C635F8A /* WaveReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveReminderScheduler.swift; sourceTree = "<group>"; };
+		C4BBC84C4C5E72D276FA46C8 /* engine-rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "engine-rules.json"; sourceTree = "<group>"; };
 		C6902271C0E2FB136488681E /* ZeroEchelonTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ZeroEchelonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5384EB3853BB57753C3752D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DA9741DE836F554912D633B8 /* ZeroEchelonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZeroEchelonApp.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A4B5C /* DesignPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignPreviewView.swift; sourceTree = "<group>"; };
+		DB404C6811F8117B8621FA4D /* EngineRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRules.swift; sourceTree = "<group>"; };
 		E0B3A9AA135930F69227B747 /* NodeFrameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFrameView.swift; sourceTree = "<group>"; };
 		F73753821593CD3C4794C04D /* ProtocolGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolGraph.swift; sourceTree = "<group>"; };
-		D0E1F2A3B4C5D6E708192A3B /* EngineRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRules.swift; sourceTree = "<group>"; };
 		F97E8BF0BAFCB12E325D0110 /* graph.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = graph.json; sourceTree = "<group>"; };
-		B1C2D3E4F5061728394A5B6C /* engine-rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "engine-rules.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -80,7 +86,7 @@
 		3F84491E5C236D0CCFDBB27A /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				A1B2C3D4E5F60718293A4B5C /* DesignPreviewView.swift */,
+				8CCCEA520DA6C1C7787F8085 /* DesignPreviewView.swift */,
 				E0B3A9AA135930F69227B747 /* NodeFrameView.swift */,
 			);
 			path = Views;
@@ -94,9 +100,19 @@
 			path = Speech;
 			sourceTree = "<group>";
 		};
+		54C7198CE63A53AA453BF2B1 /* Event */ = {
+			isa = PBXGroup;
+			children = (
+				02115DB8354D8BCF88B3FAA0 /* LocalEventStore.swift */,
+				C4786387513041387C635F8A /* WaveReminderScheduler.swift */,
+			);
+			path = Event;
+			sourceTree = "<group>";
+		};
 		58C6A2A1C3640F85104EAE77 /* ZeroEchelonTests */ = {
 			isa = PBXGroup;
 			children = (
+				78F671AF299A79301531594B /* LocalEventAndWaveTests.swift */,
 				33D186E2830D573480F3E169 /* ProtocolEngineTests.swift */,
 			);
 			path = ZeroEchelonTests;
@@ -123,7 +139,7 @@
 		893F084DA4D3CE020E6F89A5 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				D0E1F2A3B4C5D6E708192A3B /* EngineRules.swift */,
+				DB404C6811F8117B8621FA4D /* EngineRules.swift */,
 				F73753821593CD3C4794C04D /* ProtocolGraph.swift */,
 			);
 			path = Models;
@@ -132,6 +148,7 @@
 		B7AA3DB53669836BEFD6E9A3 /* ZeroEchelon */ = {
 			isa = PBXGroup;
 			children = (
+				54C7198CE63A53AA453BF2B1 /* Event */,
 				7A93207C955C64A5B0AFE8EB /* Protocol */,
 				CCC5AF3F3E1FC9DC44578397 /* Resources */,
 				546C0770BED53A62EFC503BE /* Speech */,
@@ -146,7 +163,7 @@
 		CCC5AF3F3E1FC9DC44578397 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				B1C2D3E4F5061728394A5B6C /* engine-rules.json */,
+				C4BBC84C4C5E72D276FA46C8 /* engine-rules.json */,
 				F97E8BF0BAFCB12E325D0110 /* graph.json */,
 			);
 			path = Resources;
@@ -236,7 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6A1AB9276CA3AA7C6A19492 /* Assets.xcassets in Resources */,
-				A9B8C7D6E5F403021A1B2C3D /* engine-rules.json in Resources */,
+				96A7B8FAB12533F5695165D1 /* engine-rules.json in Resources */,
 				C1CC82365982E84AA3D2BAC3 /* graph.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -248,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AEBBCB13AC344BEA68CE3E4 /* LocalEventAndWaveTests.swift in Sources */,
 				B7B80B7DC66653CDE28C7D63 /* ProtocolEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -257,13 +275,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F3E4BFF52FF5C726A3AA76B /* ContentView.swift in Sources */,
-				F1A2B3C4D5E6F708192A3B4C /* DesignPreviewView.swift in Sources */,
+				0E6D30685EC26A816EA36A93 /* DesignPreviewView.swift in Sources */,
+				88FD530450935033CEFC861A /* EngineRules.swift in Sources */,
 				2C34FDBE3F347C3725A93B8F /* GraphLoader.swift in Sources */,
+				367B95461D502F6985504D1C /* LocalEventStore.swift in Sources */,
 				E9725F650A52EDB6EE63B51B /* NodeFrameView.swift in Sources */,
 				1CB8B6C8E7C7BE038173C559 /* ProtocolEngine.swift in Sources */,
-				E1F2A3B4C5D6E7F8091A2B3C /* EngineRules.swift in Sources */,
 				A711345F86E5B2681B08D639 /* ProtocolGraph.swift in Sources */,
 				CD771ACBDDC91B1E85132644 /* SpeechController.swift in Sources */,
+				DB8BBF1A8BBA0D3D45E365E0 /* WaveReminderScheduler.swift in Sources */,
 				14FA8F2A9C6B249649B89B2B /* ZeroEchelonApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -411,8 +431,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Line 24";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Мікрофон потрібен, щоб назвати адресу голосом.";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Розпізнавання мови потрібне, щоб ввести адресу голосом.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -484,8 +502,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Line 24";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Мікрофон потрібен, щоб назвати адресу голосом.";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Розпізнавання мови потрібне, щоб ввести адресу голосом.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
