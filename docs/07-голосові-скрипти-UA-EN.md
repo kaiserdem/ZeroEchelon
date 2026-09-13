@@ -25,8 +25,8 @@
 | id | UA | EN |
 | --- | --- | --- |
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
-| Disclaimer | Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. | Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. |
 | Home | Оберіть. Що потрібно зараз? | Choose. What do you need now? |
+| Disclaimer | Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. | Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. |
 | Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |

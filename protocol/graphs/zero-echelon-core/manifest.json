@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-14-home",
+  "graphVersion": "2026-09-14-home-first",
   "locale": [
     "uk",
     "en"
@@ -19,5 +19,5 @@
     "registryChecked": "2026-09-14"
   },
   "deferred": [],
-  "notes": "Home fork after Disclaimer: incident / daily(J) / wave(I). Form keeps wave. draft: D1/NoCpr/D2 (K3/K4)."
+  "notes": "Home is entry after Start. Disclaimer only on Home→incident. J/I skip S0. draft: D1/NoCpr/D2 (K3/K4)."
 }

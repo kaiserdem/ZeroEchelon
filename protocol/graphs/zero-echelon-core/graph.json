@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-14-home",
+  "graphVersion": "2026-09-14-home-first",
   "locale": [
     "uk",
     "en"
@@ -51,7 +51,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "Disclaimer"
+          "to": "Home"
         }
       ],
       "ui": {
@@ -82,7 +82,7 @@
       "edges": [
         {
           "when": "agree",
-          "to": "Home"
+          "to": "Loc-mode"
         }
       ],
       "ui": {
@@ -94,7 +94,8 @@
             "ua": "Погоджуюсь",
             "en": "I agree"
           }
-        ]
+        ],
+        "note": "Лише на гострому шляху Home→incident. J і I без цього екрана."
       }
     },
     {
@@ -120,7 +121,7 @@
       "edges": [
         {
           "when": "incident",
-          "to": "Loc-mode"
+          "to": "Disclaimer"
         },
         {
           "when": "daily",
@@ -151,7 +152,7 @@
             "en": "After-event checklist"
           }
         ],
-        "note": "Гостра подія → Loc. J — без сцени/SALT. I — друга хвиля 24/48 год (також з Form і локального пуша)."
+        "note": "Головний екран. Гостра подія → Disclaimer → Loc. J/I без повного S0."
       }
     },
     {

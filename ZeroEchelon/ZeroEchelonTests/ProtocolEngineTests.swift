@@ -37,7 +37,7 @@ struct ProtocolEngineTests {
     }
 
     private func reachCare(engine: ProtocolEngine, role: String) throws {
-        for edge in ["next", "agree", "incident", "gnss", "next", "explosion", role, "next", "no", "no", "no", "no", "no", "next"] {
+        for edge in ["next", "incident", "agree", "gnss", "next", "explosion", role, "next", "no", "no", "no", "no", "no", "next"] {
             _ = try engine.select(edgeWhen: edge)
         }
         // Call
@@ -88,7 +88,7 @@ struct ProtocolEngineTests {
 
     @Test func threatCanLeaveTrapped() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "incident", "gnss", "next", "collapse", "witness", "next", "yes", "no"] {
+        for edge in ["next", "incident", "agree", "gnss", "next", "collapse", "witness", "next", "yes", "no"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Out-trapped")
@@ -127,9 +127,7 @@ struct ProtocolEngineTests {
 
     @Test func homeOffersIncidentDailyAndWave() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree"] {
-            _ = try engine.select(edgeWhen: edge)
-        }
+        try engine.skipEntrySplashIfNeeded()
         #expect(engine.currentNode.id == "Home")
         let whens = Set(engine.visibleButtons.map(\.when))
         #expect(whens == Set(["incident", "daily", "wave"]))
@@ -137,23 +135,30 @@ struct ProtocolEngineTests {
 
     @Test func homeDailyGoesToJ0() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "daily"] {
-            _ = try engine.select(edgeWhen: edge)
-        }
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "daily")
         #expect(engine.currentNode.id == "J0")
     }
 
     @Test func homeWaveGoesToI0() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "wave"] {
-            _ = try engine.select(edgeWhen: edge)
-        }
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "wave")
         #expect(engine.currentNode.id == "I0")
+    }
+
+    @Test func incidentPathShowsDisclaimerBeforeLoc() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "incident")
+        #expect(engine.currentNode.id == "Disclaimer")
+        _ = try engine.select(edgeWhen: "agree")
+        #expect(engine.currentNode.id == "Loc-mode")
     }
 
     @Test func locModeOffersGpsAndManualOnly() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "incident"] {
+        for edge in ["next", "incident", "agree"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Loc-mode")
@@ -164,7 +169,7 @@ struct ProtocolEngineTests {
 
     @Test func manualAddressFillsDispatcherDraft() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "incident", "manual"] {
+        for edge in ["next", "incident", "agree", "manual"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Loc-3")
@@ -228,7 +233,7 @@ struct ProtocolEngineTests {
 
     @Test func dispatcherDraftUsesCoordinatesAfterGpsPath() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "incident", "gnss", "next", "traffic", "witness"] {
+        for edge in ["next", "incident", "agree", "gnss", "next", "traffic", "witness"] {
             _ = try engine.select(edgeWhen: edge)
         }
         // On Role-witness; location captured on Loc-2
@@ -403,7 +408,7 @@ struct ProtocolEngineTests {
 
     /// Disclaimer → loc → Type(type) → Role witness → first safety node.
     private func reachFirstSafety(engine: ProtocolEngine, type: String) throws {
-        for edge in ["next", "agree", "incident", "gnss", "next", type, "witness", "next"] {
+        for edge in ["next", "incident", "agree", "gnss", "next", type, "witness", "next"] {
             _ = try engine.select(edgeWhen: edge)
         }
     }

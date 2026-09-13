@@ -1,24 +1,72 @@
 {
   "id": "happy-path-s0-s5b",
   "title": "Безпечна сцена → виклик 103",
-  "graphVersion": "2026-09-13-s0-s5b",
+  "graphVersion": "2026-09-14-home-first",
   "steps": [
-    { "nodeId": "Start", "edge": "next" },
-    { "nodeId": "Disclaimer", "edge": "agree" },
-    { "nodeId": "Home", "edge": "incident" },
-    { "nodeId": "Loc-mode", "edge": "gnss" },
-    { "nodeId": "Loc-2", "edge": "next" },
-    { "nodeId": "Type", "edge": "explosion" },
-    { "nodeId": "Role", "edge": "witness" },
-    { "nodeId": "Role-witness", "edge": "next" },
-    { "nodeId": "A1", "edge": "no" },
-    { "nodeId": "A2", "edge": "no" },
-    { "nodeId": "A3", "edge": "no" },
-    { "nodeId": "A4", "edge": "no" },
-    { "nodeId": "A5", "edge": "no" },
-    { "nodeId": "A6", "edge": "next" },
-    { "nodeId": "Call", "edge": "next" },
-    { "nodeId": "NEXT-PHASE", "edge": null }
+    {
+      "nodeId": "Start",
+      "edge": "next"
+    },
+    {
+      "nodeId": "Home",
+      "edge": "incident"
+    },
+    {
+      "nodeId": "Disclaimer",
+      "edge": "agree"
+    },
+    {
+      "nodeId": "Loc-mode",
+      "edge": "gnss"
+    },
+    {
+      "nodeId": "Loc-2",
+      "edge": "next"
+    },
+    {
+      "nodeId": "Type",
+      "edge": "explosion"
+    },
+    {
+      "nodeId": "Role",
+      "edge": "witness"
+    },
+    {
+      "nodeId": "Role-witness",
+      "edge": "next"
+    },
+    {
+      "nodeId": "A1",
+      "edge": "no"
+    },
+    {
+      "nodeId": "A2",
+      "edge": "no"
+    },
+    {
+      "nodeId": "A3",
+      "edge": "no"
+    },
+    {
+      "nodeId": "A4",
+      "edge": "no"
+    },
+    {
+      "nodeId": "A5",
+      "edge": "no"
+    },
+    {
+      "nodeId": "A6",
+      "edge": "next"
+    },
+    {
+      "nodeId": "Call",
+      "edge": "next"
+    },
+    {
+      "nodeId": "NEXT-PHASE",
+      "edge": null
+    }
   ],
   "expectTerminal": "NEXT-PHASE"
 }

@@ -100,7 +100,7 @@ function render(options?: { keepFocus?: boolean }): void {
         ${
           engine.canGoBack
             ? `<button type="button" class="back-btn" data-back>‹ ${locale === "uk" ? "Назад" : "Back"}</button>`
-            : ""
+            : `<span class="top-brand" aria-label="Line 24">Line 24</span>`
         }
         <span class="top-spacer"></span>
         <div class="locale" role="group" aria-label="Language">

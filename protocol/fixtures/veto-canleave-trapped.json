@@ -1,20 +1,56 @@
 {
   "id": "veto-canleave-trapped",
   "title": "Загроза → не можу відійти → Out-trapped",
-  "graphVersion": "2026-09-13-s0-s5b-canleave",
+  "graphVersion": "2026-09-14-home-first",
   "steps": [
-    { "nodeId": "Start", "edge": "next" },
-    { "nodeId": "Disclaimer", "edge": "agree" },
-    { "nodeId": "Home", "edge": "incident" },
-    { "nodeId": "Loc-mode", "edge": "gnss" },
-    { "nodeId": "Loc-2", "edge": "next" },
-    { "nodeId": "Type", "edge": "explosion" },
-    { "nodeId": "Role", "edge": "casualty" },
-    { "nodeId": "Role-casualty", "edge": "next" },
-    { "nodeId": "A1", "edge": "yes" },
-    { "nodeId": "CanLeave", "edge": "no" },
-    { "nodeId": "Out-trapped", "edge": "report" },
-    { "nodeId": "Form", "edge": null }
+    {
+      "nodeId": "Start",
+      "edge": "next"
+    },
+    {
+      "nodeId": "Home",
+      "edge": "incident"
+    },
+    {
+      "nodeId": "Disclaimer",
+      "edge": "agree"
+    },
+    {
+      "nodeId": "Loc-mode",
+      "edge": "gnss"
+    },
+    {
+      "nodeId": "Loc-2",
+      "edge": "next"
+    },
+    {
+      "nodeId": "Type",
+      "edge": "explosion"
+    },
+    {
+      "nodeId": "Role",
+      "edge": "casualty"
+    },
+    {
+      "nodeId": "Role-casualty",
+      "edge": "next"
+    },
+    {
+      "nodeId": "A1",
+      "edge": "yes"
+    },
+    {
+      "nodeId": "CanLeave",
+      "edge": "no"
+    },
+    {
+      "nodeId": "Out-trapped",
+      "edge": "report"
+    },
+    {
+      "nodeId": "Form",
+      "edge": null
+    }
   ],
   "expectTerminal": "Form",
   "expectVeto": true

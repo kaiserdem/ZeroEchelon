@@ -92,7 +92,7 @@ final class ProtocolEngine {
         lastSceneCheckAt = date
     }
 
-    /// Skip the silent Start splash — land on Disclaimer.
+    /// Skip the silent Start splash — land on Home.
     func skipEntrySplashIfNeeded() throws {
         guard currentNode.id == "Start" else { return }
         _ = try select(edgeWhen: "next")

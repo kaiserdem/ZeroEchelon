@@ -283,20 +283,28 @@ struct NodeFrameView: View {
 
     private var topBar: some View {
         HStack(spacing: 12) {
-            if engine.canGoBack {
-                Button {
-                    engine.goBack()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.backward")
-                            .font(.body.weight(.bold))
-                        Text(engine.locale == .uk ? "Назад" : "Back")
-                            .font(.subheadline.weight(.semibold))
+            Group {
+                if engine.canGoBack {
+                    Button {
+                        engine.goBack()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.backward")
+                                .font(.body.weight(.bold))
+                            Text(engine.locale == .uk ? "Назад" : "Back")
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .foregroundStyle(CivicTheme.accent)
                     }
-                    .foregroundStyle(CivicTheme.accent)
+                    .buttonStyle(.plain)
+                } else {
+                    Text("Line 24")
+                        .font(.subheadline.weight(.heavy))
+                        .foregroundStyle(CivicTheme.accent)
+                        .accessibilityAddTraits(.isHeader)
                 }
-                .buttonStyle(.plain)
             }
+            .frame(minWidth: 88, alignment: .leading)
 
             Spacer(minLength: 8)
 

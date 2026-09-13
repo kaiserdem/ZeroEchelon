@@ -64,16 +64,22 @@ body {
   padding: 10px 16px 12px;
 }
 
-.back-btn {
+.back-btn,
+.top-brand {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-width: 88px;
   border: 0;
   background: transparent;
   color: var(--accent);
-  font: 600 0.9rem/1 var(--font);
-  cursor: pointer;
+  font: 700 0.9rem/1 var(--font);
   padding: 0;
+}
+
+.back-btn {
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .top-spacer {
