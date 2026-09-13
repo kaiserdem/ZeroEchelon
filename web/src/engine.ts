@@ -90,67 +90,7 @@ export class ProtocolEngine {
   }
 
   get helperText(): string | null {
-    switch (this.currentNode.id) {
-      case "Disclaimer":
-        return this.locale === "uk"
-          ? "Далі — короткі кроки допомоги. 103 завжди внизу екрана."
-          : "Next — short help steps. 103 stays at the bottom.";
-      case "Loc-mode":
-        return this.locale === "uk"
-          ? "Поки немає справжнього QR: оберіть, як показати місце для демо."
-          : "No real QR yet: pick how to show the place for the demo.";
-      case "Loc-1":
-        return this.locale === "uk"
-          ? "У фіналі адреса прийде з QR на підʼїзді / у вагоні. Нижче — демо-рядок."
-          : "In production this comes from a QR on site. Below — a demo line.";
-      case "Loc-2":
-        return this.locale === "uk"
-          ? "Зачитайте цифри диспетчеру. Інтернет не потрібен."
-          : "Read the digits to the dispatcher. No internet needed.";
-      case "Loc-3":
-        return this.locale === "uk"
-          ? "Одне поле за разом: місто, вулиця, будинок…"
-          : "One field at a time: city, street, building…";
-      case "Type":
-        return this.locale === "uk"
-          ? "Один дотик = вибір. Це поле для звіту службам."
-          : "One tap = choice. This fills the report for responders.";
-      case "Call":
-        return this.locale === "uk"
-          ? "Червона кнопка внизу набирає 103. Тут — текст, який зачитати."
-          : "The red button below dials 103. Here — the text to read aloud.";
-      case "CanLeave":
-        return this.locale === "uk"
-          ? "Люди біля загрози — у звіті як недосяжні. Не підходьте допомагати."
-          : "People near the threat go in the report as unreachable. Do not go help them.";
-      case "Out":
-      case "Cont":
-        return this.locale === "uk"
-          ? "Медичних кроків немає. Головне — 101 внизу. У звіті зазначте недосяжних."
-          : "No medical steps. Primary is 101 below. Mark unreachable people in the report.";
-      case "Out-trapped":
-        return this.locale === "uk"
-          ? "Ви не зобовʼязані йти 300 м, якщо не можете. Не чіпайте. Кличте 101."
-          : "You are not ordered to walk 300 m if you cannot. Do not touch. Call 101.";
-      case "A7":
-        return this.locale === "uk"
-          ? "Якщо знову небезпечно — відхід / 101, не медичні кроки."
-          : "If danger returns — withdraw / 101, no medical steps.";
-      case "Four":
-        return this.locale === "uk"
-          ? "Не рахуйте пульс — лише чи відчуваєте. Сумнів — як червоний."
-          : "Do not count the pulse — only whether you feel it. Unsure — treat as red.";
-      case "Organic":
-        return this.locale === "uk"
-          ? "103 внизу. Не робіть дихальних вправ."
-          : "103 below. Do not do breathing exercises.";
-      case "NEXT-PHASE":
-        return this.locale === "uk"
-          ? "Далі — кроки за вашою роллю (свідок або постраждалий)."
-          : "Next — steps for your role (witness or casualty).";
-      default:
-        return null;
-    }
+    return null;
   }
 
   get detailBlock(): string | null {
@@ -445,7 +385,7 @@ export class ProtocolEngine {
     pushReturn: boolean,
     recordHistory: boolean,
   ): EdgeSelectionResult {
-    let targetId = id;
+    let targetId = this.remapSafetyTarget(id, edgeWhen);
     if (this.sessionRole === "casualty") {
       if (targetId === "Count" || this.nextIsBranchB(targetId)) {
         targetId = "Casualty-menu";
@@ -491,6 +431,61 @@ export class ProtocolEngine {
 
   private nextIsBranchB(id: string): boolean {
     return nodeById(this.graph, id)?.branch === "B";
+  }
+
+  private static readonly safetyThreatIds = new Set([
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+  ]);
+
+  /** Threat checks A1–A5 relevant to incidentType (docs/01 A0). A6 always last. */
+  private safetyThreatQueue(type: string | null): string[] {
+    switch (type) {
+      case "explosion":
+      case "shooting":
+      case "train":
+        return ["A1", "A2", "A3", "A4", "A5", "A6"];
+      case "collapse":
+        return ["A2", "A1", "A3", "A4", "A5", "A6"];
+      case "fire":
+        return ["A3", "A4", "A5", "A2", "A6"];
+      case "traffic":
+        return ["A4", "A3", "A5", "A6"];
+      case "chemical":
+        return ["A5", "A3", "A4", "A6"];
+      case "household":
+        return ["A3", "A4", "A5", "A6"];
+      default:
+        return ["A1", "A2", "A3", "A4", "A5", "A6"];
+    }
+  }
+
+  private remapSafetyTarget(targetId: string, edgeWhen: string): string {
+    const queue = this.safetyThreatQueue(this.incidentType);
+
+    if (
+      targetId === "A1" &&
+      (this.currentNode.id === "Role-witness" ||
+        this.currentNode.id === "Role-casualty")
+    ) {
+      return queue[0] ?? "A1";
+    }
+
+    if (
+      ProtocolEngine.safetyThreatIds.has(this.currentNode.id) &&
+      (edgeWhen === "no" || edgeWhen === "cannot")
+    ) {
+      const idx = queue.indexOf(this.currentNode.id);
+      if (idx >= 0 && idx + 1 < queue.length) {
+        return queue[idx + 1]!;
+      }
+      return "A6";
+    }
+
+    return targetId;
   }
 
   private captureSideEffects(edgeWhen: string): void {

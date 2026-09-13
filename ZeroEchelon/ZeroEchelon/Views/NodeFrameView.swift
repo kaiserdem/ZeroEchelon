@@ -48,13 +48,6 @@ struct NodeFrameView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
 
-                    if let helper = engine.helperText {
-                        Text(helper)
-                            .font(CivicTheme.helperFont)
-                            .foregroundStyle(CivicTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
                     if let anti = engine.antiPatternText {
                         Label(anti, systemImage: "exclamationmark.triangle.fill")
                             .font(.title3.weight(.bold))

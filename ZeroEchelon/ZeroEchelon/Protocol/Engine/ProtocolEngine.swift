@@ -100,69 +100,8 @@ final class ProtocolEngine {
         currentNode.antiPattern?.text(for: locale)
     }
 
-    /// Extra line under the main phrase — explains the step without changing protocol voice.
-    var helperText: String? {
-        switch currentNode.id {
-        case "Disclaimer":
-            return locale == .uk
-                ? "Далі — короткі кроки допомоги. 103 завжди внизу екрана."
-                : "Next — short help steps. 103 stays at the bottom."
-        case "Loc-mode":
-            return locale == .uk
-                ? "Поки немає справжнього QR: оберіть, як показати місце для демо."
-                : "No real QR yet: pick how to show the place for the demo."
-        case "Loc-1":
-            return locale == .uk
-                ? "У фіналі адреса прийде з QR на підʼїзді / у вагоні. Нижче — демо-рядок."
-                : "In production this comes from a QR on site. Below — a demo line."
-        case "Loc-2":
-            return locale == .uk
-                ? "Зачитайте цифри диспетчеру. Інтернет не потрібен."
-                : "Read the digits to the dispatcher. No internet needed."
-        case "Loc-3":
-            return locale == .uk
-                ? "Одне поле за разом: місто, вулиця, будинок…"
-                : "One field at a time: city, street, building…"
-        case "Type":
-            return locale == .uk
-                ? "Один дотик = вибір. Це поле для звіту службам."
-                : "One tap = choice. This fills the report for responders."
-        case "Call":
-            return locale == .uk
-                ? "Червона кнопка внизу набирає 103. Тут — текст, який зачитати."
-                : "The red button below dials 103. Here — the text to read aloud."
-        case "CanLeave":
-            return locale == .uk
-                ? "Люди біля загрози — у звіті як недосяжні. Не підходьте допомагати."
-                : "People near the threat go in the report as unreachable. Do not go help them."
-        case "Out", "Cont":
-            return locale == .uk
-                ? "Медичних кроків немає. Головне — 101 внизу. У звіті зазначте недосяжних."
-                : "No medical steps. Primary is 101 below. Mark unreachable people in the report."
-        case "Out-trapped":
-            return locale == .uk
-                ? "Ви не зобовʼязані йти 300 м, якщо не можете. Не чіпайте. Кличте 101."
-                : "You are not ordered to walk 300 m if you cannot. Do not touch. Call 101."
-        case "A7":
-            return locale == .uk
-                ? "Якщо знову небезпечно — відхід / 101, не медичні кроки."
-                : "If danger returns — withdraw / 101, no medical steps."
-        case "Four":
-            return locale == .uk
-                ? "Не рахуйте пульс — лише чи відчуваєте. Сумнів — як червоний."
-                : "Do not count the pulse — only whether you feel it. Unsure — treat as red."
-        case "Organic":
-            return locale == .uk
-                ? "103 внизу. Не робіть дихальних вправ."
-                : "103 below. Do not do breathing exercises."
-        case "NEXT-PHASE":
-            return locale == .uk
-                ? "Далі — кроки за вашою роллю (свідок або постраждалий)."
-                : "Next — steps for your role (witness or casualty)."
-        default:
-            return nil
-        }
-    }
+    /// Extra UI tips under the voice line — disabled (noise on emergency screens).
+    var helperText: String? { nil }
 
     var detailBlock: String? {
         switch currentNode.id {
