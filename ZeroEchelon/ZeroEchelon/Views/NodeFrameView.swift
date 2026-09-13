@@ -86,6 +86,7 @@ struct NodeFrameView: View {
             EmergencyBar(
                 locale: engine.locale,
                 show101: engine.showsRescue101,
+                prioritize101: engine.prioritize101,
                 emphasizeCall: engine.currentNode.id == "Call"
             ) { number in
                 dial(number)
@@ -193,38 +194,67 @@ struct NodeFrameView: View {
 struct EmergencyBar: View {
     var locale: ContentLocale
     var show101: Bool
+    var prioritize101: Bool
     var emphasizeCall: Bool
     var onDial: (String) -> Void
 
     var body: some View {
         VStack(spacing: 8) {
             Text(locale == .uk
-                 ? "Екстрений виклик — завжди на екрані"
-                 : "Emergency call — always on screen")
+                 ? (prioritize101
+                    ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
+                    : "Екстрений виклик — завжди на екрані")
+                 : (prioritize101
+                    ? "101 first. 103 — if casualties are at a safe distance"
+                    : "Emergency call — always on screen"))
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
 
-            Button {
-                onDial("103")
-            } label: {
-                Text(locale == .uk ? "ВИКЛИКАТИ 103" : "CALL 103")
-                    .font(.title2.weight(.bold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, emphasizeCall ? 20 : 16)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
-
-            if show101 {
+            if prioritize101, show101 {
                 Button {
                     onDial("101")
                 } label: {
-                    Text(locale == .uk ? "Викликати 101 (ДСНС)" : "Call 101 (rescue)")
+                    Text(locale == .uk ? "ВИКЛИКАТИ 101 (ДСНС)" : "CALL 101 (rescue)")
+                        .font(.title2.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+
+                Button {
+                    onDial("103")
+                } label: {
+                    Text(locale == .uk ? "Викликати 103" : "Call 103")
                         .font(.headline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                 }
                 .buttonStyle(.bordered)
+            } else {
+                Button {
+                    onDial("103")
+                } label: {
+                    Text(locale == .uk ? "ВИКЛИКАТИ 103" : "CALL 103")
+                        .font(.title2.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, emphasizeCall ? 20 : 16)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+
+                if show101 {
+                    Button {
+                        onDial("101")
+                    } label: {
+                        Text(locale == .uk ? "Викликати 101 (ДСНС)" : "Call 101 (rescue)")
+                            .font(.headline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
         }
         .padding(.horizontal, 20)

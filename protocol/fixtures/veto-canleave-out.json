@@ -1,20 +1,20 @@
 {
-  "id": "veto-path-s5a",
-  "title": "Міна в полі зору → вето Out",
-  "graphVersion": "2026-09-13-s0-s5b",
+  "id": "veto-canleave-out",
+  "title": "Загроза → можу відійти → Out",
+  "graphVersion": "2026-09-13-s0-s5b-canleave",
   "steps": [
     { "nodeId": "Start", "edge": "next" },
     { "nodeId": "Disclaimer", "edge": "agree" },
     { "nodeId": "Loc-mode", "edge": "gnss" },
     { "nodeId": "Loc-2", "edge": "next" },
     { "nodeId": "Type", "edge": "collapse" },
-    { "nodeId": "Role", "edge": "casualty" },
-    { "nodeId": "Role-casualty", "edge": "next" },
+    { "nodeId": "Role", "edge": "witness" },
+    { "nodeId": "Role-witness", "edge": "next" },
     { "nodeId": "A1", "edge": "yes" },
+    { "nodeId": "CanLeave", "edge": "yes" },
     { "nodeId": "Out", "edge": "report" },
-    { "nodeId": "Form", "edge": "back-out" },
-    { "nodeId": "Out", "edge": null }
+    { "nodeId": "Form", "edge": null }
   ],
-  "expectTerminal": "Out",
+  "expectTerminal": "Form",
   "expectVeto": true
 }

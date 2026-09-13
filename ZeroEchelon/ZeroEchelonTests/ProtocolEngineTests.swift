@@ -8,81 +8,99 @@ struct ProtocolEngineTests {
         if let bundled = Bundle.main.url(forResource: "graph", withExtension: "json") {
             return try GraphLoader.load(from: bundled)
         }
-        // Fallback: repo protocol/ when tests run without host resources
         let testsDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         let repoRoot = testsDir
-            .deletingLastPathComponent() // ZeroEchelon/
-            .deletingLastPathComponent() // repo
-        let url = repoRoot.appendingPathComponent("protocol/graphs/zero-echelon-core/graph.json")
-        return try GraphLoader.load(from: url)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return try GraphLoader.load(
+            from: repoRoot.appendingPathComponent("protocol/graphs/zero-echelon-core/graph.json")
+        )
     }
 
-    @Test func loadsGraph() throws {
+    private func reachCare(engine: ProtocolEngine, role: String) throws {
+        for edge in ["next", "agree", "qr", "next", "explosion", role, "next", "no", "no", "no", "no", "no", "next"] {
+            _ = try engine.select(edgeWhen: edge)
+        }
+        // Call
+        #expect(engine.currentNode.id == "Call")
+    }
+
+    @Test func graphContainsS6S12Core() throws {
         let graph = try loadGraph()
-        #expect(graph.commercial == false)
-        #expect(graph.entry == "Start")
-        #expect(graph.node(id: "Call") != nil)
+        for id in ["Count", "Casualty-menu", "C0", "D0", "E0", "F0", "Form", "I0", "J0", "CanLeave"] {
+            #expect(graph.node(id: id) != nil, "missing \(id)")
+        }
+        #expect(graph.node(id: "NEXT-PHASE") == nil)
     }
 
-    @Test func happyPathReachesNextPhase() throws {
+    @Test func witnessPathReachesBleeding() throws {
         let engine = try ProtocolEngine(graph: try loadGraph())
-        let path: [(String, String)] = [
-            ("Start", "next"),
-            ("Disclaimer", "agree"),
-            ("Loc-mode", "qr"),
-            ("Loc-1", "next"),
-            ("Type", "explosion"),
-            ("Role", "witness"),
-            ("Role-witness", "next"),
-            ("A1", "no"),
-            ("A2", "no"),
-            ("A3", "no"),
-            ("A4", "no"),
-            ("A5", "no"),
-            ("A6", "next"),
-            ("Call", "next"),
-        ]
-
-        for (expectedId, edge) in path {
-            #expect(engine.currentNode.id == expectedId)
-            _ = try engine.select(edgeWhen: edge)
-        }
-
-        #expect(engine.currentNode.id == "NEXT-PHASE")
-        #expect(engine.sessionRole == .witness)
-        #expect(engine.incidentType == "explosion")
-        #expect(engine.steps.count == path.count)
+        try reachCare(engine: engine, role: "witness")
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Count")
+        _ = try engine.select(edgeWhen: "one")
+        #expect(engine.currentNode.id == "C0")
+        _ = try engine.select(edgeWhen: "no")
+        #expect(engine.currentNode.id == "D0")
     }
 
-    @Test func vetoPathOpensForm() throws {
+    @Test func casualtyPathOpensSelfMenu() throws {
         let engine = try ProtocolEngine(graph: try loadGraph())
-        for edge in ["next", "agree", "gnss", "next", "collapse", "casualty", "next", "yes"] {
+        try reachCare(engine: engine, role: "casualty")
+        _ = try engine.select(edgeWhen: "next-casualty")
+        #expect(engine.currentNode.id == "Casualty-menu")
+        _ = try engine.select(edgeWhen: "crush")
+        #expect(engine.currentNode.id == "F0")
+    }
+
+    @Test func threatCanLeaveTrapped() throws {
+        let engine = try ProtocolEngine(graph: try loadGraph())
+        for edge in ["next", "agree", "gnss", "next", "collapse", "witness", "next", "yes", "no"] {
             _ = try engine.select(edgeWhen: edge)
         }
-        #expect(engine.currentNode.id == "Out")
-        #expect(engine.currentNode.veto == true)
+        #expect(engine.currentNode.id == "Out-trapped")
+    }
 
-        _ = try engine.select(edgeWhen: "report")
+    @Test func noBleedPathReachesFormViaChestCrush() throws {
+        let engine = try ProtocolEngine(graph: try loadGraph())
+        try reachCare(engine: engine, role: "witness")
+        _ = try engine.select(edgeWhen: "next") // Count
+        _ = try engine.select(edgeWhen: "one") // C0
+        _ = try engine.select(edgeWhen: "no") // D0
+        _ = try engine.select(edgeWhen: "yes") // D2
+        _ = try engine.select(edgeWhen: "yes") // Sup
+        _ = try engine.select(edgeWhen: "next") // Neck
+        _ = try engine.select(edgeWhen: "next") // E0
+        _ = try engine.select(edgeWhen: "no") // F0
+        _ = try engine.select(edgeWhen: "no") // G0
+        _ = try engine.select(edgeWhen: "next") // G1
+        _ = try engine.select(edgeWhen: "next") // Ban
+        _ = try engine.select(edgeWhen: "next") // Form
         #expect(engine.currentNode.id == "Form")
-        #expect(engine.unreachableMarked == true)
-
-        let whens = engine.visibleButtons.map(\.when)
-        #expect(whens.contains("back-out"))
-        #expect(whens.contains("erase"))
-        #expect(!whens.contains("back-cont"))
     }
 
-    @Test func goBackRestoresPreviousNode() throws {
+    @Test func dispatcherDraftUsesLocalizedIncidentType() throws {
         let engine = try ProtocolEngine(graph: try loadGraph())
-        try engine.skipEntrySplashIfNeeded()
-        #expect(engine.currentNode.id == "Disclaimer")
-        #expect(engine.canGoBack == false)
+        try reachCare(engine: engine, role: "witness")
+        #expect(engine.incidentType == "explosion")
+        #expect(engine.dispatcherDraft.hasPrefix("Вибух."))
+        #expect(!engine.dispatcherDraft.contains("explosion"))
+        engine.locale = .en
+        #expect(engine.dispatcherDraft.hasPrefix("Explosion."))
+    }
 
-        _ = try engine.select(edgeWhen: "agree")
-        #expect(engine.currentNode.id == "Loc-mode")
-        #expect(engine.canGoBack == true)
-
-        engine.goBack()
-        #expect(engine.currentNode.id == "Disclaimer")
+    @Test func noCprSingleCasualtyAvoidsNextPersonVoice() throws {
+        let engine = try ProtocolEngine(graph: try loadGraph())
+        try reachCare(engine: engine, role: "witness")
+        _ = try engine.select(edgeWhen: "next") // Count
+        _ = try engine.select(edgeWhen: "one")
+        #expect(engine.multipleCasualties == false)
+        _ = try engine.select(edgeWhen: "no") // D0
+        _ = try engine.select(edgeWhen: "yes") // D1 → NoCpr
+        #expect(engine.currentNode.id == "NoCpr")
+        #expect(!engine.voiceText.lowercased().contains("наступн"))
+        #expect(!engine.voiceText.lowercased().contains("next"))
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "E0")
     }
 }

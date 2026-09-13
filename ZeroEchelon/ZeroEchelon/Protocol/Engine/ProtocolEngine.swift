@@ -31,6 +31,8 @@ final class ProtocolEngine {
     private(set) var steps: [ProtocolLogStep]
     private(set) var unreachableMarked: Bool
     private(set) var lastVetoNodeId: String?
+    /// True after Count→many/unknown (SALT multi-casualty context).
+    private(set) var multipleCasualties: Bool
 
     private var returnStack: [String]
     private var history: [String]
@@ -47,6 +49,7 @@ final class ProtocolEngine {
         self.steps = []
         self.unreachableMarked = false
         self.lastVetoNodeId = nil
+        self.multipleCasualties = false
         self.returnStack = []
         self.history = []
     }
@@ -65,6 +68,11 @@ final class ProtocolEngine {
             return locale == .uk
                 ? "Місце з QR-коду на стіні:"
                 : "Location from the wall QR code:"
+        case "NoCpr" where sessionRole == .casualty || !multipleCasualties:
+            // P0 from audit: do not order "go to the next person" when there is no next / cannot leave
+            return locale == .uk
+                ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 103 внизу."
+                : "CPR will not help here. Stay. Tap 103 below."
         default:
             return currentNode.voice.text(for: locale)
         }
@@ -105,14 +113,22 @@ final class ProtocolEngine {
             return locale == .uk
                 ? "Червона кнопка внизу набирає 103. Тут — текст, який зачитати."
                 : "The red button below dials 103. Here — the text to read aloud."
+        case "CanLeave":
+            return locale == .uk
+                ? "Люди біля загрози — у звіті як недосяжні. Не підходьте допомагати."
+                : "People near the threat go in the report as unreachable. Do not go help them."
         case "Out", "Cont":
             return locale == .uk
-                ? "Медичних кроків немає: зона небезпечна. Лише відхід і 101."
-                : "No medical steps: the area is unsafe. Only leave and call 101."
+                ? "Медичних кроків немає. Головне — 101 внизу. У звіті зазначте недосяжних."
+                : "No medical steps. Primary is 101 below. Mark unreachable people in the report."
+        case "Out-trapped":
+            return locale == .uk
+                ? "Ви не зобовʼязані йти 300 м, якщо не можете. Не чіпайте. Кличте 101."
+                : "You are not ordered to walk 300 m if you cannot. Do not touch. Call 101."
         case "NEXT-PHASE":
             return locale == .uk
-                ? "Вхідний каркас завершено. Медичні кроки — у наступній версії."
-                : "Entry scaffold done. Medical steps come in the next version."
+                ? "Далі — кроки за вашою роллю (свідок або постраждалий)."
+                : "Next — steps for your role (witness or casualty)."
         default:
             return nil
         }
@@ -149,28 +165,44 @@ final class ProtocolEngine {
         var buttons = currentNode.primaryButtons(locale: locale)
             .filter { !["dial", "dial-101"].contains($0.when) }
 
-        if currentNode.id == "Form" {
-            let backWhen = lastVetoNodeId == "Cont" ? "back-cont" : "back-out"
-            buttons = buttons.filter { $0.when == backWhen || $0.when == "erase" }
+        if currentNode.id == "Call" {
+            switch sessionRole {
+            case .casualty:
+                buttons = buttons.filter { $0.when != "next" }
+                // Rename sole continue button
+                buttons = buttons.map { b in
+                    guard b.when == "next-casualty" else { return b }
+                    return ProtocolButton(when: b.when, ua: "Далі", en: "Next")
+                }
+            case .witness, nil:
+                buttons = buttons.filter { $0.when != "next-casualty" }
+                buttons = buttons.map { b in
+                    guard b.when == "next" else { return b }
+                    return ProtocolButton(when: b.when, ua: "Далі", en: "Next")
+                }
+            }
         }
 
+        if currentNode.id == "Form" {
+            if lastVetoNodeId != nil {
+                let backWhen: String
+                switch lastVetoNodeId {
+                case "Cont": backWhen = "back-cont"
+                case "Out-trapped": backWhen = "back-trapped"
+                default: backWhen = "back-out"
+                }
+                buttons = buttons.filter { $0.when == backWhen || $0.when == "erase" }
+            } else {
+                buttons = buttons.filter { ["read", "give", "erase"].contains($0.when) }
+            }
+        }
+
+        // Casualty: hide witness-only delegation question labels already in graph via roles filter in primaryButtons? edges still show Hands for both if roles include both — Hands is witness-only in roles
         if currentNode.id == "Loc-mode" {
             buttons = [
-                ProtocolButton(
-                    when: "qr",
-                    ua: "З QR на стіні (демо)",
-                    en: "From wall QR (demo)"
-                ),
-                ProtocolButton(
-                    when: "gnss",
-                    ua: "Мої координати (GPS)",
-                    en: "My coordinates (GPS)"
-                ),
-                ProtocolButton(
-                    when: "manual",
-                    ua: "Введу адресу сам",
-                    en: "I will type the address"
-                ),
+                ProtocolButton(when: "qr", ua: "З QR на стіні (демо)", en: "From wall QR (demo)"),
+                ProtocolButton(when: "gnss", ua: "Мої координати (GPS)", en: "My coordinates (GPS)"),
+                ProtocolButton(when: "manual", ua: "Введу адресу сам", en: "I will type the address"),
             ]
         }
 
@@ -178,7 +210,15 @@ final class ProtocolEngine {
     }
 
     var showsRescue101: Bool {
-        currentNode.veto || currentNode.branch == "A" || currentNode.id == "Form"
+        currentNode.veto
+            || currentNode.id == "CanLeave"
+            || currentNode.branch == "A"
+            || currentNode.id == "Form"
+    }
+
+    /// On veto screens, 101 is the primary emergency action.
+    var prioritize101: Bool {
+        currentNode.veto || currentNode.id == "CanLeave"
     }
 
     var dispatcherDraft: String {
@@ -188,7 +228,7 @@ final class ProtocolEngine {
             case .en: "place already on the location screen"
             }
         }()
-        let type = incidentType ?? (locale == .uk ? "тип ще не обрано" : "type not set")
+        let type = localizedIncidentTypeLabel()
         let role: String = {
             switch sessionRole {
             case .witness: locale == .uk ? "цивільний свідок" : "civilian bystander"
@@ -202,6 +242,17 @@ final class ProtocolEngine {
         return "\(type). \(place). Help needed. I am \(role)."
     }
 
+    /// Human label from Type (S2) buttons — never the raw edge id (`explosion` → «Вибух»).
+    private func localizedIncidentTypeLabel() -> String {
+        guard let incidentType else {
+            return locale == .uk ? "тип ще не обрано" : "type not set"
+        }
+        if let button = graph.node(id: "Type")?.ui?.buttons?.first(where: { $0.when == incidentType }) {
+            return button.title(for: locale)
+        }
+        return incidentType
+    }
+
     func goBack() {
         guard let previousId = history.popLast(),
               let node = graph.node(id: previousId)
@@ -211,8 +262,15 @@ final class ProtocolEngine {
 
     @discardableResult
     func select(edgeWhen: String) throws -> EdgeSelectionResult {
-        if currentNode.id == "Form", edgeWhen == "back-out" || edgeWhen == "back-cont" {
-            let targetId = edgeWhen == "back-cont" ? "Cont" : "Out"
+        if currentNode.id == "Form",
+           edgeWhen == "back-out" || edgeWhen == "back-cont" || edgeWhen == "back-trapped"
+        {
+            let targetId: String
+            switch edgeWhen {
+            case "back-cont": targetId = "Cont"
+            case "back-trapped": targetId = "Out-trapped"
+            default: targetId = "Out"
+            }
             return try navigate(to: targetId, edgeWhen: edgeWhen, pushReturn: false, recordHistory: true)
         }
 
@@ -273,6 +331,7 @@ final class ProtocolEngine {
         steps = []
         unreachableMarked = false
         lastVetoNodeId = nil
+        multipleCasualties = false
         returnStack = []
         history = []
         try skipEntrySplashIfNeeded()
@@ -284,8 +343,20 @@ final class ProtocolEngine {
         pushReturn: Bool,
         recordHistory: Bool
     ) throws -> EdgeSelectionResult {
-        guard let next = graph.node(id: id) else {
-            throw ProtocolGraphError.missingNode(id)
+        var targetId = id
+        // Role-aware remaps (same class as CanLeave: avoid absurd orders)
+        if sessionRole == .casualty {
+            switch targetId {
+            case "Hands": targetId = "Hold"
+            case "D2": targetId = "Sup"
+            case "NoCpr": targetId = "E0"
+            case "Count", "B0", "B1", "Green", "First": targetId = "Casualty-menu"
+            default: break
+            }
+        }
+
+        guard let next = graph.node(id: targetId) else {
+            throw ProtocolGraphError.missingNode(targetId)
         }
         steps.append(ProtocolLogStep(nodeId: currentNode.id, edge: edgeWhen))
         if pushReturn {
@@ -311,6 +382,8 @@ final class ProtocolEngine {
             incidentType = edgeWhen
         case "Role":
             sessionRole = SessionRole(rawValue: edgeWhen)
+        case "Count":
+            multipleCasualties = (edgeWhen == "many" || edgeWhen == "unknown")
         default:
             break
         }

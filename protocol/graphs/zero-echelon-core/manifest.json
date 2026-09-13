@@ -1,10 +1,13 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-13-s0-s5b",
-  "locale": ["uk", "en"],
+  "graphVersion": "2026-09-13-s0-s12",
+  "locale": [
+    "uk",
+    "en"
+  ],
   "commercial": false,
-  "slice": "S0-S5b",
+  "slice": "S0-S12",
   "entry": "Start",
   "graphFile": "graph.json",
   "generatedFrom": {
@@ -15,10 +18,10 @@
     "registryChecked": "2026-09-13"
   },
   "deferred": [
-    "Count",
-    "casualty self-help menu",
-    "S6–S12 medical branches",
-    "A7 scene re-check loop"
+    "A7 scene re-check loop",
+    "full SALT Four-signs",
+    "vented chest seal E2/E3",
+    "G full flags path"
   ],
-  "notes": "Перша машиночитана редакція: дисклеймер → локація → тип → роль → безпека → вето/103. Після Call клієнт зупиняється на NEXT-PHASE до наступної версії графа."
+  "notes": "S0–S12 + daily J. Call→Count/Casualty-menu за роллю. draft: D1/NoCpr/D2 (K3/K4)."
 }
