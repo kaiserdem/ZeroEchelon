@@ -25,7 +25,7 @@
 | id | UA | EN |
 | --- | --- | --- |
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
-| Loc-mode | Звідки взяти місце події. | How to get the incident location. |
+| Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
 | Loc-3 | Назвіть населений пункт. Далі — вулицю. | Name the town or city. Then the street. |

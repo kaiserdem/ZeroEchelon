@@ -11,7 +11,8 @@
 Каркас клієнтів (поки без коду додатка):
 
 - [`protocol/`](protocol/README.md) — спільне ядро алгоритму (дані)
-- [`ios/`](ios/README.md) — майбутній SwiftUI-клієнт
+- [`ZeroEchelon/`](ZeroEchelon/) — Xcode SwiftUI-додаток (рушій вузлів)
+- [`ios/`](ios/README.md) — SPM-тести рушія (`swift test`)
 - [`web/`](web/README.md) — майбутній PWA для QR
 - [`tools/`](tools/README.md) — валідатори (пізніше)
 

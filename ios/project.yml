@@ -1,0 +1,46 @@
+name: ZeroEchelon
+options:
+  bundleIdPrefix: ua.zeroechelon
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  BASE_SDK: iphoneos
+  SWIFT_VERSION: "6.0"
+packages:
+  ZeroEchelonKit:
+    path: .
+targets:
+  ZeroEchelon:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - "**/*.md"
+    resources:
+      - path: ../protocol/graphs/zero-echelon-core/graph.json
+        buildPhase: resources
+        type: file
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: ua.zeroechelon.app
+      INFOPLIST_GENERATION: YES
+      GENERATE_INFOPLIST_FILE: YES
+      MARKETING_VERSION: "0.1.0"
+      CURRENT_PROJECT_VERSION: "1"
+      TARGETED_DEVICE_FAMILY: "1,2"
+      INFOPLIST_KEY_CFBundleDisplayName: Zero Echelon
+      INFOPLIST_KEY_UILaunchScreen_Generation: YES
+      INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+      SWIFT_STRICT_CONCURRENCY: complete
+    dependencies:
+      - package: ZeroEchelonKit
+        product: ZeroEchelonKit
+schemes:
+  ZeroEchelon:
+    build:
+      targets:
+        ZeroEchelon: all
+    run:
+      config: Debug
