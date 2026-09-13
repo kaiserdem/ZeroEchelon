@@ -76,8 +76,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Це не заміна 103. Рішення — ваші. Закон автоматично не захищає.",
-        "en": "This is not a substitute for 103. The decisions are yours. The law does not automatically protect you."
+        "ua": "Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає.",
+        "en": "Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping."
       },
       "edges": [
         {

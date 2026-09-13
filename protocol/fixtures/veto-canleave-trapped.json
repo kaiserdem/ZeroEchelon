@@ -5,8 +5,8 @@
   "steps": [
     { "nodeId": "Start", "edge": "next" },
     { "nodeId": "Disclaimer", "edge": "agree" },
-    { "nodeId": "Loc-mode", "edge": "manual" },
-    { "nodeId": "Loc-3", "edge": "next" },
+    { "nodeId": "Loc-mode", "edge": "gnss" },
+    { "nodeId": "Loc-2", "edge": "next" },
     { "nodeId": "Type", "edge": "explosion" },
     { "nodeId": "Role", "edge": "casualty" },
     { "nodeId": "Role-casualty", "edge": "next" },
