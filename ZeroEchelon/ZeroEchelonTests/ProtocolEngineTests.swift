@@ -37,7 +37,7 @@ struct ProtocolEngineTests {
     }
 
     private func reachCare(engine: ProtocolEngine, role: String) throws {
-        for edge in ["next", "agree", "gnss", "next", "explosion", role, "next", "no", "no", "no", "no", "no", "next"] {
+        for edge in ["next", "agree", "incident", "gnss", "next", "explosion", role, "next", "no", "no", "no", "no", "no", "next"] {
             _ = try engine.select(edgeWhen: edge)
         }
         // Call
@@ -56,7 +56,7 @@ struct ProtocolEngineTests {
     @Test func graphContainsS6S12Core() throws {
         let graph = try loadGraph()
         for id in [
-            "Count", "Casualty-menu", "C0", "D0", "E0", "Anti", "E2", "Vent", "E3", "Burp", "Watch",
+            "Home", "Count", "Casualty-menu", "C0", "D0", "E0", "Anti", "E2", "Vent", "E3", "Burp", "Watch",
             "F0", "Form", "I0", "J0", "CanLeave", "A7",
             "B2", "B3", "Second", "Br", "Kid", "Four", "Red", "Yellow", "Green2", "NoResp",
             "G2", "G3", "Flags", "Organic", "Ground", "Slow", "Ban",
@@ -88,7 +88,7 @@ struct ProtocolEngineTests {
 
     @Test func threatCanLeaveTrapped() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "gnss", "next", "collapse", "witness", "next", "yes", "no"] {
+        for edge in ["next", "agree", "incident", "gnss", "next", "collapse", "witness", "next", "yes", "no"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Out-trapped")
@@ -125,9 +125,35 @@ struct ProtocolEngineTests {
         #expect(engine.dispatcherDraft.hasPrefix("Explosion."))
     }
 
-    @Test func locModeOffersGpsAndManualOnly() throws {
+    @Test func homeOffersIncidentDailyAndWave() throws {
         let engine = try makeEngine()
         for edge in ["next", "agree"] {
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "Home")
+        let whens = Set(engine.visibleButtons.map(\.when))
+        #expect(whens == Set(["incident", "daily", "wave"]))
+    }
+
+    @Test func homeDailyGoesToJ0() throws {
+        let engine = try makeEngine()
+        for edge in ["next", "agree", "daily"] {
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "J0")
+    }
+
+    @Test func homeWaveGoesToI0() throws {
+        let engine = try makeEngine()
+        for edge in ["next", "agree", "wave"] {
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "I0")
+    }
+
+    @Test func locModeOffersGpsAndManualOnly() throws {
+        let engine = try makeEngine()
+        for edge in ["next", "agree", "incident"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Loc-mode")
@@ -138,7 +164,7 @@ struct ProtocolEngineTests {
 
     @Test func manualAddressFillsDispatcherDraft() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "manual"] {
+        for edge in ["next", "agree", "incident", "manual"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Loc-3")
@@ -171,7 +197,7 @@ struct ProtocolEngineTests {
 
     @Test func dispatcherDraftUsesCoordinatesAfterGpsPath() throws {
         let engine = try makeEngine()
-        for edge in ["next", "agree", "gnss", "next", "traffic", "witness"] {
+        for edge in ["next", "agree", "incident", "gnss", "next", "traffic", "witness"] {
             _ = try engine.select(edgeWhen: edge)
         }
         // On Role-witness; location captured on Loc-2
@@ -346,7 +372,7 @@ struct ProtocolEngineTests {
 
     /// Disclaimer → loc → Type(type) → Role witness → first safety node.
     private func reachFirstSafety(engine: ProtocolEngine, type: String) throws {
-        for edge in ["next", "agree", "gnss", "next", type, "witness", "next"] {
+        for edge in ["next", "agree", "incident", "gnss", "next", type, "witness", "next"] {
             _ = try engine.select(edgeWhen: edge)
         }
     }

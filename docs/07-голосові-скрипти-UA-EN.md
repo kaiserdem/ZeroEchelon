@@ -25,6 +25,8 @@
 | id | UA | EN |
 | --- | --- | --- |
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
+| Disclaimer | Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. | Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. |
+| Home | Оберіть. Що потрібно зараз? | Choose. What do you need now? |
 | Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
@@ -34,7 +36,6 @@
 | Role-witness | Режим свідка. Спершу викличте 103, якщо можете. | Bystander mode. Call 103 first if you can. |
 | Role-casualty | Режим постраждалого. Викличте 103. Далі — що зробити для себе. | Casualty mode. Call 103. Next — what to do for yourself. |
 | Casualty-menu | Що потрібно вам зараз. Оберіть одне. | What do you need right now. Choose one. |
-| Disclaimer | Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. | Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. |
 | Call | Викличте 103. Зачитайте текст на екрані. | Call 103. Read the text on the screen. |
 | NEXT-PHASE | Вхід завершено. Далі — допомога за роллю. | Entry done. Next — help by role. |
 

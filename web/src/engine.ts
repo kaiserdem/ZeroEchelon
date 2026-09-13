@@ -284,7 +284,7 @@ export class ProtocolEngine {
         );
       } else {
         buttons = buttons.filter((b) =>
-          ["read", "give", "erase"].includes(b.when),
+          ["read", "give", "wave", "erase"].includes(b.when),
         );
       }
     }

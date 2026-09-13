@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-13-s0-s12-g",
+  "graphVersion": "2026-09-14-home",
   "locale": [
     "uk",
     "en"
@@ -16,8 +16,8 @@
     "flow": "docs/04-блок-схеми.md",
     "screens": "docs/12-екрани-та-специфікація.md",
     "voice": "docs/07-голосові-скрипти-UA-EN.md",
-    "registryChecked": "2026-09-13"
+    "registryChecked": "2026-09-14"
   },
   "deferred": [],
-  "notes": "S0–S12 complete slice: E2/E3, A7, SALT Four-signs, full G PFA. draft: D1/NoCpr/D2 (K3/K4)."
+  "notes": "Home fork after Disclaimer: incident / daily(J) / wave(I). Form keeps wave. draft: D1/NoCpr/D2 (K3/K4)."
 }

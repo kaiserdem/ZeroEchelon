@@ -5,6 +5,7 @@
   "steps": [
     { "nodeId": "Start", "edge": "next" },
     { "nodeId": "Disclaimer", "edge": "agree" },
+    { "nodeId": "Home", "edge": "incident" },
     { "nodeId": "Loc-mode", "edge": "gnss" },
     { "nodeId": "Loc-2", "edge": "next" },
     { "nodeId": "Type", "edge": "explosion" },

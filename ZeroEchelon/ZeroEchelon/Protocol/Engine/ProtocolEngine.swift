@@ -280,7 +280,7 @@ final class ProtocolEngine {
                 }
                 buttons = buttons.filter { $0.when == backWhen || $0.when == "erase" }
             } else {
-                buttons = buttons.filter { ["read", "give", "erase"].contains($0.when) }
+                buttons = buttons.filter { ["read", "give", "wave", "erase"].contains($0.when) }
             }
         }
 

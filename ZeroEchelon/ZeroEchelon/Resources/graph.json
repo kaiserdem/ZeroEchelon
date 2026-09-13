@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-13-s0-s12-g",
+  "graphVersion": "2026-09-14-home",
   "locale": [
     "uk",
     "en"
@@ -12,7 +12,7 @@
     "flow": "docs/04-блок-схеми.md",
     "screens": "docs/12-екрани-та-специфікація.md",
     "voice": "docs/07-голосові-скрипти-UA-EN.md",
-    "registryChecked": "2026-09-13"
+    "registryChecked": "2026-09-14"
   },
   "entry": "Start",
   "alwaysAvailable": [
@@ -82,7 +82,7 @@
       "edges": [
         {
           "when": "agree",
-          "to": "Loc-mode"
+          "to": "Home"
         }
       ],
       "ui": {
@@ -95,6 +95,63 @@
             "en": "I agree"
           }
         ]
+      }
+    },
+    {
+      "id": "Home",
+      "type": "question",
+      "branch": "entry",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 2,
+      "registry": [
+        "A7"
+      ],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Оберіть. Що потрібно зараз?",
+        "en": "Choose. What do you need now?"
+      },
+      "edges": [
+        {
+          "when": "incident",
+          "to": "Loc-mode"
+        },
+        {
+          "when": "daily",
+          "to": "J0"
+        },
+        {
+          "when": "wave",
+          "to": "I0"
+        }
+      ],
+      "ui": {
+        "screenId": "Home",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "incident",
+            "ua": "Щось сталось зараз",
+            "en": "Something happened now"
+          },
+          {
+            "when": "daily",
+            "ua": "Симптоми / щоденна допомога",
+            "en": "Symptoms / daily help"
+          },
+          {
+            "when": "wave",
+            "ua": "Чек-лист після події",
+            "en": "After-event checklist"
+          }
+        ],
+        "note": "Гостра подія → Loc. J — без сцени/SALT. I — друга хвиля 24/48 год (також з Form і локального пуша)."
       }
     },
     {
@@ -1320,8 +1377,8 @@
           },
           {
             "when": "wave",
-            "ua": "Чек-лист 24 год",
-            "en": "24h checklist"
+            "ua": "Чек-лист після події",
+            "en": "After-event checklist"
           },
           {
             "when": "erase",
