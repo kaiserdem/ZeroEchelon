@@ -377,16 +377,14 @@ struct EmergencyBar: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Text(locale == .uk
-                 ? (prioritize101
-                    ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
-                    : "Екстрений виклик — завжди на екрані")
-                 : (prioritize101
-                    ? "101 first. 103 — if casualties are at a safe distance"
-                    : "Emergency call — always on screen"))
-                .font(CivicTheme.emergencyLabel)
-                .foregroundStyle(CivicTheme.muted)
-                .multilineTextAlignment(.center)
+            if prioritize101 {
+                Text(locale == .uk
+                     ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
+                     : "101 first. 103 — if casualties are at a safe distance")
+                    .font(CivicTheme.emergencyLabel)
+                    .foregroundStyle(CivicTheme.muted)
+                    .multilineTextAlignment(.center)
+            }
 
             if prioritize101, show101 {
                 Button {

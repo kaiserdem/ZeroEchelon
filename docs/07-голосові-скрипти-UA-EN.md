@@ -64,7 +64,7 @@
 | Cont | Вважайте зону небезпечною. Не дійте тут. Натисніть 101 внизу. | Treat the area as unsafe. Do not act here. Tap 101 below. |
 | CanLeave | Чи можете зараз відійти від небезпеки, не чіпаючи предмет і уламки? | Can you move away from the danger now without touching the object or rubble? |
 | Out-trapped | Не чіпайте предмет і уламки. Не смикайте. Не звільняйте. Натисніть 101 внизу. У звіті зазначте: ви або люди тут. | Do not touch the object or rubble. Do not pull. Do not free anyone. Tap 101 below. In the report mark: you or people are here. |
-| A6 | Не заходьте всередину завалу. Не рухайте уламки. | Do not enter the collapse. Do not move rubble. |
+| A6 | *За типом інциденту (рушій):* ДТП — проїжджа / аварійка / проводи; пожежа — дим; хімія — не чіпати; побут — вимкнути джерело; вибух/завал/потяг/стрілянина — не в завал. У `graph.json` лишається fallback «завал». | *By incident type (engine):* traffic — roadway / hazards / wires; fire — smoke; chemical — do not touch; household — turn off source; explosion/collapse/train/shooting — do not enter collapse. Graph fallback remains collapse wording. |
 | A7 | Перевірте загрози знову. Повторний удар можливий. | Check the threats again. A second strike is possible. |
 
 ---
