@@ -5191,6 +5191,7 @@
       "ui": {
         "screenId": "S11",
         "template": "action",
+        "showDispatcherDraft": true,
         "buttons": [
           {
             "when": "next",
@@ -5237,6 +5238,7 @@
       "ui": {
         "screenId": "S11",
         "template": "handover",
+        "showDispatcherDraft": true,
         "buttons": [
           {
             "when": "next",
@@ -5245,8 +5247,8 @@
           },
           {
             "when": "wave",
-            "ua": "Чек-лист 24 год",
-            "en": "24h checklist"
+            "ua": "Чек-лист після події",
+            "en": "After-event checklist"
           }
         ]
       }

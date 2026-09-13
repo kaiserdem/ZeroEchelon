@@ -211,6 +211,12 @@ final class ProtocolEngine {
     /// Extra UI tips under the voice line — disabled (noise on emergency screens).
     var helperText: String? { nil }
 
+    /// True on the medic handover screen — show an offline QR of the draft.
+    var showsHandoverQR: Bool { currentNode.id == "Give" }
+
+    /// Payload encoded into the handover QR (same text the medic sees / dispatcher hears).
+    var handoverQRPayload: String { dispatcherDraft }
+
     var detailBlock: String? {
         switch currentNode.id {
         case "Loc-1":
@@ -219,7 +225,7 @@ final class ProtocolEngine {
             return demoCoordinatesDisplay
         case "Loc-3":
             return manualLocationSummary
-        case "Call", "CALL-read":
+        case "Call", "CALL-read", "Read", "Give", "Form":
             return dispatcherDraft
         default:
             if currentNode.ui?.showDispatcherDraft == true {

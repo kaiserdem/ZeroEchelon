@@ -210,6 +210,15 @@ export class ProtocolEngine {
     return null;
   }
 
+  get showsHandoverQR(): boolean {
+    return this.currentNode.id === "Give";
+  }
+
+  /** Payload encoded into the handover QR (same text medic sees / dispatcher hears). */
+  get handoverQRPayload(): string {
+    return this.dispatcherDraft;
+  }
+
   get detailBlock(): string | null {
     switch (this.currentNode.id) {
       case "Loc-1":
@@ -220,6 +229,9 @@ export class ProtocolEngine {
         return this.manualLocationSummary;
       case "Call":
       case "CALL-read":
+      case "Read":
+      case "Give":
+      case "Form":
         return this.dispatcherDraft;
       default:
         if (this.currentNode.ui?.showDispatcherDraft) {

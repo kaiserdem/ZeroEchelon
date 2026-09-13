@@ -195,6 +195,37 @@ struct ProtocolEngineTests {
         #expect(!engine.dispatcherDraft.contains("демо"))
     }
 
+    @Test func readScreenShowsDispatcherDraft() throws {
+        let engine = try makeEngine()
+        try reachCare(engine: engine, role: "witness")
+        _ = try engine.select(edgeWhen: "next") // Count
+        _ = try engine.select(edgeWhen: "one")
+        _ = try engine.select(edgeWhen: "no") // D0
+        _ = try engine.select(edgeWhen: "yes") // D2
+        _ = try engine.select(edgeWhen: "yes") // Sup
+        _ = try engine.select(edgeWhen: "next") // Neck
+        _ = try engine.select(edgeWhen: "next") // E0
+        _ = try engine.select(edgeWhen: "no") // F0
+        _ = try engine.select(edgeWhen: "no") // G0
+        for edge in ["next", "next", "next", "no", "next", "next", "next"] {
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "Form")
+        #expect(engine.detailBlock?.contains("Вибух") == true)
+
+        _ = try engine.select(edgeWhen: "read")
+        #expect(engine.currentNode.id == "Read")
+        #expect(engine.detailBlock == engine.dispatcherDraft)
+        #expect(engine.detailBlock?.isEmpty == false)
+
+        _ = try engine.select(edgeWhen: "next")
+        _ = try engine.select(edgeWhen: "give")
+        #expect(engine.currentNode.id == "Give")
+        #expect(engine.showsHandoverQR)
+        #expect(engine.handoverQRPayload == engine.dispatcherDraft)
+        #expect(!engine.handoverQRPayload.isEmpty)
+    }
+
     @Test func dispatcherDraftUsesCoordinatesAfterGpsPath() throws {
         let engine = try makeEngine()
         for edge in ["next", "agree", "incident", "gnss", "next", "traffic", "witness"] {

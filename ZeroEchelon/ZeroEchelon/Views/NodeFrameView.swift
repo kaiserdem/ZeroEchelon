@@ -78,6 +78,10 @@ struct NodeFrameView: View {
                             }
                     }
 
+                    if engine.showsHandoverQR {
+                        handoverQRBlock
+                    }
+
                     if engine.isManualLocationEntry {
                         manualLocationInput
                     }
@@ -135,6 +139,39 @@ struct NodeFrameView: View {
         }
         .onChange(of: engine.locale) { _, _ in
             speakCurrent()
+        }
+    }
+
+    private var handoverQRBlock: some View {
+        VStack(spacing: 10) {
+            if let image = QRCodeImage.make(from: engine.handoverQRPayload) {
+                Image(uiImage: image)
+                    .interpolation(.none)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 260, maxHeight: 260)
+                    .padding(12)
+                    .background(
+                        Color.white,
+                        in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+                    )
+                    .accessibilityLabel(engine.locale == .uk
+                                        ? "QR-код звіту для медика"
+                                        : "Report QR code for medic")
+            } else {
+                Text(engine.locale == .uk
+                     ? "QR зараз недоступний. Покажіть текст вище."
+                     : "QR unavailable. Show the text above.")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(CivicTheme.muted)
+            }
+
+            Text(engine.locale == .uk
+                 ? "Код містить текст звіту. Мережа не потрібна."
+                 : "The code holds the report text. No network needed.")
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(CivicTheme.muted)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -419,5 +456,21 @@ struct EmergencyBar: View {
         .padding(.top, 10)
         .padding(.bottom, 14)
         .background(CivicTheme.barFill)
+    }
+}
+
+enum QRCodeImage {
+    static func make(from string: String, scale: CGFloat = 10) -> UIImage? {
+        let data = Data(string.utf8)
+        guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
+        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue("M", forKey: "inputCorrectionLevel")
+        guard let output = filter.outputImage else { return nil }
+        let transformed = output.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(transformed, from: transformed.extent) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
     }
 }
