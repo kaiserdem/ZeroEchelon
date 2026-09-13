@@ -34,8 +34,18 @@ final class ProtocolEngine {
     /// True after Count→many/unknown (SALT multi-casualty context).
     private(set) var multipleCasualties: Bool
 
+    /// Seconds between scene re-checks while in care branches B–G (default 3 min).
+    var sceneRecheckInterval: TimeInterval = 180
+    /// Clock injection for tests.
+    var now: () -> Date = { Date() }
+    private(set) var lastSceneCheckAt: Date?
+
     private var returnStack: [String]
     private var history: [String]
+    private var pendingRecheckEdge: String?
+    private var suppressSceneRecheck = false
+
+    private static let careBranches: Set<String> = ["B", "C", "D", "E", "F", "G"]
 
     init(graph: ProtocolGraph, locale: ContentLocale = .uk) throws {
         guard graph.commercial == false else {
@@ -50,8 +60,16 @@ final class ProtocolEngine {
         self.unreachableMarked = false
         self.lastVetoNodeId = nil
         self.multipleCasualties = false
+        self.lastSceneCheckAt = nil
+        self.pendingRecheckEdge = nil
+        self.suppressSceneRecheck = false
         self.returnStack = []
         self.history = []
+    }
+
+    /// Test helper: mark the last scene check at an absolute time.
+    func setLastSceneCheckAtForTesting(_ date: Date?) {
+        lastSceneCheckAt = date
     }
 
     /// Skip the silent Start splash — land on Disclaimer.
@@ -125,6 +143,18 @@ final class ProtocolEngine {
             return locale == .uk
                 ? "Ви не зобовʼязані йти 300 м, якщо не можете. Не чіпайте. Кличте 101."
                 : "You are not ordered to walk 300 m if you cannot. Do not touch. Call 101."
+        case "A7":
+            return locale == .uk
+                ? "Якщо знову небезпечно — відхід / 101, не медичні кроки."
+                : "If danger returns — withdraw / 101, no medical steps."
+        case "Four":
+            return locale == .uk
+                ? "Не рахуйте пульс — лише чи відчуваєте. Сумнів — як червоний."
+                : "Do not count the pulse — only whether you feel it. Unsure — treat as red."
+        case "Organic":
+            return locale == .uk
+                ? "103 внизу. Не робіть дихальних вправ."
+                : "103 below. Do not do breathing exercises."
         case "NEXT-PHASE":
             return locale == .uk
                 ? "Далі — кроки за вашою роллю (свідок або постраждалий)."
@@ -218,7 +248,7 @@ final class ProtocolEngine {
 
     /// On veto screens, 101 is the primary emergency action.
     var prioritize101: Bool {
-        currentNode.veto || currentNode.id == "CanLeave"
+        currentNode.veto || currentNode.id == "CanLeave" || currentNode.id == "A7"
     }
 
     var dispatcherDraft: String {
@@ -274,6 +304,16 @@ final class ProtocolEngine {
             return try navigate(to: targetId, edgeWhen: edgeWhen, pushReturn: false, recordHistory: true)
         }
 
+        // A7 interrupt: pause care tap, show scene re-check, then resume or CanLeave.
+        if shouldInterceptForSceneRecheck {
+            pendingRecheckEdge = edgeWhen
+            return try navigate(to: "A7", edgeWhen: "recheck", pushReturn: true, recordHistory: true)
+        }
+
+        if currentNode.id == "A7" {
+            return try handleA7(edgeWhen: edgeWhen)
+        }
+
         guard let edge = currentNode.edges.first(where: { $0.when == edgeWhen }) else {
             throw ProtocolGraphError.missingEdge(node: currentNode.id, when: edgeWhen)
         }
@@ -317,6 +357,46 @@ final class ProtocolEngine {
         )
     }
 
+    private var shouldInterceptForSceneRecheck: Bool {
+        if suppressSceneRecheck {
+            suppressSceneRecheck = false
+            return false
+        }
+        guard currentNode.id != "A7" else { return false }
+        guard Self.careBranches.contains(currentNode.branch) else { return false }
+        guard let last = lastSceneCheckAt else { return false }
+        return now().timeIntervalSince(last) >= sceneRecheckInterval
+    }
+
+    private func handleA7(edgeWhen: String) throws -> EdgeSelectionResult {
+        guard currentNode.edges.contains(where: { $0.when == edgeWhen }) else {
+            throw ProtocolGraphError.missingEdge(node: "A7", when: edgeWhen)
+        }
+        switch edgeWhen {
+        case "safe":
+            lastSceneCheckAt = now()
+            let pending = pendingRecheckEdge
+            pendingRecheckEdge = nil
+            steps.append(ProtocolLogStep(nodeId: "A7", edge: "safe"))
+            if let resumeId = returnStack.popLast(),
+               let resumeNode = graph.node(id: resumeId)
+            {
+                currentNode = resumeNode
+            }
+            suppressSceneRecheck = true
+            if let pending {
+                return try select(edgeWhen: pending)
+            }
+            return EdgeSelectionResult(didNavigate: true, externalURL: nil, clearedLog: false)
+        case "threat":
+            pendingRecheckEdge = nil
+            lastSceneCheckAt = now()
+            return try navigate(to: "CanLeave", edgeWhen: "threat", pushReturn: false, recordHistory: true)
+        default:
+            throw ProtocolGraphError.missingEdge(node: "A7", when: edgeWhen)
+        }
+    }
+
     func finishExternalAndReturn() {
         guard let previous = returnStack.popLast(),
               let node = graph.node(id: previous)
@@ -332,6 +412,9 @@ final class ProtocolEngine {
         unreachableMarked = false
         lastVetoNodeId = nil
         multipleCasualties = false
+        lastSceneCheckAt = nil
+        pendingRecheckEdge = nil
+        suppressSceneRecheck = false
         returnStack = []
         history = []
         try skipEntrySplashIfNeeded()
@@ -343,29 +426,37 @@ final class ProtocolEngine {
         pushReturn: Bool,
         recordHistory: Bool
     ) throws -> EdgeSelectionResult {
-        var targetId = id
+        var targetId = remapSafetyTarget(id, edgeWhen: edgeWhen)
         // Role-aware remaps (same class as CanLeave: avoid absurd orders)
         if sessionRole == .casualty {
-            switch targetId {
-            case "Hands": targetId = "Hold"
-            case "D2": targetId = "Sup"
-            case "NoCpr": targetId = "E0"
-            case "Count", "B0", "B1", "Green", "First": targetId = "Casualty-menu"
-            default: break
+            // Entire SALT branch B is witness-only
+            if targetId == "Count" || nextIsBranchB(targetId) {
+                targetId = "Casualty-menu"
+            } else {
+                switch targetId {
+                case "Hands": targetId = "Hold"
+                case "D2": targetId = "Sup"
+                case "NoCpr": targetId = "E0"
+                default: break
+                }
             }
         }
 
         guard let next = graph.node(id: targetId) else {
             throw ProtocolGraphError.missingNode(targetId)
         }
-        steps.append(ProtocolLogStep(nodeId: currentNode.id, edge: edgeWhen))
+        let leavingId = currentNode.id
+        steps.append(ProtocolLogStep(nodeId: leavingId, edge: edgeWhen))
         if pushReturn {
-            returnStack.append(currentNode.id)
+            returnStack.append(leavingId)
         }
         if recordHistory {
-            history.append(currentNode.id)
+            history.append(leavingId)
         }
         currentNode = next
+        if leavingId == "A6" {
+            lastSceneCheckAt = now()
+        }
         if let role = next.ui?.sessionRole {
             sessionRole = SessionRole(rawValue: role) ?? sessionRole
         }
@@ -374,6 +465,57 @@ final class ProtocolEngine {
             externalURL: externalURL(for: next),
             clearedLog: false
         )
+    }
+
+    private func nextIsBranchB(_ id: String) -> Bool {
+        graph.node(id: id)?.branch == "B"
+    }
+
+    /// Threat checks A1–A5 relevant to `incidentType` (docs/01 A0). A6 always last.
+    private static let safetyThreatIds: Set<String> = ["A1", "A2", "A3", "A4", "A5"]
+
+    private func safetyThreatQueue(for type: String?) -> [String] {
+        switch type {
+        case "explosion", "shooting", "train":
+            ["A1", "A2", "A3", "A4", "A5", "A6"]
+        case "collapse":
+            ["A2", "A1", "A3", "A4", "A5", "A6"]
+        case "fire":
+            ["A3", "A4", "A5", "A2", "A6"]
+        case "traffic":
+            ["A4", "A3", "A5", "A6"]
+        case "chemical":
+            ["A5", "A3", "A4", "A6"]
+        case "household":
+            ["A3", "A4", "A5", "A6"]
+        default:
+            // other / unknown — full chain
+            ["A1", "A2", "A3", "A4", "A5", "A6"]
+        }
+    }
+
+    /// Remap graph A1→A2… chain onto the type-specific queue.
+    private func remapSafetyTarget(_ targetId: String, edgeWhen: String) -> String {
+        let queue = safetyThreatQueue(for: incidentType)
+
+        // Role → A1 in graph: land on first relevant threat instead.
+        if targetId == "A1",
+           currentNode.id == "Role-witness" || currentNode.id == "Role-casualty"
+        {
+            return queue.first ?? "A1"
+        }
+
+        // «Ні» / «Не бачу» on a threat → next in this type's queue (may skip A*).
+        if Self.safetyThreatIds.contains(currentNode.id),
+           edgeWhen == "no" || edgeWhen == "cannot"
+        {
+            if let idx = queue.firstIndex(of: currentNode.id), idx + 1 < queue.count {
+                return queue[idx + 1]
+            }
+            return "A6"
+        }
+
+        return targetId
     }
 
     private func captureSideEffects(edgeWhen: String) {

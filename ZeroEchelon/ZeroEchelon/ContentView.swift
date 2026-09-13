@@ -39,6 +39,7 @@ struct ContentView: View {
                 )
             } else {
                 ProgressView("Завантаження протоколу…")
+                    .tint(CivicTheme.accent)
             }
         }
         .task { model.load() }

@@ -1,21 +1,38 @@
 # web/
 
-Клієнт для **QR без встановлення**: PWA / статичний веб. Працює в Safari і Chrome на iOS/Android.
+Клієнт для **QR без встановлення**: статичний веб (Vite). Той самий граф, що й iOS.
 
-## Призначення
+## Дизайн
 
-- Той самий граф, що й iOS: пакет з `../protocol/`.
-- Service Worker + кеш для офлайну після першого відкриття (і по можливості precache з QR-хоста).
-- Web Speech API або аналог для озвучення; кнопка `tel:103`.
-- Локальний журнал у `localStorage` / IndexedDB, без хмари.
+Зафіксовано **Civic Signal (варіант C)** — ті самі токени, що `CivicTheme` в iOS:
+accent `#0d449e`, danger `#d91f29`, warning `#f2b814`, canvas `#f5f7fc`.
 
-## Чого тут немає на старті
+## Запуск
 
-- Збірка Vite/Next (додасте з кодом).
-- Окремий «веб-алгоритм» — заборонено.
+```bash
+cd web
+npm install
+npm run dev
+```
 
-## Навіщо окремо від ZeroEchelon/
+Відкрий URL з терміналу (зазвичай `http://localhost:5173`).
 
-PWA відкривається з QR без App Store. Той самий `protocol/graphs/*.json`, інший UI-шар.
+Збірка для Cloudflare Pages:
 
-Історія продукту: людина сканує QR на стіні і одразу бачить інструкцію. App Store для цього не підходить. iOS-додаток — якість і майбутній ШІ; web — вхід без встановлення.
+```bash
+npm run build
+```
+
+Артефакти в `web/dist`. Build output directory у Pages: `dist`. Root directory: `web`.
+
+## Стек
+
+- Vite + TypeScript
+- `ProtocolEngine` у `src/engine.ts` (порт Swift)
+- Граф: `@protocol/graphs/zero-echelon-core/graph.json`
+- Web Speech API (опційно)
+
+## Чого ще немає
+
+- Service Worker / повний PWA offline
+- Справжній QR → адреса (демо-рядки як в iOS)

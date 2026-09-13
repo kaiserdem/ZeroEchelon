@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-13-s0-s12-e2e3",
+  "graphVersion": "2026-09-13-s0-s12-g",
   "locale": [
     "uk",
     "en"
@@ -863,7 +863,57 @@
             "en": "Got it"
           }
         ],
-        "note": "A7 (повторна перевірка сцени) — у наступній редакції; цикл поки не врізано."
+        "note": "Після Call рушій періодично піднімає A7 під час допомоги (B–G)."
+      }
+    },
+    {
+      "id": "A7",
+      "type": "question",
+      "branch": "A",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 1,
+      "registry": [
+        "B2",
+        "B3"
+      ],
+      "conflict": [
+        "K5"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Перевірте загрози знову. Повторний удар можливий.",
+        "en": "Check the threats again. A second strike is possible."
+      },
+      "edges": [
+        {
+          "when": "safe"
+        },
+        {
+          "when": "threat",
+          "to": "CanLeave"
+        }
+      ],
+      "ui": {
+        "screenId": "S4",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "safe",
+            "ua": "Зона ще робоча",
+            "en": "Scene still workable"
+          },
+          {
+            "when": "threat",
+            "ua": "Знову небезпечно",
+            "en": "Danger again"
+          }
+        ],
+        "note": "Вставляється рушієм під час B–G кожні ~3 хв. safe — resume відкладеного ребра."
       }
     },
     {
@@ -1529,11 +1579,11 @@
         },
         {
           "when": "no",
-          "to": "First"
+          "to": "B2"
         },
         {
           "when": "cannot",
-          "to": "First"
+          "to": "B2"
         }
       ],
       "ui": {
@@ -1581,7 +1631,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "First"
+          "to": "B2"
         }
       ],
       "ui": {
@@ -1590,8 +1640,8 @@
         "buttons": [
           {
             "when": "next",
-            "ua": "Далі до нерухомих",
-            "en": "Next to the still"
+            "ua": "Далі — хто махає",
+            "en": "Next — who is waving"
           }
         ]
       }
@@ -1621,7 +1671,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "C0"
+          "to": "Br"
         }
       ],
       "ui": {
@@ -1635,6 +1685,661 @@
           }
         ],
         "note": "Лише якщо сцена вже пройшла CanLeave/безпеку. Не входити до UXO."
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "B2",
+      "type": "action",
+      "voice": {
+        "ua": "Скажіть: хто не може йти — помахайте рукою.",
+        "en": "Say: if you cannot walk — wave your hand."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "B3"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Сказав",
+            "en": "Said it"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "B3",
+      "type": "question",
+      "voice": {
+        "ua": "Махає або тягнеться до вас?",
+        "en": "Is the person waving or reaching for you?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Second"
+        },
+        {
+          "when": "no",
+          "to": "First"
+        },
+        {
+          "when": "cannot",
+          "to": "First"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Махає",
+            "en": "Waving"
+          },
+          {
+            "when": "no",
+            "ua": "Не рухається",
+            "en": "Not moving"
+          },
+          {
+            "when": "cannot",
+            "ua": "Не бачу",
+            "en": "Cannot see"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Second",
+      "type": "action",
+      "voice": {
+        "ua": "Цю — другим. Спершу той, хто не рухається.",
+        "en": "This one — second. First the person who is not moving."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Br"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зрозумів",
+            "en": "Got it"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Br",
+      "type": "question",
+      "voice": {
+        "ua": "Грудна клітка піднімається? Повітря чути?",
+        "en": "Does the chest rise? Can you feel air?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Four"
+        },
+        {
+          "when": "no",
+          "to": "Kid"
+        },
+        {
+          "when": "cannot",
+          "to": "Kid"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          },
+          {
+            "when": "cannot",
+            "ua": "Не бачу",
+            "en": "Cannot see"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Kid",
+      "type": "question",
+      "voice": {
+        "ua": "Це дитина?",
+        "en": "Is this a child?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Two"
+        },
+        {
+          "when": "no",
+          "to": "One"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "One",
+      "type": "action",
+      "voice": {
+        "ua": "Закиньте голову обережно. Відкрийте рот. Приберіть видиме.",
+        "en": "Tilt the head carefully. Open the mouth. Clear what you can see."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Again"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зробив",
+            "en": "Done"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Two",
+      "type": "action",
+      "voice": {
+        "ua": "Дитині: два вдихи рот до рота, якщо можете.",
+        "en": "For a child: two rescue breaths if you can."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Again"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зробив / далі",
+            "en": "Done / next"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Again",
+      "type": "question",
+      "voice": {
+        "ua": "Дихання зʼявилося?",
+        "en": "Did breathing start?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Four"
+        },
+        {
+          "when": "no",
+          "to": "NoResp"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K11"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "NoResp",
+      "type": "action",
+      "voice": {
+        "ua": "Не дихає, не реагує. Запамʼятайте місце. Ідіть до наступного.",
+        "en": "Not breathing, not responding. Remember the place. Go to the next person."
+      },
+      "edges": [
+        {
+          "when": "more",
+          "to": "B2"
+        },
+        {
+          "when": "help",
+          "to": "C0"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "more",
+            "ua": "До наступного",
+            "en": "To the next"
+          },
+          {
+            "when": "help",
+            "ua": "Починаю допомагати",
+            "en": "Start helping"
+          }
+        ],
+        "note": "K11: без expectant / dead."
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Four",
+      "type": "question",
+      "voice": {
+        "ua": "Чи реагує на голос? Чи є пульс на запʼясті? Чи дихає вільно? Чи кров зупинена?",
+        "en": "Does the person respond? Is there a wrist pulse? Is breathing easy? Is bleeding stopped?"
+      },
+      "edges": [
+        {
+          "when": "bad",
+          "to": "Red"
+        },
+        {
+          "when": "good",
+          "to": "Minor"
+        },
+        {
+          "when": "unsure",
+          "to": "Red"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "bad",
+            "ua": "Хоч одне ні",
+            "en": "Any no"
+          },
+          {
+            "when": "good",
+            "ua": "Усе так",
+            "en": "All yes"
+          },
+          {
+            "when": "unsure",
+            "ua": "Не впевнений",
+            "en": "Not sure"
+          }
+        ],
+        "note": "K10: пульс лише так/ні, без підрахунку. Сумнів → червоний."
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Minor",
+      "type": "question",
+      "voice": {
+        "ua": "Лише невеликі травми — подряпини, без сильного болю?",
+        "en": "Only minor injuries — scrapes, no severe pain?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Green2"
+        },
+        {
+          "when": "no",
+          "to": "Yellow"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так, незначні",
+            "en": "Yes, minor"
+          },
+          {
+            "when": "no",
+            "ua": "Ні, серйозніше",
+            "en": "No, more serious"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Red",
+      "type": "action",
+      "voice": {
+        "ua": "Червоний. Допомагайте цій людині зараз.",
+        "en": "Red. Help this person now."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "C0"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Допомагаю",
+            "en": "Helping"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K1"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1"
+      ],
+      "id": "Yellow",
+      "type": "action",
+      "voice": {
+        "ua": "Жовтий. Допомога може зачекати. Повернетесь.",
+        "en": "Yellow. Help can wait. You will return."
+      },
+      "edges": [
+        {
+          "when": "more",
+          "to": "B2"
+        },
+        {
+          "when": "help",
+          "to": "C0"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "more",
+            "ua": "До наступного",
+            "en": "To the next"
+          },
+          {
+            "when": "help",
+            "ua": "Все одно допомагаю",
+            "en": "Help anyway"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "B",
+      "roles": [
+        "witness"
+      ],
+      "precedence": 3,
+      "registry": [
+        "A1",
+        "A7"
+      ],
+      "id": "Green2",
+      "type": "action",
+      "voice": {
+        "ua": "Зелений. Оглянете пізніше. Може тримати тиск, якщо скажете.",
+        "en": "Green. Check later. This person can hold pressure if you ask."
+      },
+      "edges": [
+        {
+          "when": "more",
+          "to": "B2"
+        },
+        {
+          "when": "help",
+          "to": "C0"
+        }
+      ],
+      "ui": {
+        "screenId": "S7",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "more",
+            "ua": "До наступного",
+            "en": "To the next"
+          },
+          {
+            "when": "help",
+            "ua": "Починаю допомагати",
+            "en": "Start helping"
+          }
+        ]
       }
     },
     {
@@ -3420,7 +4125,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "Ban"
+          "to": "G2"
         }
       ],
       "ui": {
@@ -3433,6 +4138,273 @@
             "en": "Next"
           }
         ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "G",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 8,
+      "registry": [
+        "A6"
+      ],
+      "id": "G2",
+      "type": "action",
+      "voice": {
+        "ua": "Скажіть правду, яку знаєте. Допоможіть знайти близьких, якщо це безпечно.",
+        "en": "Tell the truth you know. Help find family if that is safe."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "G3"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Далі",
+            "en": "Next"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "G",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 8,
+      "registry": [
+        "A6"
+      ],
+      "id": "G3",
+      "type": "question",
+      "voice": {
+        "ua": "Людина каже, що важко дихати?",
+        "en": "Does the person say it is hard to breathe?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Flags"
+        },
+        {
+          "when": "no",
+          "to": "Ground"
+        },
+        {
+          "when": "cannot",
+          "to": "Ground"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          },
+          {
+            "when": "cannot",
+            "ua": "Не знаю",
+            "en": "Do not know"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K13"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "G",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 8,
+      "registry": [
+        "A6"
+      ],
+      "id": "Flags",
+      "type": "question",
+      "voice": {
+        "ua": "Є кров у кашлі? Біль у грудях? Сині губи? Набряк обличчя? Шумне дихання?",
+        "en": "Blood in the cough? Chest pain? Blue lips? Face swelling? Noisy breathing?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Organic"
+        },
+        {
+          "when": "no",
+          "to": "Ground"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Є хоч одне",
+            "en": "At least one"
+          },
+          {
+            "when": "no",
+            "ua": "Немає",
+            "en": "None"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K13"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "G",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 8,
+      "registry": [
+        "A6"
+      ],
+      "id": "Organic",
+      "type": "action",
+      "voice": {
+        "ua": "Це не просто страх. Викличте 103. Не заспокоюйте диханням.",
+        "en": "This is not just fear. Call 103. Do not treat this with breathing."
+      },
+      "antiPattern": {
+        "ua": "Не робіть дихальних вправ і не кажіть «заспокойся».",
+        "en": "Do not do breathing exercises and do not say “calm down”."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Ban"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Далі",
+            "en": "Next"
+          }
+        ],
+        "note": "K13: прапорці позитивні — без Slow/Ground breathing."
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "G",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 8,
+      "registry": [
+        "A6"
+      ],
+      "id": "Ground",
+      "type": "action",
+      "voice": {
+        "ua": "Поставте стопи на підлогу. Постукайте пальцями по колінах. Назвіть три речі, які бачите.",
+        "en": "Put your feet on the floor. Tap your knees. Name three things you can see."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Slow"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Далі",
+            "en": "Next"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [
+        "K13"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "G",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 8,
+      "registry": [
+        "A6"
+      ],
+      "id": "Slow",
+      "type": "action",
+      "voice": {
+        "ua": "Дихайте повільніше. Я з вами. Не рахуйте.",
+        "en": "Breathe more slowly. I am with you. Do not count."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Ban"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Далі",
+            "en": "Next"
+          }
+        ],
+        "note": "Лише після негативних Flags / G3 no."
       }
     },
     {
