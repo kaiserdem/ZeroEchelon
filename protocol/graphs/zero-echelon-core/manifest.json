@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-13-s0-s12",
+  "graphVersion": "2026-09-13-s0-s12-e2e3",
   "locale": [
     "uk",
     "en"
@@ -20,8 +20,7 @@
   "deferred": [
     "A7 scene re-check loop",
     "full SALT Four-signs",
-    "vented chest seal E2/E3",
     "G full flags path"
   ],
-  "notes": "S0–S12 + daily J. Call→Count/Casualty-menu за роллю. draft: D1/NoCpr/D2 (K3/K4)."
+  "notes": "S0–S12 + daily J + E2/E3 vented seal. Call→Count/Casualty-menu за роллю. draft: D1/NoCpr/D2 (K3/K4)."
 }

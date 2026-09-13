@@ -25,9 +25,18 @@ struct ProtocolEngineTests {
         #expect(engine.currentNode.id == "Call")
     }
 
+    /// Witness, one casualty, no bleed, breathing OK, stay → Neck → E0.
+    private func reachE0(engine: ProtocolEngine) throws {
+        try reachCare(engine: engine, role: "witness")
+        for edge in ["next", "one", "no", "yes", "yes", "next", "next"] {
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "E0")
+    }
+
     @Test func graphContainsS6S12Core() throws {
         let graph = try loadGraph()
-        for id in ["Count", "Casualty-menu", "C0", "D0", "E0", "F0", "Form", "I0", "J0", "CanLeave"] {
+        for id in ["Count", "Casualty-menu", "C0", "D0", "E0", "Anti", "E2", "Vent", "E3", "Burp", "Watch", "F0", "Form", "I0", "J0", "CanLeave"] {
             #expect(graph.node(id: id) != nil, "missing \(id)")
         }
         #expect(graph.node(id: "NEXT-PHASE") == nil)
@@ -102,5 +111,25 @@ struct ProtocolEngineTests {
         #expect(!engine.voiceText.lowercased().contains("next"))
         _ = try engine.select(edgeWhen: "next")
         #expect(engine.currentNode.id == "E0")
+    }
+
+    @Test func chestWoundWithoutSealGoesOpenThenF0() throws {
+        let engine = try ProtocolEngine(graph: try loadGraph())
+        try reachE0(engine: engine)
+        for edge in ["yes", "next", "next", "no", "next"] {
+            // E0→E1→Anti→E2 no→Open→F0
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "F0")
+    }
+
+    @Test func chestWoundWithSealBurpsThenF0() throws {
+        let engine = try ProtocolEngine(graph: try loadGraph())
+        try reachE0(engine: engine)
+        for edge in ["yes", "next", "next", "yes", "next", "yes", "next"] {
+            // E0→E1→Anti→E2 yes→Vent→E3 yes→Burp→F0
+            _ = try engine.select(edgeWhen: edge)
+        }
+        #expect(engine.currentNode.id == "F0")
     }
 }

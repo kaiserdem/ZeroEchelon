@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-13-s0-s12",
+  "graphVersion": "2026-09-13-s0-s12-e2e3",
   "locale": [
     "uk",
     "en"
@@ -2792,7 +2792,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "Open"
+          "to": "Anti"
         }
       ],
       "ui": {
@@ -2803,6 +2803,258 @@
             "when": "next",
             "ua": "Зрозумів",
             "en": "Got it"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "E",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 6,
+      "registry": [
+        "A2",
+        "A3"
+      ],
+      "id": "Anti",
+      "type": "action",
+      "voice": {
+        "ua": "Не заклеюйте. Ні плівкою, ні скотчем, ні пакетом. Закрита рана може вбити.",
+        "en": "Do not seal it. Not with film, tape, or a bag. A sealed wound can kill."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "E2"
+        }
+      ],
+      "ui": {
+        "screenId": "S10",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зрозумів",
+            "en": "Got it"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "E",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 6,
+      "registry": [
+        "A2",
+        "A3"
+      ],
+      "id": "E2",
+      "type": "question",
+      "voice": {
+        "ua": "Є спеціальна наліпка з клапаном — і ви вмієте її клеїти?",
+        "en": "Do you have a vented chest seal — and do you know how to apply it?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Vent"
+        },
+        {
+          "when": "no",
+          "to": "Open"
+        }
+      ],
+      "ui": {
+        "screenId": "S10",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "E",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 6,
+      "registry": [
+        "A2",
+        "A3"
+      ],
+      "id": "Vent",
+      "type": "action",
+      "voice": {
+        "ua": "Накладіть наліпку з клапаном. Дивіться, як дихає.",
+        "en": "Apply the vented seal. Watch the breathing."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "E3"
+        }
+      ],
+      "ui": {
+        "screenId": "S10",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Наклав",
+            "en": "Applied"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "E",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 6,
+      "registry": [
+        "A2",
+        "A3"
+      ],
+      "id": "E3",
+      "type": "question",
+      "voice": {
+        "ua": "Тривога і задишка наростають?",
+        "en": "Are fear and shortness of breath getting worse?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Burp"
+        },
+        {
+          "when": "no",
+          "to": "Watch"
+        }
+      ],
+      "ui": {
+        "screenId": "S10",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "E",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 6,
+      "registry": [
+        "A2",
+        "A3"
+      ],
+      "id": "Burp",
+      "type": "action",
+      "voice": {
+        "ua": "Зніміть наліпку. Дайте повітрю вийти. Потім накладіть знову, якщо вмієте.",
+        "en": "Take the seal off. Let air out. Then put it back if you know how."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "F0"
+        }
+      ],
+      "ui": {
+        "screenId": "S10",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зняв / далі",
+            "en": "Removed / next"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "branch": "E",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 6,
+      "registry": [
+        "A2",
+        "A3"
+      ],
+      "id": "Watch",
+      "type": "action",
+      "voice": {
+        "ua": "Спостерігайте дихання. Якщо стане гірше — зніміть наліпку.",
+        "en": "Watch the breathing. If it gets worse — take the seal off."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "F0"
+        }
+      ],
+      "ui": {
+        "screenId": "S10",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Далі",
+            "en": "Next"
           }
         ]
       }
