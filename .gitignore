@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Робочі артефакти агента — генеруються заново, у репозиторії не потрібні
+.cursor/output/
+.cursor/tasks/
+.cursor/learnings/
+.cursor/learning_categories/
+
+# Редактори
+.vscode/
+.idea/
+*.swp
+*~
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.moved-aside
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
