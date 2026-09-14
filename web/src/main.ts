@@ -182,11 +182,11 @@ function render(options?: { keepFocus?: boolean }): void {
 
   const settingsOverlay = showSettings
     ? `
-    <div class="settings-backdrop" data-settings-close>
+    <div class="settings-backdrop">
       <div class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="settings-head">
           <h2 id="settings-title">${escapeHtml(locale === "uk" ? "Налаштування" : "Settings")}</h2>
-          <button type="button" class="settings-done" data-settings-close>${escapeHtml(locale === "uk" ? "Готово" : "Done")}</button>
+          <button type="button" class="settings-done">${escapeHtml(locale === "uk" ? "Готово" : "Done")}</button>
         </div>
         <section class="settings-section">
           <h3>${escapeHtml(locale === "uk" ? "Інтерфейс" : "Interface")}</h3>
