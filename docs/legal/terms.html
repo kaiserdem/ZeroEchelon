@@ -3,73 +3,87 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Умови користування — Line 24</title>
-  <meta name="description" content="Умови користування та дисклеймер застосунку Line 24." />
+  <title>Terms of Use — Line 24</title>
+  <meta name="description" content="Terms of Use for Line 24 (Ukrainian / English)." />
   <link rel="icon" href="logo-256.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="i18n.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-header">
-      <a class="brand-lockup" href="index.html">
-        <span class="brand-mark"><img src="logo-256.png" width="64" height="64" alt="" /></span>
-        <span class="brand-text">
-          <span class="brand-name">Line 24</span>
-          <span class="brand-tag">Офлайн-підказки порятунку</span>
-        </span>
+      <a class="brand-mark-solo" href="index.html" aria-label="Line 24">
+        <img src="logo-256.png" width="72" height="72" alt="" />
       </a>
+      <div class="header-bar">
+        <a class="brand-title" href="index.html">Line 24</a>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-set-locale="uk" aria-pressed="true">UA</button>
+          <button type="button" data-set-locale="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+      <p class="brand-tagline i18n" data-locale="uk">Офлайн-підказки порятунку</p>
+      <p class="brand-tagline i18n" data-locale="en" hidden>Offline rescue guidance</p>
       <nav>
-        <a href="privacy.html">Конфіденційність</a>
-        <a href="support.html">Підтримка</a>
-        <a href="terms.html" aria-current="page">Умови</a>
+        <a class="i18n" data-locale="uk" href="privacy.html">Конфіденційність</a>
+        <a class="i18n" data-locale="en" href="privacy.html" hidden>Privacy</a>
+        <a class="i18n" data-locale="uk" href="support.html">Підтримка</a>
+        <a class="i18n" data-locale="en" href="support.html" hidden>Support</a>
+        <a class="i18n" data-locale="uk" href="terms.html" aria-current="page">Умови</a>
+        <a class="i18n" data-locale="en" href="terms.html" aria-current="page" hidden>Terms</a>
       </nav>
     </header>
 
     <article class="page-panel">
-      <h1>Умови користування</h1>
-      <p class="meta">Останнє оновлення: 14 вересня 2026</p>
+      <div class="i18n" data-locale="uk">
+        <h1>Умови користування</h1>
+        <p class="meta">Останнє оновлення: 14 вересня 2026</p>
+        <p>Користуючись <strong>Line 24</strong>, ви погоджуєтесь із цими умовами.</p>
+        <h2>1. Призначення</h2>
+        <p>Офлайн-підказки для цивільного свідка або постраждалого. Це <strong>не</strong> заміна ЕМД і <strong>не</strong> гарантія результату.</p>
+        <h2>2. Спочатку виклик служби</h2>
+        <p>Якщо можете — спочатку викличте <strong>103</strong>. Рішення залишаються за вами.</p>
+        <h2>3. Не офіційна інструкція МОЗ</h2>
+        <p>Не позиціонується як домедична допомога «за наказом № 441» для службових осіб.</p>
+        <h2>4. Немає імунітету «доброго самаритянина»</h2>
+        <p>Закон сам по собі не гарантує захист за допомогу в Україні.</p>
+        <h2>5. Обмеження відповідальності</h2>
+        <p>Застосунок надається «як є». Наскільки дозволено законом, видавець не відповідає за ваші дії чи бездіяльність.</p>
+        <h2>6. Дані</h2>
+        <p>Див. <a href="privacy.html">політику конфіденційності</a>.</p>
+        <h2>7. Контакт</h2>
+        <p><a href="support.html">Підтримка</a> · <a href="https://github.com/kaiserdem/ZeroEchelon/issues">GitHub Issues</a></p>
+        <p class="muted">Це не індивідуальна юридична консультація.</p>
+      </div>
 
-      <p>Користуючись застосунком <strong>Line 24</strong>, ви погоджуєтесь із цими умовами. Якщо не згодні — не використовуйте застосунок (окрім негайного виклику екстрених служб за потреби).</p>
-
-      <h2>1. Призначення</h2>
-      <p>Line 24 — офлайн-підказки кроків для цивільного свідка або постраждалого в перші хвилини після події. Це <strong>не</strong> заміна бригади ЕМД, диспетчера чи лікаря і <strong>не</strong> гарантія результату.</p>
-
-      <h2>2. Спочатку виклик служби</h2>
-      <p>Якщо можете — <strong>спочатку викличте 103</strong> (в Україні). Застосунок підказує дії «за можливості»; рішення й відповідальність за дії залишаються за вами.</p>
-
-      <h2>3. Не медичний виріб «від імені держави»</h2>
-      <p>Застосунок не є офіційною інструкцією МОЗ і не позиціонується як «домедична допомога за наказом № 441» для службових осіб. Користувач — цивільна особа.</p>
-
-      <h2>4. Немає «захисту доброго самаритянина» в Україні</h2>
-      <p>Закон сам по собі не гарантує імунітет за допомогу. Не трактуйте підказки застосунку як юридичний захист.</p>
-
-      <h2>5. Обмеження відповідальності</h2>
-      <p>Наскільки дозволено законом, видавець не відповідає за рішення, дії чи бездіяльність користувача, за шкоду життю, здоровʼю чи майну, повʼязану з використанням або неможливістю використати підказки застосунку. Застосунок надається «як є».</p>
-      <p class="muted">Цей розділ не обмежує права споживача, які не можна виключити за імперативними нормами.</p>
-
-      <h2>6. Дані</h2>
-      <p>Обробка даних описана в <a href="privacy.html">Політиці конфіденційності</a>. Журнал — локальний; не вводьте зайві ідентифікатори постраждалих.</p>
-
-      <h2>7. Інтелектуальна власність</h2>
-      <p>Документація репозиторію може поширюватися за умовами LICENSE / docs. Чужі протоколи (WHO, ERC тощо) лишаються за своїми ліцензіями.</p>
-
-      <h2>8. Некомерційне використання</h2>
-      <p>Продукт задуманий як некомерційний інструмент публічної безпеки (без реклами й продажу даних у поточному дизайні).</p>
-
-      <h2>9. Зміни умов</h2>
-      <p>Ми можемо оновлювати ці умови; актуальна версія завжди на цій сторінці.</p>
-
-      <h2>10. Контакт</h2>
-      <p><a href="support.html">Підтримка</a> · <a href="https://github.com/kaiserdem/ZeroEchelon/issues">GitHub Issues</a></p>
-
-      <p class="muted">Це не індивідуальна юридична консультація. Перед масштабним пілотом текст має перевірити юрист.</p>
+      <div class="i18n" data-locale="en" hidden>
+        <h1>Terms of Use</h1>
+        <p class="meta">Last updated: 14 September 2026</p>
+        <p>By using <strong>Line 24</strong>, you agree to these terms.</p>
+        <h2>1. Purpose</h2>
+        <p>Offline guidance prompts for a civilian bystander or casualty. This is <strong>not</strong> a substitute for EMS and <strong>not</strong> a guarantee of outcome.</p>
+        <h2>2. Call emergency services first</h2>
+        <p>When you can, call EMS first (<strong>103</strong> in Ukraine). Decisions remain yours.</p>
+        <h2>3. Not an official MoH protocol</h2>
+        <p>Not positioned as mandated first-aid instruction for duty officers.</p>
+        <h2>4. No Good Samaritan immunity claim</h2>
+        <p>Ukrainian law does not by itself grant immunity for helping.</p>
+        <h2>5. Limitation of liability</h2>
+        <p>Software is provided as is. To the extent allowed by law, the publisher is not liable for your actions or inaction.</p>
+        <h2>6. Data</h2>
+        <p>See the <a href="privacy.html">Privacy Policy</a>.</p>
+        <h2>7. Contact</h2>
+        <p><a href="support.html">Support</a> · <a href="https://github.com/kaiserdem/ZeroEchelon/issues">GitHub Issues</a></p>
+        <p class="muted">This is not personal legal advice.</p>
+      </div>
     </article>
 
     <footer>
-      <p><a href="index.html">← Усі сторінки</a> · Line 24</p>
+      <p class="i18n" data-locale="uk"><a href="index.html">← Усі сторінки</a> · Line 24</p>
+      <p class="i18n" data-locale="en" hidden><a href="index.html">← All pages</a> · Line 24</p>
     </footer>
   </div>
 </body>

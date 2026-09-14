@@ -3,57 +3,79 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Line 24 — Правова інформація</title>
-  <meta name="description" content="Політика конфіденційності, підтримка та умови користування Line 24." />
+  <title>Line 24 — Legal</title>
+  <meta name="description" content="Privacy, Support and Terms for Line 24 (UA/EN)." />
   <link rel="icon" href="logo-256.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="i18n.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-header">
-      <a class="brand-lockup" href="index.html">
-        <span class="brand-mark"><img src="logo-256.png" width="64" height="64" alt="" /></span>
-        <span class="brand-text">
-          <span class="brand-name">Line 24</span>
-          <span class="brand-tag">Офлайн-підказки порятунку</span>
-        </span>
+      <a class="brand-mark-solo" href="index.html" aria-label="Line 24">
+        <img src="logo-256.png" width="72" height="72" alt="" />
       </a>
+      <div class="header-bar">
+        <a class="brand-title" href="index.html">Line 24</a>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-set-locale="uk" aria-pressed="true">UA</button>
+          <button type="button" data-set-locale="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+      <p class="brand-tagline i18n" data-locale="uk">Офлайн-підказки порятунку</p>
+      <p class="brand-tagline i18n" data-locale="en" hidden>Offline rescue guidance</p>
       <nav>
-        <a href="privacy.html">Конфіденційність</a>
-        <a href="support.html">Підтримка</a>
-        <a href="terms.html">Умови</a>
+        <a class="i18n" data-locale="uk" href="privacy.html" aria-current="page">Конфіденційність</a>
+        <a class="i18n" data-locale="en" href="privacy.html" aria-current="page" hidden>Privacy</a>
+        <a class="i18n" data-locale="uk" href="support.html" aria-current="page">Підтримка</a>
+        <a class="i18n" data-locale="en" href="support.html" aria-current="page" hidden>Support</a>
+        <a class="i18n" data-locale="uk" href="terms.html" aria-current="page">Умови</a>
+        <a class="i18n" data-locale="en" href="terms.html" aria-current="page" hidden>Terms</a>
       </nav>
     </header>
 
     <div class="hero">
-      <div class="hero-logo">
-        <img src="logo-256.png" width="112" height="112" alt="Line 24" />
-      </div>
-      <h1>Правова інформація</h1>
-      <p class="meta">Сторінки для App Store Connect</p>
+<h1 class="i18n" data-locale="uk">Правова інформація</h1>
+      <h1 class="i18n" data-locale="en" hidden>Legal &amp; support</h1>
+      <p class="meta i18n" data-locale="uk">Сторінки для App Store Connect · UA / EN</p>
+      <p class="meta i18n" data-locale="en" hidden>App Store Connect pages · UA / EN</p>
     </div>
 
-    <div class="card-grid">
+    <div class="card-grid i18n" data-locale="uk">
       <a class="card" href="privacy.html">
         <strong>Політика конфіденційності</strong>
-        <span>Що зберігається на пристрої і чого ми не збираємо</span>
+        <span>Що зберігається на пристрої</span>
       </a>
       <a class="card" href="support.html">
         <strong>Підтримка</strong>
-        <span>Як звʼязатися і відповіді на часті питання</span>
+        <span>Як звʼязатися</span>
       </a>
       <a class="card" href="terms.html">
         <strong>Умови користування</strong>
-        <span>Дисклеймер і обмеження відповідальності</span>
+        <span>Дисклеймер і відповідальність</span>
+      </a>
+    </div>
+
+    <div class="card-grid i18n" data-locale="en" hidden>
+      <a class="card" href="privacy.html">
+        <strong>Privacy Policy</strong>
+        <span>What stays on your device</span>
+      </a>
+      <a class="card" href="support.html">
+        <strong>Support</strong>
+        <span>How to contact us</span>
+      </a>
+      <a class="card" href="terms.html">
+        <strong>Terms of Use</strong>
+        <span>Disclaimer and liability</span>
       </a>
     </div>
 
     <footer>
-      <p>Line 24 ·
-        <a href="https://github.com/kaiserdem/ZeroEchelon">github.com/kaiserdem/ZeroEchelon</a></p>
+      <p>Line 24 · <a href="https://github.com/kaiserdem/ZeroEchelon">github.com/kaiserdem/ZeroEchelon</a></p>
     </footer>
   </div>
 </body>

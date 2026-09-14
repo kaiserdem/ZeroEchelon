@@ -42,9 +42,9 @@ a {
 .site-header {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1rem;
   margin-bottom: 1.75rem;
-  padding: 1.15rem 1.2rem 1.25rem;
+  padding: 1.25rem 1.2rem 1.3rem;
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid var(--line);
   border-radius: calc(var(--radius) + 4px);
@@ -52,58 +52,49 @@ a {
   backdrop-filter: blur(10px);
 }
 
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.brand-lockup {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  text-decoration: none;
-  color: inherit;
-  min-width: 0;
-}
-
-.brand-mark {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+.brand-mark-solo {
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+  border-radius: 18px;
   overflow: hidden;
-  flex-shrink: 0;
   box-shadow: 0 8px 20px rgba(13, 31, 71, 0.18);
   background: #000;
+  text-decoration: none;
 }
 
-.brand-mark img {
+.brand-mark-solo img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.brand-text {
+.header-bar {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.brand-name {
+.brand-title {
   font-weight: 800;
   font-size: 1.45rem;
   letter-spacing: -0.03em;
   color: var(--accent);
   line-height: 1.1;
+  text-decoration: none;
 }
 
-.brand-tag {
-  font-size: 0.86rem;
+.brand-tagline {
+  margin: 0;
+  font-size: 0.95rem;
   color: var(--muted);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lang-switch {
@@ -286,13 +277,5 @@ footer {
 footer a { font-weight: 700; }
 
 @media (min-width: 720px) {
-  .site-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .header-top { flex: 1; }
-
-  nav { justify-content: flex-end; }
+  nav { justify-content: flex-start; }
 }

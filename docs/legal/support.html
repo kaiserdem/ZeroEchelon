@@ -3,64 +3,83 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Підтримка — Line 24</title>
-  <meta name="description" content="Підтримка користувачів застосунку Line 24." />
+  <title>Support — Line 24</title>
+  <meta name="description" content="Support for Line 24 (Ukrainian / English)." />
   <link rel="icon" href="logo-256.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="i18n.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-header">
-      <a class="brand-lockup" href="index.html">
-        <span class="brand-mark"><img src="logo-256.png" width="64" height="64" alt="" /></span>
-        <span class="brand-text">
-          <span class="brand-name">Line 24</span>
-          <span class="brand-tag">Офлайн-підказки порятунку</span>
-        </span>
+      <a class="brand-mark-solo" href="index.html" aria-label="Line 24">
+        <img src="logo-256.png" width="72" height="72" alt="" />
       </a>
+      <div class="header-bar">
+        <a class="brand-title" href="index.html">Line 24</a>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-set-locale="uk" aria-pressed="true">UA</button>
+          <button type="button" data-set-locale="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+      <p class="brand-tagline i18n" data-locale="uk">Офлайн-підказки порятунку</p>
+      <p class="brand-tagline i18n" data-locale="en" hidden>Offline rescue guidance</p>
       <nav>
-        <a href="privacy.html">Конфіденційність</a>
-        <a href="support.html" aria-current="page">Підтримка</a>
-        <a href="terms.html">Умови</a>
+        <a class="i18n" data-locale="uk" href="privacy.html">Конфіденційність</a>
+        <a class="i18n" data-locale="en" href="privacy.html" hidden>Privacy</a>
+        <a class="i18n" data-locale="uk" href="support.html" aria-current="page">Підтримка</a>
+        <a class="i18n" data-locale="en" href="support.html" aria-current="page" hidden>Support</a>
+        <a class="i18n" data-locale="uk" href="terms.html">Умови</a>
+        <a class="i18n" data-locale="en" href="terms.html" hidden>Terms</a>
       </nav>
     </header>
 
     <article class="page-panel">
-      <h1>Підтримка</h1>
-      <p class="meta">Застосунок Line 24 · Support URL для App Store</p>
-
-      <div class="alert">
-        <p><strong>Надзвичайна ситуація зараз?</strong><br />
-        Спочатку викличте <strong>103</strong> (екстрена меддопомога). За потреби ДСНС — <strong>101</strong>. Застосунок не замінює служби.</p>
+      <div class="i18n" data-locale="uk">
+        <h1>Підтримка</h1>
+        <p class="meta">Line 24 · Support URL для App Store</p>
+        <div class="alert">
+          <p><strong>Надзвичайна ситуація зараз?</strong><br />
+          Спочатку викличте <strong>103</strong>. За потреби ДСНС — <strong>101</strong>. Застосунок не замінює служби.</p>
+        </div>
+        <h2>Як звʼязатися</h2>
+        <ul>
+          <li><a href="https://github.com/kaiserdem/ZeroEchelon/issues/new">Створити issue на GitHub</a></li>
+          <li>Репозиторій: <a href="https://github.com/kaiserdem/ZeroEchelon">kaiserdem/ZeroEchelon</a></li>
+        </ul>
+        <p class="muted">Опишіть модель iPhone, версію iOS, кроки. Не надсилайте фото постраждалих чи персональні дані.</p>
+        <h2>Часті питання</h2>
+        <p><strong>Чи потрібен інтернет?</strong> Ні.</p>
+        <p><strong>Куди діваються дані?</strong> Лише на пристрій — див. <a href="privacy.html">політику конфіденційності</a>.</p>
+        <p><strong>Як стерти журнал?</strong> У застосунку після передачі звіту, або видаліть застосунок.</p>
       </div>
 
-      <h2>Як звʼязатися</h2>
-      <p>Технічні питання, помилки, відгуки про тексти протоколу:</p>
-      <ul>
-        <li><a href="https://github.com/kaiserdem/ZeroEchelon/issues/new">Створити issue на GitHub</a></li>
-        <li>Репозиторій: <a href="https://github.com/kaiserdem/ZeroEchelon">kaiserdem/ZeroEchelon</a></li>
-      </ul>
-      <p class="muted">Опишіть: модель iPhone, версію iOS, кроки відтворення. Не надсилайте у issue фото постраждалих чи персональні дані.</p>
-
-      <h2>Часті питання</h2>
-      <p><strong>Чи потрібен інтернет?</strong> Ні. Протокол і журнал працюють офлайн.</p>
-      <p><strong>Куди діваються дані?</strong> Лише на пристрій. Див. <a href="privacy.html">Політику конфіденційності</a>.</p>
-      <p><strong>Як стерти журнал?</strong> Після передачі звіту оберіть стирання, або видаліть застосунок.</p>
-      <p><strong>Чому питає мікрофон?</strong> Лише для диктовки адреси, якщо ви самі натиснули мікрофон.</p>
-
-      <h2>Документація</h2>
-      <ul>
-        <li><a href="https://github.com/kaiserdem/ZeroEchelon">README проєкту</a></li>
-        <li><a href="terms.html">Умови користування</a></li>
-        <li><a href="privacy.html">Політика конфіденційності</a></li>
-      </ul>
+      <div class="i18n" data-locale="en" hidden>
+        <h1>Support</h1>
+        <p class="meta">Line 24 · App Store Support URL</p>
+        <div class="alert">
+          <p><strong>Emergency right now?</strong><br />
+          Call local EMS first (<strong>103</strong> in Ukraine). Rescue service <strong>101</strong> if needed. The app does not replace emergency services.</p>
+        </div>
+        <h2>Contact</h2>
+        <ul>
+          <li><a href="https://github.com/kaiserdem/ZeroEchelon/issues/new">Open a GitHub issue</a></li>
+          <li>Repository: <a href="https://github.com/kaiserdem/ZeroEchelon">kaiserdem/ZeroEchelon</a></li>
+        </ul>
+        <p class="muted">Include iPhone model, iOS version, and steps. Do not post casualty photos or personal data.</p>
+        <h2>FAQ</h2>
+        <p><strong>Do I need the internet?</strong> No.</p>
+        <p><strong>Where does data go?</strong> On-device only — see the <a href="privacy.html">Privacy Policy</a>.</p>
+        <p><strong>How do I erase the journal?</strong> In-app after handover, or uninstall the app.</p>
+      </div>
     </article>
 
     <footer>
-      <p><a href="index.html">← Усі сторінки</a> · Line 24</p>
+      <p class="i18n" data-locale="uk"><a href="index.html">← Усі сторінки</a> · Line 24</p>
+      <p class="i18n" data-locale="en" hidden><a href="index.html">← All pages</a> · Line 24</p>
     </footer>
   </div>
 </body>
