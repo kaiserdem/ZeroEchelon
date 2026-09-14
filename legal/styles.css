@@ -57,10 +57,10 @@ a {
   width: 72px;
   height: 72px;
   margin: 0 auto;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(13, 31, 71, 0.18);
-  background: #000;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  background: transparent;
   text-decoration: none;
 }
 
@@ -68,7 +68,24 @@ a {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.hero-logo {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 1rem;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hero-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .header-bar {
@@ -154,23 +171,6 @@ nav a[aria-current="page"] {
   text-align: center;
   margin: 0 0 1.75rem;
   padding: 1.25rem 1rem 0.25rem;
-}
-
-.hero-logo {
-  width: 112px;
-  height: 112px;
-  margin: 0 auto 1rem;
-  border-radius: 28px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 16px 36px rgba(13, 31, 71, 0.2);
-}
-
-.hero-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
 .page-panel {
