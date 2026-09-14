@@ -108,7 +108,8 @@ body {
   color: #fff;
 }
 
-.voice-toggle {
+.voice-toggle,
+.settings-btn {
   width: 36px;
   height: 36px;
   border: 0;
@@ -117,6 +118,104 @@ body {
   color: var(--accent);
   cursor: pointer;
   font-size: 1rem;
+}
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(13, 31, 71, 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.settings-sheet {
+  width: min(480px, 100%);
+  max-height: min(86dvh, 640px);
+  overflow: auto;
+  background: var(--surface);
+  border-radius: 18px 18px 0 0;
+  padding: 16px 18px 28px;
+  box-shadow: 0 -12px 40px rgba(13, 31, 71, 0.18);
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.settings-head h2 {
+  margin: 0;
+  font: 800 1.2rem/1.2 var(--font);
+  color: var(--ink);
+}
+
+.settings-done {
+  border: 0;
+  background: var(--secondary-fill);
+  color: var(--accent);
+  font: 700 0.95rem/1 var(--font);
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.settings-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(13, 31, 71, 0.08);
+}
+
+.settings-section h3 {
+  margin: 0 0 10px;
+  font: 700 0.8rem/1.2 var(--font);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font: 600 1rem/1.3 var(--font);
+  color: var(--ink);
+}
+
+.settings-toggle {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: var(--secondary-fill);
+  color: var(--accent);
+  font: 700 0.85rem/1 var(--font);
+  cursor: pointer;
+}
+
+.settings-toggle.on {
+  background: var(--accent);
+  color: #fff;
+}
+
+.settings-link {
+  display: block;
+  padding: 12px 0;
+  font: 700 1rem/1.3 var(--font);
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(13, 31, 71, 0.06);
+}
+
+.settings-version {
+  margin: 14px 0 0;
+  font: 600 0.85rem/1.3 var(--font);
+  color: var(--muted);
 }
 
 .divider {

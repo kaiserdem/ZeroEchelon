@@ -26,7 +26,28 @@ const appRoot = document.querySelector<HTMLDivElement>("#app");
 if (!appRoot) throw new Error("#app missing");
 const root: HTMLDivElement = appRoot;
 
-const engine = new ProtocolEngine(graph, rules, "uk");
+const PREFS = {
+  locale: "line24.locale",
+  speak: "line24.speakOnAppear",
+} as const;
+
+const LEGAL = {
+  privacy: "https://kaiserdem.github.io/ZeroEchelon/legal/privacy.html",
+  support: "https://kaiserdem.github.io/ZeroEchelon/legal/support.html",
+  terms: "https://kaiserdem.github.io/ZeroEchelon/legal/terms.html",
+} as const;
+
+function loadLocale(): ContentLocale {
+  const raw = localStorage.getItem(PREFS.locale);
+  return raw === "en" || raw === "uk" ? raw : "uk";
+}
+
+function loadSpeak(): boolean {
+  const raw = localStorage.getItem(PREFS.speak);
+  return raw === null ? true : raw === "true";
+}
+
+const engine = new ProtocolEngine(graph, rules, loadLocale());
 engine.skipEntrySplashIfNeeded();
 
 const stored = loadLocalEvent();
@@ -34,7 +55,8 @@ if (stored) {
   engine.hydrate(stored);
 }
 
-let speakOnAppear = true;
+let speakOnAppear = loadSpeak();
+let showSettings = false;
 let lastSpokenKey = "";
 
 function dial(number: string): void {
@@ -158,6 +180,42 @@ function render(options?: { keepFocus?: boolean }): void {
     `
     : "";
 
+  const settingsOverlay = showSettings
+    ? `
+    <div class="settings-backdrop" data-settings-close>
+      <div class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="settings-head">
+          <h2 id="settings-title">${escapeHtml(locale === "uk" ? "Налаштування" : "Settings")}</h2>
+          <button type="button" class="settings-done" data-settings-close>${escapeHtml(locale === "uk" ? "Готово" : "Done")}</button>
+        </div>
+        <section class="settings-section">
+          <h3>${escapeHtml(locale === "uk" ? "Інтерфейс" : "Interface")}</h3>
+          <div class="settings-row">
+            <span>${escapeHtml(locale === "uk" ? "Мова" : "Language")}</span>
+            <div class="locale" role="group" aria-label="Language">
+              <button type="button" data-locale="uk" class="${locale === "uk" ? "active" : ""}">UA</button>
+              <button type="button" data-locale="en" class="${locale === "en" ? "active" : ""}">EN</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span>${escapeHtml(locale === "uk" ? "Озвучення екранів" : "Speak screens aloud")}</span>
+            <button type="button" class="settings-toggle${speakOnAppear ? " on" : ""}" data-voice data-in-settings>
+              ${speakOnAppear ? (locale === "uk" ? "Увімк" : "On") : locale === "uk" ? "Вимк" : "Off"}
+            </button>
+          </div>
+        </section>
+        <section class="settings-section">
+          <h3>${escapeHtml(locale === "uk" ? "Про додаток" : "About")}</h3>
+          <a class="settings-link" href="${LEGAL.privacy}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Політика конфіденційності" : "Privacy Policy")}</a>
+          <a class="settings-link" href="${LEGAL.support}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Підтримка" : "Support")}</a>
+          <a class="settings-link" href="${LEGAL.terms}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Умови користування" : "Terms of Use")}</a>
+          <p class="settings-version">Line 24 · web demo</p>
+        </section>
+      </div>
+    </div>
+  `
+    : "";
+
   root.innerHTML = `
     <div class="frame${isVeto ? " is-veto" : ""}">
       <p class="demo-banner">${locale === "uk" ? "Веб-демо · не App Store" : "Web demo · not App Store"}</p>
@@ -168,11 +226,8 @@ function render(options?: { keepFocus?: boolean }): void {
             : `<span class="top-brand" aria-label="Line 24">Line 24</span>`
         }
         <span class="top-spacer"></span>
-        <div class="locale" role="group" aria-label="Language">
-          <button type="button" data-locale="uk" class="${locale === "uk" ? "active" : ""}">UA</button>
-          <button type="button" data-locale="en" class="${locale === "en" ? "active" : ""}">EN</button>
-        </div>
         <button type="button" class="voice-toggle" data-voice aria-label="${locale === "uk" ? "Голос" : "Voice"}">${speakOnAppear ? "🔊" : "🔇"}</button>
+        <button type="button" class="settings-btn" data-settings aria-label="${locale === "uk" ? "Налаштування" : "Settings"}">⚙</button>
       </header>
       <div class="divider"></div>
       <main class="content">
@@ -197,6 +252,7 @@ function render(options?: { keepFocus?: boolean }): void {
         ${lastEvent}
       </main>
       <footer class="emergency">${emergencyHtml}</footer>
+      ${settingsOverlay}
     </div>
   `;
 
@@ -233,20 +289,45 @@ function bind(): void {
     render();
   });
 
+  root.querySelector("[data-settings]")?.addEventListener("click", () => {
+    showSettings = true;
+    render();
+  });
+
+  root.querySelector(".settings-backdrop")?.addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) {
+      showSettings = false;
+      render();
+    }
+  });
+
+  root.querySelectorAll(".settings-done").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      showSettings = false;
+      render();
+    });
+  });
+
   root.querySelectorAll<HTMLButtonElement>("[data-locale]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const value = btn.dataset.locale;
       if (value === "uk" || value === "en") {
         engine.locale = value;
+        localStorage.setItem(PREFS.locale, value);
+        lastSpokenKey = "";
         render();
       }
     });
   });
 
-  root.querySelector("[data-voice]")?.addEventListener("click", () => {
-    speakOnAppear = !speakOnAppear;
-    if (!speakOnAppear) stopSpeaking();
-    render();
+  root.querySelectorAll("[data-voice]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      speakOnAppear = !speakOnAppear;
+      localStorage.setItem(PREFS.speak, String(speakOnAppear));
+      if (!speakOnAppear) stopSpeaking();
+      lastSpokenKey = "";
+      render();
+    });
   });
 
   const locInput = root.querySelector<HTMLInputElement>("[data-loc-input]");

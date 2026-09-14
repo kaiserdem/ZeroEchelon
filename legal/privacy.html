@@ -3,78 +3,109 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Політика конфіденційності — Line 24</title>
-  <meta name="description" content="Політика конфіденційності застосунку Line 24." />
+  <title>Privacy Policy — Line 24</title>
+  <meta name="description" content="Privacy Policy for Line 24 (Ukrainian / English)." />
   <link rel="icon" href="logo-256.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="i18n.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-header">
-      <a class="brand-lockup" href="index.html">
-        <span class="brand-mark"><img src="logo-256.png" width="64" height="64" alt="" /></span>
-        <span class="brand-text">
-          <span class="brand-name">Line 24</span>
-          <span class="brand-tag">Офлайн-підказки порятунку</span>
-        </span>
-      </a>
+      <div class="header-top">
+        <a class="brand-lockup" href="index.html">
+          <span class="brand-mark"><img src="logo-256.png" width="64" height="64" alt="Line 24" /></span>
+          <span class="brand-text">
+            <span class="brand-name">Line 24</span>
+            <span class="brand-tag i18n" data-locale="uk">Офлайн-підказки порятунку</span>
+            <span class="brand-tag i18n" data-locale="en" hidden>Offline rescue guidance</span>
+          </span>
+        </a>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-set-locale="uk" aria-pressed="true">UA</button>
+          <button type="button" data-set-locale="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
       <nav>
-        <a href="privacy.html" aria-current="page">Конфіденційність</a>
-        <a href="support.html">Підтримка</a>
-        <a href="terms.html">Умови</a>
+        <a class="i18n" data-locale="uk" href="privacy.html" aria-current="page">Конфіденційність</a>
+        <a class="i18n" data-locale="uk" href="support.html">Підтримка</a>
+        <a class="i18n" data-locale="uk" href="terms.html">Умови</a>
+        <a class="i18n" data-locale="en" href="privacy.html" aria-current="page" hidden>Privacy</a>
+        <a class="i18n" data-locale="en" href="support.html" hidden>Support</a>
+        <a class="i18n" data-locale="en" href="terms.html" hidden>Terms</a>
       </nav>
     </header>
 
     <article class="page-panel">
-      <h1>Політика конфіденційності</h1>
-      <p class="meta">Останнє оновлення: 14 вересня 2026</p>
+      <div class="i18n" data-locale="uk">
+        <h1>Політика конфіденційності</h1>
+        <p class="meta">Останнє оновлення: 14 вересня 2026</p>
+        <p>Ця політика описує, як застосунок <strong>Line 24</strong> (ядро — Zero Echelon) обробляє дані. Коротко: <strong>журнал події зберігається лише на вашому пристрої</strong>; ми не ведемо облікових записів і не надсилаємо медичні дані на наші сервери.</p>
+        <h2>1. Хто ми</h2>
+        <p>Видавець Line 24. Звʼязок: <a href="support.html">підтримка</a> або <a href="https://github.com/kaiserdem/ZeroEchelon/issues">GitHub Issues</a>.</p>
+        <h2>2. Які дані обробляються</h2>
+        <ul>
+          <li><strong>Локальний журнал однієї події</strong> — лише на пристрої.</li>
+          <li><strong>Локальні нагадування</strong> 24 і 48 годин.</li>
+          <li><strong>Мікрофон / мова</strong> — лише для диктовки адреси, якщо ви самі увімкнули.</li>
+          <li><strong>QR / текст звіту</strong> — на пристрої; передача лише з вашої ініціативи.</li>
+        </ul>
+        <h2>3. Чого ми не робимо</h2>
+        <ul>
+          <li>Немає акаунтів і входу.</li>
+          <li>Немає аналітики здоровʼя / інциденту на наші сервери.</li>
+          <li>Немає продажу даних і рекламних SDK.</li>
+          <li>Немає підключення до ЕСОЗ.</li>
+        </ul>
+        <h2>4. Зберігання і видалення</h2>
+        <p>Журнал лишається на пристрої, доки ви не зітрете його в застосунку або не видалите застосунок.</p>
+        <h2>5. Дозволи iOS</h2>
+        <ul>
+          <li>Мікрофон і розпізнавання мови — для диктовки адреси.</li>
+          <li>Сповіщення — для локальних нагадувань 24/48 год.</li>
+        </ul>
+        <h2>6. Контакт</h2>
+        <p><a href="https://github.com/kaiserdem/ZeroEchelon/issues">github.com/kaiserdem/ZeroEchelon/issues</a></p>
+      </div>
 
-      <p>Ця політика описує, як застосунок <strong>Line 24</strong> (робоча назва ядра — Zero Echelon) обробляє дані. Коротко: <strong>журнал події зберігається лише на вашому пристрої</strong>; ми не ведемо облікових записів і не надсилаємо медичні дані на наші сервери.</p>
-
-      <h2>1. Хто ми</h2>
-      <p>Видавець застосунку Line 24. Звʼязок: через <a href="support.html">сторінку підтримки</a> або <a href="https://github.com/kaiserdem/ZeroEchelon/issues">GitHub Issues</a>.</p>
-
-      <h2>2. Які дані обробляються</h2>
-      <ul>
-        <li><strong>Локальний журнал однієї події</strong> (тип інциденту, роль, чернетка місця/звіту, мітки часу, за потреби лічильники SALT / час турнікета) — лише у сховищі пристрою.</li>
-        <li><strong>Локальні нагадування</strong> через 24 і 48 годин (системні нотифікації на пристрої).</li>
-        <li><strong>Мікрофон і розпізнавання мови</strong> — лише якщо ви самі вмикаєте диктовку адреси; аудіо не зберігається нами і не надсилається на наші сервери. Обробка йде через системні API Apple на пристрої.</li>
-        <li><strong>QR / текст звіту</strong> — формується на пристрої; передача іншій особі лише з вашої ініціативи.</li>
-      </ul>
-
-      <h2>3. Чого ми не робимо</h2>
-      <ul>
-        <li>Не створюємо акаунти й не вимагаємо входу.</li>
-        <li>Не збираємо аналітику з корисним навантаженням про здоровʼя чи інцидент.</li>
-        <li>Не продаємо й не передаємо персональні дані третім сторонам для реклами.</li>
-        <li>Не підключаємося до ЕСОЗ / центральних медичних реєстрів.</li>
-      </ul>
-
-      <h2>4. Зберігання і видалення</h2>
-      <p>Дані журналу лишаються на пристрої, доки ви не оберете стирання (наприклад, після «Передав медику» → «Стерти журнал») або не видалите застосунок. Рекомендуємо стирати журнал після передачі службам.</p>
-
-      <h2>5. Дозволи iOS</h2>
-      <ul>
-        <li><strong>Мікрофон</strong> — для диктовки полів адреси.</li>
-        <li><strong>Розпізнавання мови</strong> — те саме.</li>
-        <li><strong>Сповіщення</strong> — для локальних нагадувань 24/48 год (якщо ви дозволите).</li>
-      </ul>
-
-      <h2>6. Діти</h2>
-      <p>Застосунок не призначений для дітей як окрема аудиторія; ним може користуватися будь-хто в надзвичайній ситуації. Ми свідомо не збираємо дані для профілювання неповнолітніх.</p>
-
-      <h2>7. Зміни</h2>
-      <p>Оновлення цієї політики публікуватимуться на цій сторінці з новою датою.</p>
-
-      <h2>8. Контакт</h2>
-      <p>Питання щодо приватності: <a href="https://github.com/kaiserdem/ZeroEchelon/issues">github.com/kaiserdem/ZeroEchelon/issues</a> (тема: Privacy).</p>
+      <div class="i18n" data-locale="en" hidden>
+        <h1>Privacy Policy</h1>
+        <p class="meta">Last updated: 14 September 2026</p>
+        <p>This policy describes how <strong>Line 24</strong> (core: Zero Echelon) handles data. In short: the <strong>event journal stays on your device only</strong>; we do not run accounts and do not upload health data to our servers.</p>
+        <h2>1. Who we are</h2>
+        <p>Publisher of Line 24. Contact via <a href="support.html">Support</a> or <a href="https://github.com/kaiserdem/ZeroEchelon/issues">GitHub Issues</a>.</p>
+        <h2>2. Data processed</h2>
+        <ul>
+          <li><strong>Single-event local journal</strong> — on-device only.</li>
+          <li><strong>Local reminders</strong> at 24 and 48 hours.</li>
+          <li><strong>Microphone / speech</strong> — only if you start address dictation.</li>
+          <li><strong>QR / report text</strong> — on-device; shared only when you choose to.</li>
+        </ul>
+        <h2>3. What we do not do</h2>
+        <ul>
+          <li>No accounts or sign-in.</li>
+          <li>No health/incident analytics to our servers.</li>
+          <li>No sale of data and no ad SDKs.</li>
+          <li>No connection to Ukraine’s eHealth (ESOZ).</li>
+        </ul>
+        <h2>4. Retention and deletion</h2>
+        <p>The journal stays on the device until you erase it in-app or uninstall the app.</p>
+        <h2>5. iOS permissions</h2>
+        <ul>
+          <li>Microphone and speech recognition — for address dictation.</li>
+          <li>Notifications — for local 24/48h reminders.</li>
+        </ul>
+        <h2>6. Contact</h2>
+        <p><a href="https://github.com/kaiserdem/ZeroEchelon/issues">github.com/kaiserdem/ZeroEchelon/issues</a></p>
+      </div>
     </article>
 
     <footer>
-      <p><a href="index.html">← Усі сторінки</a> · Line 24</p>
+      <p class="i18n" data-locale="uk"><a href="index.html">← Усі сторінки</a> · Line 24</p>
+      <p class="i18n" data-locale="en" hidden><a href="index.html">← All pages</a> · Line 24</p>
     </footer>
   </div>
 </body>
