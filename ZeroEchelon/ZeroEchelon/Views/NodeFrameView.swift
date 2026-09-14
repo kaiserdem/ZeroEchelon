@@ -33,6 +33,8 @@ struct NodeFrameView: View {
     var onSelect: ((String) -> Void)?
     var onOpenLastReport: (() -> Void)?
 
+    @State private var showSettings = false
+
     private var isVeto: Bool { engine.currentNode.veto }
 
     var body: some View {
@@ -146,8 +148,12 @@ struct NodeFrameView: View {
                 speakCurrent()
             }
         }
-        .onChange(of: engine.locale) { _, _ in
+        .onChange(of: engine.locale) { _, newLocale in
+            AppPreferences.locale = newLocale
             speakCurrent()
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(locale: $engine.locale, speakOnAppear: $speakOnAppear)
         }
     }
 
@@ -359,10 +365,12 @@ struct NodeFrameView: View {
 
             Spacer(minLength: 8)
 
-            localeCapsules
-
             Button {
                 speakOnAppear.toggle()
+                AppPreferences.speakOnAppear = speakOnAppear
+                if !speakOnAppear {
+                    speech.stop()
+                }
             } label: {
                 Image(systemName: speakOnAppear ? "speaker.wave.2.fill" : "speaker.slash.fill")
                     .foregroundStyle(CivicTheme.accent)
@@ -371,37 +379,22 @@ struct NodeFrameView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(engine.locale == .uk ? "Голос" : "Voice")
+
+            Button {
+                showSettings = true
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .foregroundStyle(CivicTheme.accent)
+                    .frame(width: 36, height: 36)
+                    .background(CivicTheme.secondaryFill, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(engine.locale == .uk ? "Налаштування" : "Settings")
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, 10)
         .background(screenBackground)
-    }
-
-    private var localeCapsules: some View {
-        HStack(spacing: 0) {
-            localeChip(.uk, title: "UA")
-            localeChip(.en, title: "EN")
-        }
-        .background(CivicTheme.secondaryFill, in: Capsule())
-    }
-
-    private func localeChip(_ locale: ContentLocale, title: String) -> some View {
-        Button {
-            engine.locale = locale
-        } label: {
-            Text(title)
-                .font(.subheadline.weight(.bold))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .foregroundStyle(engine.locale == locale ? Color.white : CivicTheme.accent)
-                .background {
-                    if engine.locale == locale {
-                        Capsule().fill(CivicTheme.accent)
-                    }
-                }
-        }
-        .buttonStyle(.plain)
     }
 
     private func lastEventCard(_ summary: String) -> some View {

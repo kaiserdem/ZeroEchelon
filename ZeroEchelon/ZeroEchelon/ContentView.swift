@@ -7,14 +7,14 @@ final class AppModel {
     var engine: ProtocolEngine?
     var loadError: String?
     var speech = SpeechController()
-    var speakOnAppear = true
+    var speakOnAppear = AppPreferences.speakOnAppear
 
     private let waveScheduler = WaveReminderScheduler()
 
     func load() {
         do {
             let package = try GraphLoader.loadBundledPackage()
-            let engine = try ProtocolEngine(package: package, locale: .uk)
+            let engine = try ProtocolEngine(package: package, locale: AppPreferences.locale)
             try engine.skipEntrySplashIfNeeded()
 
             if let record = LocalEventStore.load() {
@@ -24,6 +24,7 @@ final class AppModel {
             }
 
             self.engine = engine
+            speakOnAppear = AppPreferences.speakOnAppear
             loadError = nil
 
             waveScheduler.onOpenWaveChecklist = { [weak self] in
