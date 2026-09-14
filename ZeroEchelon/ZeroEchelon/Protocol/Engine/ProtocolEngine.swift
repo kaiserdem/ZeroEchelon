@@ -360,12 +360,15 @@ final class ProtocolEngine {
 
     var dispatcherDraft: String {
         var lines: [String] = []
-        lines.append(localizedIncidentTypeLabel() + ".")
-        lines.append(
-            locationLine
-                ?? (locale == .uk ? "місце ще не вказано" : "place not set")
-        )
-        lines.append(locale == .uk ? "Я \(localizedRoleLabel())." : "I am \(localizedRoleLabel()).")
+        if let typeLabel = localizedIncidentTypeLabel() {
+            lines.append(typeLabel + ".")
+        }
+        if let locationLine {
+            lines.append(locationLine)
+        }
+        if let roleLabel = localizedRoleLabel() {
+            lines.append(locale == .uk ? "Я \(roleLabel)." : "I am \(roleLabel).")
+        }
 
         if let casualties = saltCasualtiesLine() {
             lines.append(casualties)
@@ -383,21 +386,19 @@ final class ProtocolEngine {
     }
 
     /// Human label from Type (S2) buttons — never the raw edge id (`explosion` → «Вибух»).
-    private func localizedIncidentTypeLabel() -> String {
-        guard let incidentType else {
-            return locale == .uk ? "тип ще не обрано" : "type not set"
-        }
+    private func localizedIncidentTypeLabel() -> String? {
+        guard let incidentType else { return nil }
         if let button = graph.node(id: "Type")?.ui?.buttons?.first(where: { $0.when == incidentType }) {
             return button.title(for: locale)
         }
         return incidentType
     }
 
-    private func localizedRoleLabel() -> String {
+    private func localizedRoleLabel() -> String? {
         switch sessionRole {
         case .witness: locale == .uk ? "цивільний свідок" : "civilian bystander"
         case .casualty: locale == .uk ? "постраждалий" : "casualty"
-        case nil: locale == .uk ? "роль ще не обрана" : "role not set"
+        case nil: nil
         }
     }
 

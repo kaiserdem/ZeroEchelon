@@ -345,16 +345,15 @@ export class ProtocolEngine {
 
   get dispatcherDraft(): string {
     const lines: string[] = [];
-    lines.push(`${this.localizedIncidentTypeLabel()}.`);
-    lines.push(
-      this.locationLine ??
-        (this.locale === "uk" ? "місце ще не вказано" : "place not set"),
-    );
-    lines.push(
-      this.locale === "uk"
-        ? `Я ${this.localizedRoleLabel()}.`
-        : `I am ${this.localizedRoleLabel()}.`,
-    );
+    const typeLabel = this.localizedIncidentTypeLabel();
+    if (typeLabel) lines.push(`${typeLabel}.`);
+    if (this.locationLine) lines.push(this.locationLine);
+    const roleLabel = this.localizedRoleLabel();
+    if (roleLabel) {
+      lines.push(
+        this.locale === "uk" ? `Я ${roleLabel}.` : `I am ${roleLabel}.`,
+      );
+    }
     const casualties = this.saltCasualtiesLine();
     if (casualties) lines.push(casualties);
     if (this.tourniquetOn) {
@@ -373,10 +372,8 @@ export class ProtocolEngine {
     return lines.join("\n");
   }
 
-  private localizedIncidentTypeLabel(): string {
-    if (!this.incidentType) {
-      return this.locale === "uk" ? "тип ще не обрано" : "type not set";
-    }
+  private localizedIncidentTypeLabel(): string | null {
+    if (!this.incidentType) return null;
     const typeNode = nodeById(this.graph, "Type");
     const button = typeNode?.ui?.buttons?.find(
       (b) => b.when === this.incidentType,
@@ -385,14 +382,14 @@ export class ProtocolEngine {
     return this.incidentType;
   }
 
-  private localizedRoleLabel(): string {
+  private localizedRoleLabel(): string | null {
     if (this.sessionRole === "witness") {
       return this.locale === "uk" ? "цивільний свідок" : "civilian bystander";
     }
     if (this.sessionRole === "casualty") {
       return this.locale === "uk" ? "постраждалий" : "casualty";
     }
-    return this.locale === "uk" ? "роль ще не обрана" : "role not set";
+    return null;
   }
 
   private saltCasualtiesLine(): string | null {
