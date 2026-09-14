@@ -184,18 +184,14 @@ h2 {
   margin-top: 0.25rem;
 }
 
-p, li {
-  color: var(--ink);
-}
+p, li { color: var(--ink); }
 
 ul {
   padding-left: 1.15rem;
   margin: 0.4rem 0 0.8rem;
 }
 
-li + li {
-  margin-top: 0.35rem;
-}
+li + li { margin-top: 0.35rem; }
 
 .card-grid {
   display: grid;
@@ -241,21 +237,9 @@ li + li {
   margin: 0 0 1.25rem;
 }
 
-.alert strong {
-  color: var(--danger);
-}
+.alert strong { color: var(--danger); }
 
 .muted { color: var(--muted); }
-
-.lang {
-  margin: 1.75rem 0 0;
-  padding-top: 1.25rem;
-  border-top: 1px dashed var(--line);
-}
-
-.lang h2 {
-  margin-top: 0;
-}
 
 footer {
   margin-top: 2rem;
@@ -265,9 +249,7 @@ footer {
   font-weight: 600;
 }
 
-footer a {
-  font-weight: 700;
-}
+footer a { font-weight: 700; }
 
 @media (min-width: 640px) {
   .site-header {
@@ -276,7 +258,5 @@ footer a {
     justify-content: space-between;
   }
 
-  nav {
-    justify-content: flex-end;
-  }
+  nav { justify-content: flex-end; }
 }
