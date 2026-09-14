@@ -48,9 +48,7 @@ final class SpeechController {
                 return
             }
 
-            let micGranted = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
-                AVAudioSession.sharedInstance().requestRecordPermission { cont.resume(returning: $0) }
-            }
+            let micGranted = await AVAudioApplication.requestRecordPermission()
             guard micGranted else {
                 lastError = locale == .uk
                     ? "Немає доступу до мікрофона"
