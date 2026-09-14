@@ -86,10 +86,15 @@ function render(options?: { keepFocus?: boolean }): void {
   const emphasizeCall = engine.currentNode.id === "Call";
   const listening = isDictating();
 
-  const actionsClass = isType ? "actions grid" : "actions";
+  const actionsClass = isType ? "actions type-grid" : "actions";
   const actionHtml = buttons
     .map((button, index) => {
-      const primary = index === 0 || isVeto || isType;
+      if (isType) {
+        const title = buttonTitle(button, locale);
+        const src = `type-icons/type_${encodeURIComponent(button.when)}.png`;
+        return `<button type="button" class="type-icon-btn" data-when="${escapeAttr(button.when)}" aria-label="${escapeAttr(title)}"><img src="${src}" alt="" width="56" height="56" decoding="async" /><span>${escapeHtml(title)}</span></button>`;
+      }
+      const primary = index === 0 || isVeto;
       let cls = "action-btn secondary";
       if (isVeto) cls = "action-btn veto";
       else if (primary) cls = "action-btn primary";

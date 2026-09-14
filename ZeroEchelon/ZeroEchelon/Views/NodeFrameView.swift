@@ -94,11 +94,12 @@ struct NodeFrameView: View {
                                 columns: [
                                     GridItem(.flexible(), spacing: 10),
                                     GridItem(.flexible(), spacing: 10),
+                                    GridItem(.flexible(), spacing: 10),
                                 ],
                                 spacing: 10
                             ) {
-                                ForEach(Array(engine.visibleButtons.enumerated()), id: \.element.id) { index, button in
-                                    actionButton(button, index: index)
+                                ForEach(engine.visibleButtons, id: \.id) { button in
+                                    typeIconButton(button)
                                 }
                             }
                         } else {
@@ -257,8 +258,45 @@ struct NodeFrameView: View {
     }
 
     @ViewBuilder
+    private func typeIconButton(_ button: ProtocolButton) -> some View {
+        let title = button.title(for: engine.locale)
+        Button {
+            handle(button.when)
+        } label: {
+            VStack(spacing: 6) {
+                Image("type_\(button.when)")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 48, height: 48)
+                    .accessibilityHidden(true)
+
+                Text(title)
+                    .font(.body.weight(.bold))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(CivicTheme.ink)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 0)
+            .background(
+                CivicTheme.surface,
+                in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                    .stroke(CivicTheme.secondaryFill, lineWidth: 1.5)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+    }
+
+    @ViewBuilder
     private func actionButton(_ button: ProtocolButton, index: Int) -> some View {
-        let primary = index == 0 || engine.currentNode.id == "Type"
+        let primary = index == 0
         Button {
             handle(button.when)
         } label: {
