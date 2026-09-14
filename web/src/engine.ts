@@ -47,6 +47,10 @@ export class ProtocolEngine {
   eventStartedAt: string | null = null;
   reachedFormAt: string | null = null;
   waveRemindersScheduled = false;
+  tourniquetOn: string | null = null;
+  saltRedCount = 0;
+  saltYellowCount = 0;
+  saltGreenCount = 0;
 
   /** Seconds between scene re-checks (overridable in tests). */
   sceneRecheckInterval: number;
@@ -340,22 +344,33 @@ export class ProtocolEngine {
   }
 
   get dispatcherDraft(): string {
-    const place =
+    const lines: string[] = [];
+    lines.push(`${this.localizedIncidentTypeLabel()}.`);
+    lines.push(
       this.locationLine ??
-      (this.locale === "uk" ? "місце ще не вказано" : "place not set");
-    const type = this.localizedIncidentTypeLabel();
-    let role: string;
-    if (this.sessionRole === "witness") {
-      role = this.locale === "uk" ? "цивільний свідок" : "civilian bystander";
-    } else if (this.sessionRole === "casualty") {
-      role = this.locale === "uk" ? "постраждалий" : "casualty";
-    } else {
-      role = this.locale === "uk" ? "роль ще не обрана" : "role not set";
+        (this.locale === "uk" ? "місце ще не вказано" : "place not set"),
+    );
+    lines.push(
+      this.locale === "uk"
+        ? `Я ${this.localizedRoleLabel()}.`
+        : `I am ${this.localizedRoleLabel()}.`,
+    );
+    const casualties = this.saltCasualtiesLine();
+    if (casualties) lines.push(casualties);
+    if (this.tourniquetOn) {
+      lines.push(this.tourniquetLine(this.tourniquetOn));
     }
-    if (this.locale === "uk") {
-      return `${type}. ${place}. Потрібна допомога. Я ${role}.`;
+    const facts = this.keyFactLines();
+    if (facts.length > 0) {
+      const joined = facts.join("; ");
+      lines.push(
+        this.locale === "uk" ? `Зроблено: ${joined}.` : `Done: ${joined}.`,
+      );
     }
-    return `${type}. ${place}. Help needed. I am ${role}.`;
+    lines.push(
+      this.locale === "uk" ? "Потрібна допомога." : "Help needed.",
+    );
+    return lines.join("\n");
   }
 
   private localizedIncidentTypeLabel(): string {
@@ -368,6 +383,96 @@ export class ProtocolEngine {
     );
     if (button) return buttonTitle(button, this.locale);
     return this.incidentType;
+  }
+
+  private localizedRoleLabel(): string {
+    if (this.sessionRole === "witness") {
+      return this.locale === "uk" ? "цивільний свідок" : "civilian bystander";
+    }
+    if (this.sessionRole === "casualty") {
+      return this.locale === "uk" ? "постраждалий" : "casualty";
+    }
+    return this.locale === "uk" ? "роль ще не обрана" : "role not set";
+  }
+
+  private saltCasualtiesLine(): string | null {
+    const red = this.saltRedCount;
+    const yellow = this.saltYellowCount;
+    const green = this.saltGreenCount;
+    const unreachable = this.unreachableMarked ? 1 : 0;
+    if (red + yellow + green + unreachable === 0) return null;
+    if (this.locale === "uk") {
+      const parts: string[] = [];
+      if (red > 0) parts.push(`червоних ${red}`);
+      if (yellow > 0) parts.push(`жовтих ${yellow}`);
+      if (green > 0) parts.push(`зелених ${green}`);
+      if (unreachable > 0) parts.push(`недосяжних ${unreachable}`);
+      return `Постраждалі: ${parts.join(", ")}.`;
+    }
+    const parts: string[] = [];
+    if (red > 0) parts.push(`red ${red}`);
+    if (yellow > 0) parts.push(`yellow ${yellow}`);
+    if (green > 0) parts.push(`green ${green}`);
+    if (unreachable > 0) parts.push(`unreachable ${unreachable}`);
+    return `Casualties: ${parts.join(", ")}.`;
+  }
+
+  private tourniquetLine(iso: string): string {
+    const time = new Intl.DateTimeFormat(
+      this.locale === "uk" ? "uk-UA" : "en-GB",
+      { timeStyle: "short" },
+    ).format(new Date(iso));
+    return this.locale === "uk"
+      ? `Джгут накладено о ${time}.`
+      : `Tourniquet applied at ${time}.`;
+  }
+
+  private keyFactLines(): string[] {
+    const labels =
+      this.locale === "uk"
+        ? ({
+            C0: "масивна кровотеча",
+            C1: "тиск на рану",
+            Hold: "триває тиск",
+            Pack: "тампонада",
+            Tq: "джгут",
+            "Tq-time": "час джгута",
+            Tq2: "другий джгут",
+            Still: "кровотеча після джгута",
+            Open: "відкрита рана грудей",
+            Burp: "клапан / «відрижка» плівки",
+            Crush: "завал / не звільняти",
+            NoCpr: "без СЛР",
+            NoResp: "не дихає",
+            Deleg: "делеговано тиск",
+          } as Record<string, string>)
+        : ({
+            C0: "massive bleeding",
+            C1: "direct pressure",
+            Hold: "holding pressure",
+            Pack: "wound packing",
+            Tq: "tourniquet",
+            "Tq-time": "tourniquet time",
+            Tq2: "second tourniquet",
+            Still: "bleeding after tourniquet",
+            Open: "open chest wound",
+            Burp: "burp the seal",
+            Crush: "crush — do not release",
+            NoCpr: "no CPR",
+            NoResp: "not breathing",
+            Deleg: "pressure handed off",
+          } as Record<string, string>);
+    const seen = new Set<string>();
+    const facts: string[] = [];
+    for (let i = this.steps.length - 1; i >= 0; i -= 1) {
+      const step = this.steps[i];
+      const label = labels[step.nodeId];
+      if (!label || seen.has(step.nodeId)) continue;
+      seen.add(step.nodeId);
+      facts.push(label);
+      if (facts.length === 3) break;
+    }
+    return facts.reverse();
   }
 
   goBack(): void {
@@ -574,6 +679,10 @@ export class ProtocolEngine {
       locationLevel: this.locationLevel,
       steps: this.steps,
       waveRemindersScheduled: this.waveRemindersScheduled,
+      tourniquetOn: this.tourniquetOn,
+      saltRedCount: this.saltRedCount,
+      saltYellowCount: this.saltYellowCount,
+      saltGreenCount: this.saltGreenCount,
     };
   }
 
@@ -587,6 +696,10 @@ export class ProtocolEngine {
     this.locationLevel = record.locationLevel;
     this.steps = record.steps;
     this.waveRemindersScheduled = record.waveRemindersScheduled;
+    this.tourniquetOn = record.tourniquetOn ?? null;
+    this.saltRedCount = record.saltRedCount ?? 0;
+    this.saltYellowCount = record.saltYellowCount ?? 0;
+    this.saltGreenCount = record.saltGreenCount ?? 0;
   }
 
   markWaveRemindersScheduled(): void {
@@ -623,6 +736,10 @@ export class ProtocolEngine {
     this.eventStartedAt = null;
     this.reachedFormAt = null;
     this.waveRemindersScheduled = false;
+    this.tourniquetOn = null;
+    this.saltRedCount = 0;
+    this.saltYellowCount = 0;
+    this.saltGreenCount = 0;
     this.steps = [];
     this.locationLine = null;
     this.locationLevel = null;
@@ -697,6 +814,7 @@ export class ProtocolEngine {
     if (recordHistory) this.history.push(leavingId);
     this.currentNode = next;
     this.captureLocationIfNeeded(next.id);
+    this.captureReportArrival(next.id, leavingId, edgeWhen);
     if (leavingId === this.rules.sceneRecheck.armAfterLeavingNodeId) {
       this.lastSceneCheckAt = this.now();
     }
@@ -727,6 +845,35 @@ export class ProtocolEngine {
         break;
       default:
         break;
+    }
+  }
+
+  private captureReportArrival(
+    arrivedAt: string,
+    leavingId: string,
+    edgeWhen: string,
+  ): void {
+    switch (arrivedAt) {
+      case "Red":
+        this.saltRedCount += 1;
+        break;
+      case "Yellow":
+        this.saltYellowCount += 1;
+        break;
+      case "Green":
+      case "Green2":
+        this.saltGreenCount += 1;
+        break;
+      case "Tq-time":
+        if (!this.tourniquetOn) {
+          this.tourniquetOn = new Date(this.now()).toISOString();
+        }
+        break;
+      default:
+        break;
+    }
+    if (leavingId === "Tq" && edgeWhen === "next" && !this.tourniquetOn) {
+      this.tourniquetOn = new Date(this.now()).toISOString();
     }
   }
 

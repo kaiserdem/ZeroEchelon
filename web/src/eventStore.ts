@@ -15,6 +15,10 @@ export interface LocalEventRecord {
   locationLevel: number | null;
   steps: ProtocolLogStep[];
   waveRemindersScheduled: boolean;
+  tourniquetOn?: string | null;
+  saltRedCount?: number;
+  saltYellowCount?: number;
+  saltGreenCount?: number;
 }
 
 export function isExpired(record: LocalEventRecord, now = Date.now()): boolean {

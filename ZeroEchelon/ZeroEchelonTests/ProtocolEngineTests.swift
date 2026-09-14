@@ -445,4 +445,23 @@ struct ProtocolEngineTests {
         try reachFirstSafety(engine: engine, type: "explosion")
         #expect(engine.currentNode.id == "A1")
     }
+
+    @Test func dispatcherDraftIncludesTourniquetAndSalt() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "incident")
+
+        try engine.setCurrentNodeForTesting("Four")
+        _ = try engine.select(edgeWhen: "bad")
+        #expect(engine.currentNode.id == "Red")
+        #expect(engine.saltRedCount == 1)
+        #expect(engine.dispatcherDraft.contains("червоних 1"))
+
+        try engine.setCurrentNodeForTesting("Tq")
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.tourniquetOn != nil)
+        #expect(engine.currentNode.id == "Tq-time")
+        #expect(engine.dispatcherDraft.contains("Джгут накладено"))
+        #expect(engine.dispatcherDraft.contains("Зроблено:"))
+    }
 }

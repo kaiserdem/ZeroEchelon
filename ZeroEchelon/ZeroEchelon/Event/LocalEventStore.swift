@@ -11,8 +11,65 @@ struct LocalEventRecord: Codable, Equatable, Sendable {
     var locationLevel: Int?
     var steps: [ProtocolLogStep]
     var waveRemindersScheduled: Bool
+    var tourniquetOn: Date?
+    var saltRedCount: Int
+    var saltYellowCount: Int
+    var saltGreenCount: Int
 
     static let maxRetentionAfterStart: TimeInterval = 48 * 60 * 60
+
+    enum CodingKeys: String, CodingKey {
+        case eventId, startedAt, reachedFormAt, sessionRole, incidentType
+        case locationLine, locationLevel, steps, waveRemindersScheduled
+        case tourniquetOn, saltRedCount, saltYellowCount, saltGreenCount
+    }
+
+    init(
+        eventId: UUID,
+        startedAt: Date,
+        reachedFormAt: Date?,
+        sessionRole: String?,
+        incidentType: String?,
+        locationLine: String?,
+        locationLevel: Int?,
+        steps: [ProtocolLogStep],
+        waveRemindersScheduled: Bool,
+        tourniquetOn: Date? = nil,
+        saltRedCount: Int = 0,
+        saltYellowCount: Int = 0,
+        saltGreenCount: Int = 0
+    ) {
+        self.eventId = eventId
+        self.startedAt = startedAt
+        self.reachedFormAt = reachedFormAt
+        self.sessionRole = sessionRole
+        self.incidentType = incidentType
+        self.locationLine = locationLine
+        self.locationLevel = locationLevel
+        self.steps = steps
+        self.waveRemindersScheduled = waveRemindersScheduled
+        self.tourniquetOn = tourniquetOn
+        self.saltRedCount = saltRedCount
+        self.saltYellowCount = saltYellowCount
+        self.saltGreenCount = saltGreenCount
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        eventId = try c.decode(UUID.self, forKey: .eventId)
+        startedAt = try c.decode(Date.self, forKey: .startedAt)
+        reachedFormAt = try c.decodeIfPresent(Date.self, forKey: .reachedFormAt)
+        sessionRole = try c.decodeIfPresent(String.self, forKey: .sessionRole)
+        incidentType = try c.decodeIfPresent(String.self, forKey: .incidentType)
+        locationLine = try c.decodeIfPresent(String.self, forKey: .locationLine)
+        locationLevel = try c.decodeIfPresent(Int.self, forKey: .locationLevel)
+        steps = try c.decodeIfPresent([ProtocolLogStep].self, forKey: .steps) ?? []
+        waveRemindersScheduled = try c.decodeIfPresent(Bool.self, forKey: .waveRemindersScheduled) ?? false
+        tourniquetOn = try c.decodeIfPresent(Date.self, forKey: .tourniquetOn)
+        saltRedCount = try c.decodeIfPresent(Int.self, forKey: .saltRedCount) ?? 0
+        saltYellowCount = try c.decodeIfPresent(Int.self, forKey: .saltYellowCount) ?? 0
+        saltGreenCount = try c.decodeIfPresent(Int.self, forKey: .saltGreenCount) ?? 0
+    }
 
     func isExpired(now: Date = Date()) -> Bool {
         now.timeIntervalSince(startedAt) > Self.maxRetentionAfterStart

@@ -61,6 +61,11 @@ final class ProtocolEngine {
     private(set) var eventStartedAt: Date?
     private(set) var reachedFormAt: Date?
     private(set) var waveRemindersScheduled: Bool
+    /// First confirmed tourniquet application (Tq → Tq-time).
+    private(set) var tourniquetOn: Date?
+    private(set) var saltRedCount: Int
+    private(set) var saltYellowCount: Int
+    private(set) var saltGreenCount: Int
 
     /// Seconds between scene re-checks while in care branches (overridable in tests).
     var sceneRecheckInterval: TimeInterval
@@ -99,6 +104,10 @@ final class ProtocolEngine {
         self.eventStartedAt = nil
         self.reachedFormAt = nil
         self.waveRemindersScheduled = false
+        self.tourniquetOn = nil
+        self.saltRedCount = 0
+        self.saltYellowCount = 0
+        self.saltGreenCount = 0
         self.lastSceneCheckAt = nil
         self.pendingRecheckEdge = nil
         self.suppressSceneRecheck = false
@@ -350,20 +359,27 @@ final class ProtocolEngine {
     }
 
     var dispatcherDraft: String {
-        let place = locationLine
-            ?? (locale == .uk ? "місце ще не вказано" : "place not set")
-        let type = localizedIncidentTypeLabel()
-        let role: String = {
-            switch sessionRole {
-            case .witness: locale == .uk ? "цивільний свідок" : "civilian bystander"
-            case .casualty: locale == .uk ? "постраждалий" : "casualty"
-            case nil: locale == .uk ? "роль ще не обрана" : "role not set"
-            }
-        }()
-        if locale == .uk {
-            return "\(type). \(place). Потрібна допомога. Я \(role)."
+        var lines: [String] = []
+        lines.append(localizedIncidentTypeLabel() + ".")
+        lines.append(
+            locationLine
+                ?? (locale == .uk ? "місце ще не вказано" : "place not set")
+        )
+        lines.append(locale == .uk ? "Я \(localizedRoleLabel())." : "I am \(localizedRoleLabel()).")
+
+        if let casualties = saltCasualtiesLine() {
+            lines.append(casualties)
         }
-        return "\(type). \(place). Help needed. I am \(role)."
+        if let tq = tourniquetOn {
+            lines.append(tourniquetLine(tq))
+        }
+        let facts = keyFactLines()
+        if !facts.isEmpty {
+            let joined = facts.joined(separator: "; ")
+            lines.append(locale == .uk ? "Зроблено: \(joined)." : "Done: \(joined).")
+        }
+        lines.append(locale == .uk ? "Потрібна допомога." : "Help needed.")
+        return lines.joined(separator: "\n")
     }
 
     /// Human label from Type (S2) buttons — never the raw edge id (`explosion` → «Вибух»).
@@ -375,6 +391,102 @@ final class ProtocolEngine {
             return button.title(for: locale)
         }
         return incidentType
+    }
+
+    private func localizedRoleLabel() -> String {
+        switch sessionRole {
+        case .witness: locale == .uk ? "цивільний свідок" : "civilian bystander"
+        case .casualty: locale == .uk ? "постраждалий" : "casualty"
+        case nil: locale == .uk ? "роль ще не обрана" : "role not set"
+        }
+    }
+
+    private func saltCasualtiesLine() -> String? {
+        let red = saltRedCount
+        let yellow = saltYellowCount
+        let green = saltGreenCount
+        let unreachable = unreachableMarked ? 1 : 0
+        guard red + yellow + green + unreachable > 0 else { return nil }
+        if locale == .uk {
+            var parts: [String] = []
+            if red > 0 { parts.append("червоних \(red)") }
+            if yellow > 0 { parts.append("жовтих \(yellow)") }
+            if green > 0 { parts.append("зелених \(green)") }
+            if unreachable > 0 { parts.append("недосяжних \(unreachable)") }
+            return "Постраждалі: \(parts.joined(separator: ", "))."
+        }
+        var parts: [String] = []
+        if red > 0 { parts.append("red \(red)") }
+        if yellow > 0 { parts.append("yellow \(yellow)") }
+        if green > 0 { parts.append("green \(green)") }
+        if unreachable > 0 { parts.append("unreachable \(unreachable)") }
+        return "Casualties: \(parts.joined(separator: ", "))."
+    }
+
+    private func tourniquetLine(_ date: Date) -> String {
+        let time = Self.clockFormatter(locale: locale).string(from: date)
+        return locale == .uk
+            ? "Джгут накладено о \(time)."
+            : "Tourniquet applied at \(time)."
+    }
+
+    private static func clockFormatter(locale: ContentLocale) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: locale == .uk ? "uk_UA" : "en_GB")
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        return formatter
+    }
+
+    /// Short care facts from recent steps (max 3), not a full button log.
+    private func keyFactLines() -> [String] {
+        let labels = Self.keyFactLabels(locale: locale)
+        var seen = Set<String>()
+        var facts: [String] = []
+        for step in steps.reversed() {
+            guard let label = labels[step.nodeId], !seen.contains(step.nodeId) else { continue }
+            seen.insert(step.nodeId)
+            facts.append(label)
+            if facts.count == 3 { break }
+        }
+        return facts.reversed()
+    }
+
+    private static func keyFactLabels(locale: ContentLocale) -> [String: String] {
+        if locale == .uk {
+            return [
+                "C0": "масивна кровотеча",
+                "C1": "тиск на рану",
+                "Hold": "триває тиск",
+                "Pack": "тампонада",
+                "Tq": "джгут",
+                "Tq-time": "час джгута",
+                "Tq2": "другий джгут",
+                "Still": "кровотеча після джгута",
+                "Open": "відкрита рана грудей",
+                "Burp": "клапан / «відрижка» плівки",
+                "Crush": "завал / не звільняти",
+                "NoCpr": "без СЛР",
+                "NoResp": "не дихає",
+                "Deleg": "делеговано тиск",
+            ]
+        }
+        return [
+            "C0": "massive bleeding",
+            "C1": "direct pressure",
+            "Hold": "holding pressure",
+            "Pack": "wound packing",
+            "Tq": "tourniquet",
+            "Tq-time": "tourniquet time",
+            "Tq2": "second tourniquet",
+            "Still": "bleeding after tourniquet",
+            "Open": "open chest wound",
+            "Burp": "burp the seal",
+            "Crush": "crush — do not release",
+            "NoCpr": "no CPR",
+            "NoResp": "not breathing",
+            "Deleg": "pressure handed off",
+        ]
     }
 
     func goBack() {
@@ -558,7 +670,11 @@ final class ProtocolEngine {
             locationLine: locationLine,
             locationLevel: locationLevel,
             steps: steps,
-            waveRemindersScheduled: waveRemindersScheduled
+            waveRemindersScheduled: waveRemindersScheduled,
+            tourniquetOn: tourniquetOn,
+            saltRedCount: saltRedCount,
+            saltYellowCount: saltYellowCount,
+            saltGreenCount: saltGreenCount
         )
     }
 
@@ -572,6 +688,10 @@ final class ProtocolEngine {
         locationLevel = record.locationLevel
         steps = record.steps
         waveRemindersScheduled = record.waveRemindersScheduled
+        tourniquetOn = record.tourniquetOn
+        saltRedCount = record.saltRedCount
+        saltYellowCount = record.saltYellowCount
+        saltGreenCount = record.saltGreenCount
     }
 
     func markWaveRemindersScheduled() {
@@ -628,6 +748,10 @@ final class ProtocolEngine {
         eventStartedAt = nil
         reachedFormAt = nil
         waveRemindersScheduled = false
+        tourniquetOn = nil
+        saltRedCount = 0
+        saltYellowCount = 0
+        saltGreenCount = 0
         steps = []
         locationLine = nil
         locationLevel = nil
@@ -707,6 +831,7 @@ final class ProtocolEngine {
         }
         currentNode = next
         captureLocationIfNeeded(arrivedAt: next.id)
+        captureReportArrival(arrivedAt: next.id, leavingId: leavingId, edgeWhen: edgeWhen)
         if leavingId == rules.sceneRecheck.armAfterLeavingNodeId {
             lastSceneCheckAt = now()
         }
@@ -733,6 +858,27 @@ final class ProtocolEngine {
             resetManualLocationWizard()
         default:
             break
+        }
+    }
+
+    private func captureReportArrival(arrivedAt id: String, leavingId: String, edgeWhen: String) {
+        switch id {
+        case "Red":
+            saltRedCount += 1
+        case "Yellow":
+            saltYellowCount += 1
+        case "Green", "Green2":
+            saltGreenCount += 1
+        case "Tq-time":
+            if tourniquetOn == nil {
+                tourniquetOn = now()
+            }
+        default:
+            break
+        }
+        // Timer on Tq starts when user confirms («Наклав»).
+        if leavingId == "Tq", edgeWhen == "next", tourniquetOn == nil {
+            tourniquetOn = now()
         }
     }
 

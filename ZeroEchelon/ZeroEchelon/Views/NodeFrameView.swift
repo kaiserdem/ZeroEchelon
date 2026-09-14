@@ -512,7 +512,7 @@ struct EmergencyBar: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
-        .padding(.bottom, 14)
+        .padding(.bottom, 29) // +~5mm above home indicator / screen edge
         .background(CivicTheme.barFill)
     }
 }
