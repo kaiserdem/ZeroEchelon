@@ -287,10 +287,13 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  box-sizing: border-box;
   border: 1.5px solid var(--secondary-fill);
   border-radius: var(--button-corner);
-  padding: 10px 0;
+  padding: 6px 0;
   background: var(--surface);
   color: var(--ink);
   font: 700 1rem/1.15 var(--font);
@@ -299,8 +302,10 @@ body {
 }
 
 .type-icon-btn img {
-  width: 48px;
-  height: 48px;
+  width: 48%;
+  height: 48%;
+  max-width: 56px;
+  max-height: 56px;
   object-fit: contain;
   pointer-events: none;
 }

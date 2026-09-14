@@ -263,32 +263,37 @@ struct NodeFrameView: View {
         Button {
             handle(button.when)
         } label: {
-            VStack(spacing: 6) {
-                Image("type_\(button.when)")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 48, height: 48)
-                    .accessibilityHidden(true)
+            Color.clear
+                .aspectRatio(1, contentMode: .fit)
+                .overlay {
+                    VStack(spacing: 4) {
+                        Spacer(minLength: 0)
+                        Image("type_\(button.when)")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: 56, maxHeight: 56)
+                            .accessibilityHidden(true)
 
-                Text(title)
-                    .font(.body.weight(.bold))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(CivicTheme.ink)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
-                    .frame(maxWidth: .infinity)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .padding(.horizontal, 0)
-            .background(
-                CivicTheme.surface,
-                in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                    .stroke(CivicTheme.secondaryFill, lineWidth: 1.5)
-            }
+                        Text(title)
+                            .font(.body.weight(.bold))
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(CivicTheme.ink)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.65)
+                            .frame(maxWidth: .infinity)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 0)
+                }
+                .background(
+                    CivicTheme.surface,
+                    in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                        .stroke(CivicTheme.secondaryFill, lineWidth: 1.5)
+                }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
