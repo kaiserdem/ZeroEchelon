@@ -5,18 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Line 24 — Legal</title>
   <meta name="description" content="Privacy, Support and Terms for Line 24 (UA/EN)." />
-  <link rel="icon" href="logo-256.png" type="image/png" />
+  <link rel="icon" href="mark-256.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="site.css" />
+  <style>
+/* Critical header — identical on Privacy / Support / Terms */
+.site-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.85rem !important;
+}
+.brand-mark-solo {
+  display: block !important;
+  width: 72px !important;
+  height: 72px !important;
+  margin: 0 auto !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.brand-mark-solo img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background: transparent !important;
+}
+.header-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+.brand-title {
+  display: block !important;
+  font-weight: 800 !important;
+  font-size: 1.45rem !important;
+  color: #0d449e !important;
+  text-decoration: none !important;
+}
+.brand-tagline {
+  display: block !important;
+  margin: 0 !important;
+  width: 100% !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #52617a !important;
+}
+.brand-tagline[hidden],
+.i18n[hidden] {
+  display: none !important;
+}
+  </style>
   <script src="i18n.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-header">
       <a class="brand-mark-solo" href="index.html" aria-label="Line 24">
-        <img src="logo-256.png" width="72" height="72" alt="" />
+        <img src="mark-256.png" width="72" height="72" alt="" />
       </a>
       <div class="header-bar">
         <a class="brand-title" href="index.html">Line 24</a>

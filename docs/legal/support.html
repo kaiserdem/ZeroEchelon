@@ -5,18 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Support — Line 24</title>
   <meta name="description" content="Support for Line 24 (Ukrainian / English)." />
-  <link rel="icon" href="logo-256.png" type="image/png" />
+  <link rel="icon" href="mark-256.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="site.css" />
+  <style>
+/* Critical header — identical on Privacy / Support / Terms */
+.site-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.85rem !important;
+}
+.brand-mark-solo {
+  display: block !important;
+  width: 72px !important;
+  height: 72px !important;
+  margin: 0 auto !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.brand-mark-solo img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background: transparent !important;
+}
+.header-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+.brand-title {
+  display: block !important;
+  font-weight: 800 !important;
+  font-size: 1.45rem !important;
+  color: #0d449e !important;
+  text-decoration: none !important;
+}
+.brand-tagline {
+  display: block !important;
+  margin: 0 !important;
+  width: 100% !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #52617a !important;
+}
+.brand-tagline[hidden],
+.i18n[hidden] {
+  display: none !important;
+}
+  </style>
   <script src="i18n.js" defer></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-header">
       <a class="brand-mark-solo" href="index.html" aria-label="Line 24">
-        <img src="logo-256.png" width="72" height="72" alt="" />
+        <img src="mark-256.png" width="72" height="72" alt="" />
       </a>
       <div class="header-bar">
         <a class="brand-title" href="index.html">Line 24</a>
@@ -40,40 +90,64 @@
     <article class="page-panel">
       <div class="i18n" data-locale="uk">
         <h1>Підтримка</h1>
-        <p class="meta">Line 24 · Support URL для App Store</p>
-        <div class="alert">
-          <p><strong>Надзвичайна ситуація зараз?</strong><br />
-          Спочатку викличте <strong>103</strong>. За потреби ДСНС — <strong>101</strong>. Застосунок не замінює служби.</p>
-        </div>
-        <h2>Як звʼязатися</h2>
+        <p class="meta">Останнє оновлення: 14 вересня 2026</p>
+        <p>Тут — як звʼязатися щодо застосунку <strong>Line 24</strong> і короткі відповіді. У надзвичайній ситуації спочатку викликайте служби, не чекайте відповіді в issue.</p>
+
+        <h2>1. Надзвичайна ситуація</h2>
+        <p>Спочатку викличте <strong>103</strong> (екстрена меддопомога). За потреби ДСНС — <strong>101</strong>. Застосунок не замінює служби.</p>
+
+        <h2>2. Як звʼязатися</h2>
         <ul>
           <li><a href="https://github.com/kaiserdem/ZeroEchelon/issues/new">Створити issue на GitHub</a></li>
           <li>Репозиторій: <a href="https://github.com/kaiserdem/ZeroEchelon">kaiserdem/ZeroEchelon</a></li>
         </ul>
         <p class="muted">Опишіть модель iPhone, версію iOS, кроки. Не надсилайте фото постраждалих чи персональні дані.</p>
-        <h2>Часті питання</h2>
-        <p><strong>Чи потрібен інтернет?</strong> Ні.</p>
-        <p><strong>Куди діваються дані?</strong> Лише на пристрій — див. <a href="privacy.html">політику конфіденційності</a>.</p>
-        <p><strong>Як стерти журнал?</strong> У застосунку після передачі звіту, або видаліть застосунок.</p>
+
+        <h2>3. Часті питання</h2>
+        <ul>
+          <li><strong>Чи потрібен інтернет?</strong> Ні. Протокол і журнал працюють офлайн.</li>
+          <li><strong>Куди діваються дані?</strong> Лише на пристрій — див. <a href="privacy.html">політику конфіденційності</a>.</li>
+          <li><strong>Як стерти журнал?</strong> У застосунку після передачі звіту, або видаліть застосунок.</li>
+          <li><strong>Чому питає мікрофон?</strong> Лише для диктовки адреси, якщо ви самі натиснули мікрофон.</li>
+        </ul>
+
+        <h2>4. Документи</h2>
+        <ul>
+          <li><a href="privacy.html">Політика конфіденційності</a></li>
+          <li><a href="terms.html">Умови користування</a></li>
+          <li><a href="https://github.com/kaiserdem/ZeroEchelon">README проєкту</a></li>
+        </ul>
       </div>
 
       <div class="i18n" data-locale="en" hidden>
         <h1>Support</h1>
-        <p class="meta">Line 24 · App Store Support URL</p>
-        <div class="alert">
-          <p><strong>Emergency right now?</strong><br />
-          Call local EMS first (<strong>103</strong> in Ukraine). Rescue service <strong>101</strong> if needed. The app does not replace emergency services.</p>
-        </div>
-        <h2>Contact</h2>
+        <p class="meta">Last updated: 14 September 2026</p>
+        <p>How to contact us about <strong>Line 24</strong>, plus short answers. In an emergency call services first — do not wait for a GitHub reply.</p>
+
+        <h2>1. Emergency</h2>
+        <p>Call local EMS first (<strong>103</strong> in Ukraine). Rescue service <strong>101</strong> if needed. The app does not replace emergency services.</p>
+
+        <h2>2. Contact</h2>
         <ul>
           <li><a href="https://github.com/kaiserdem/ZeroEchelon/issues/new">Open a GitHub issue</a></li>
           <li>Repository: <a href="https://github.com/kaiserdem/ZeroEchelon">kaiserdem/ZeroEchelon</a></li>
         </ul>
         <p class="muted">Include iPhone model, iOS version, and steps. Do not post casualty photos or personal data.</p>
-        <h2>FAQ</h2>
-        <p><strong>Do I need the internet?</strong> No.</p>
-        <p><strong>Where does data go?</strong> On-device only — see the <a href="privacy.html">Privacy Policy</a>.</p>
-        <p><strong>How do I erase the journal?</strong> In-app after handover, or uninstall the app.</p>
+
+        <h2>3. FAQ</h2>
+        <ul>
+          <li><strong>Do I need the internet?</strong> No. Protocol and journal work offline.</li>
+          <li><strong>Where does data go?</strong> On-device only — see the <a href="privacy.html">Privacy Policy</a>.</li>
+          <li><strong>How do I erase the journal?</strong> In-app after handover, or uninstall the app.</li>
+          <li><strong>Why microphone?</strong> Only for address dictation if you tap the mic.</li>
+        </ul>
+
+        <h2>4. Documents</h2>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+          <li><a href="https://github.com/kaiserdem/ZeroEchelon">Project README</a></li>
+        </ul>
       </div>
     </article>
 
