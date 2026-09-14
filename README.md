@@ -53,7 +53,7 @@
 
 ## App Store URLs (GitHub Pages)
 
-Після увімкнення Pages з каталогу `/docs`:
+Сайт зараз публікується з **кореня** `master` (`/`). Робочі посилання:
 
 | Поле в App Store Connect | URL |
 | --- | --- |
@@ -61,3 +61,5 @@
 | Support | https://kaiserdem.github.io/ZeroEchelon/legal/support.html |
 | Terms of Use (опційно) | https://kaiserdem.github.io/ZeroEchelon/legal/terms.html |
 | Hub | https://kaiserdem.github.io/ZeroEchelon/legal/ |
+
+Альтернатива (якщо Folder = `/docs`): ті самі шляхи з префіксом `/docs/legal/...`.
