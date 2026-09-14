@@ -302,11 +302,11 @@ export class ProtocolEngine {
         if (this.lastVetoNodeId === "Cont") backWhen = "back-cont";
         if (this.lastVetoNodeId === "Out-trapped") backWhen = "back-trapped";
         buttons = buttons.filter(
-          (b) => b.when === backWhen || b.when === "erase",
+          (b) => b.when === backWhen || b.when === "erase" || b.when === "handed",
         );
       } else {
         buttons = buttons.filter((b) =>
-          ["read", "give", "wave", "erase"].includes(b.when),
+          ["read", "give", "handed", "wave", "erase"].includes(b.when),
         );
       }
     }
@@ -531,6 +531,14 @@ export class ProtocolEngine {
         clearedLog: true,
       };
     }
+    if (this.currentNode.id === "Handed" && edgeWhen === "erase") {
+      this.clearEventFields();
+      return {
+        didNavigate: false,
+        externalURL: null,
+        clearedLog: true,
+      };
+    }
     if (edgeWhen === "report") {
       this.unreachableMarked = true;
       this.lastVetoNodeId = this.currentNode.id;
@@ -547,7 +555,13 @@ export class ProtocolEngine {
           return { didNavigate: false, externalURL: url, clearedLog: false };
         }
       }
+      const fromHandedKeep =
+        this.currentNode.id === "Handed" && edgeWhen === "keep";
       const result = this.navigate(edge.to, edgeWhen, false, true);
+      if (fromHandedKeep) {
+        this.history = [];
+        this.returnStack = [];
+      }
       let shouldScheduleWaveReminders = false;
       if (
         this.currentNode.id === "Form" &&

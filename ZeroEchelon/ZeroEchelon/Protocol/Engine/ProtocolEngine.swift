@@ -324,9 +324,9 @@ final class ProtocolEngine {
                 case "Out-trapped": backWhen = "back-trapped"
                 default: backWhen = "back-out"
                 }
-                buttons = buttons.filter { $0.when == backWhen || $0.when == "erase" }
+                buttons = buttons.filter { $0.when == backWhen || $0.when == "erase" || $0.when == "handed" }
             } else {
-                buttons = buttons.filter { ["read", "give", "wave", "erase"].contains($0.when) }
+                buttons = buttons.filter { ["read", "give", "handed", "wave", "erase"].contains($0.when) }
             }
         }
 
@@ -545,6 +545,11 @@ final class ProtocolEngine {
             clearEventFields()
             return EdgeSelectionResult(didNavigate: false, clearedLog: true)
         }
+        // Handed → erase: clear event and let client reset to Home.
+        if currentNode.id == "Handed", edgeWhen == "erase" {
+            clearEventFields()
+            return EdgeSelectionResult(didNavigate: false, clearedLog: true)
+        }
         if edgeWhen == "report" {
             unreachableMarked = true
             lastVetoNodeId = currentNode.id
@@ -557,7 +562,12 @@ final class ProtocolEngine {
                 steps.append(ProtocolLogStep(nodeId: currentNode.id, edge: edgeWhen))
                 return EdgeSelectionResult(didNavigate: false, externalURL: url)
             }
+            let fromHandedKeep = currentNode.id == "Handed" && edgeWhen == "keep"
             let result = try navigate(to: to, edgeWhen: edgeWhen, pushReturn: false, recordHistory: true)
+            if fromHandedKeep {
+                history.removeAll()
+                returnStack.removeAll()
+            }
             if currentNode.id == "Form",
                reachedFormAt == nil,
                eventStartedAt != nil

@@ -464,4 +464,28 @@ struct ProtocolEngineTests {
         #expect(engine.dispatcherDraft.contains("Джгут накладено"))
         #expect(engine.dispatcherDraft.contains("Зроблено:"))
     }
+
+    @Test func handedKeepReturnsHomeAndKeepsEvent() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "incident")
+        try engine.setCurrentNodeForTesting("Form")
+        _ = try engine.select(edgeWhen: "handed")
+        #expect(engine.currentNode.id == "Handed")
+        let keep = try engine.select(edgeWhen: "keep")
+        #expect(keep.clearedLog == false)
+        #expect(engine.currentNode.id == "Home")
+        #expect(engine.hasPersistableEvent)
+        #expect(engine.canGoBack == false)
+    }
+
+    @Test func handedEraseClearsEvent() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "incident")
+        try engine.setCurrentNodeForTesting("Handed")
+        let erased = try engine.select(edgeWhen: "erase")
+        #expect(erased.clearedLog == true)
+        #expect(engine.hasPersistableEvent == false)
+    }
 }

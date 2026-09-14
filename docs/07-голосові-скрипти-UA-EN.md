@@ -181,6 +181,7 @@
 | Read | Зачитайте диспетчеру текст на екрані. | Read the on-screen text to the dispatcher. |
 | Give | Покажіть екран медику. Або дайте відсканувати код. | Show the screen to the medic. Or let them scan the code. |
 | Give-warn | Тут немає імен. Не надсилайте стороннім у месенджер. | There are no names here. Do not send this to strangers in chat. |
+| Handed | Передали медику. Лишити журнал для нагадувань через 24 і 48 годин — чи стерти зараз? | Handed to the medic. Keep the log for 24 and 48 hour reminders — or erase now? |
 | Erase | Стерти журнал зараз. | Erase the log now. |
 
 Шаблон зачитування — [08](08-звіт-M-ETHANE-та-передача.md), розділ 3. Голос лише дає команду `Read`.

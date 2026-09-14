@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-14-home-first",
+  "graphVersion": "2026-09-14-handed",
   "locale": [
     "uk",
     "en"
@@ -1353,6 +1353,10 @@
           "to": "Give"
         },
         {
+          "when": "handed",
+          "to": "Handed"
+        },
+        {
           "when": "erase",
           "to": "Erase"
         },
@@ -1375,6 +1379,11 @@
             "when": "give",
             "ua": "Показати медика / QR",
             "en": "Show medic / QR"
+          },
+          {
+            "when": "handed",
+            "ua": "Передав медику",
+            "en": "Handed to medic"
           },
           {
             "when": "wave",
@@ -1402,7 +1411,55 @@
             "en": "Back"
           }
         ],
-        "note": "Повний S11. Рушій фільтрує back-* за lastVetoNodeId."
+        "note": "Повний S11. Рушій фільтрує back-* за lastVetoNodeId. Handed — кінець гайду."
+      }
+    },
+    {
+      "id": "Handed",
+      "type": "question",
+      "branch": "H",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 9,
+      "registry": [
+        "B1"
+      ],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Передали медику. Лишити журнал для нагадувань через 24 і 48 годин — чи стерти зараз?",
+        "en": "Handed to the medic. Keep the log for 24 and 48 hour reminders — or erase now?"
+      },
+      "edges": [
+        {
+          "when": "keep",
+          "to": "Home"
+        },
+        {
+          "when": "erase",
+          "to": "Home"
+        }
+      ],
+      "ui": {
+        "screenId": "S11",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "keep",
+            "ua": "Лишити для 24/48",
+            "en": "Keep for 24/48"
+          },
+          {
+            "when": "erase",
+            "ua": "Стерти журнал",
+            "en": "Erase log"
+          }
+        ],
+        "note": "erase очищає локальну подію в рушії; keep лишає журнал і таймери."
       }
     },
     {
@@ -5232,6 +5289,10 @@
           "to": "Form"
         },
         {
+          "when": "handed",
+          "to": "Handed"
+        },
+        {
           "when": "wave",
           "to": "I0"
         }
@@ -5241,6 +5302,11 @@
         "template": "handover",
         "showDispatcherDraft": true,
         "buttons": [
+          {
+            "when": "handed",
+            "ua": "Передав медику",
+            "en": "Handed to medic"
+          },
           {
             "when": "next",
             "ua": "Назад",
