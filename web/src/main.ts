@@ -218,7 +218,6 @@ function render(options?: { keepFocus?: boolean }): void {
 
   root.innerHTML = `
     <div class="frame${isVeto ? " is-veto" : ""}">
-      <p class="demo-banner">${locale === "uk" ? "Веб-демо · не App Store" : "Web demo · not App Store"}</p>
       <header class="top-bar">
         ${
           engine.canGoBack
