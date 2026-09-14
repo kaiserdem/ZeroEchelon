@@ -371,8 +371,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Що сталося. Одна картинка.",
-        "en": "What happened. One picture."
+        "ua": "Що сталося. Один вибір.",
+        "en": "What happened. One choice."
       },
       "edges": [
         {

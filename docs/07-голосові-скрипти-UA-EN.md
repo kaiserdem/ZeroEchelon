@@ -31,7 +31,7 @@
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
 | Loc-3 | Назвіть населений пункт. Далі — вулицю. | Name the town or city. Then the street. |
-| Type | Що сталося. Одна картинка. | What happened. One picture. |
+| Type | Що сталося. Один вибір. | What happened. One choice. |
 | Role | Ви допомагаєте іншим — чи допомога потрібна вам? | Are you helping others — or do you need help yourself? |
 | Role-witness | Режим свідка. Спершу викличте 103, якщо можете. | Bystander mode. Call 103 first if you can. |
 | Role-casualty | Режим постраждалого. Викличте 103. Далі — що зробити для себе. | Casualty mode. Call 103. Next — what to do for yourself. |
