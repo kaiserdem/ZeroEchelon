@@ -50,3 +50,14 @@
 ## Ліцензія
 
 Див. [`LICENSE`](LICENSE).
+
+## App Store URLs (GitHub Pages)
+
+Після увімкнення Pages з каталогу `/docs`:
+
+| Поле в App Store Connect | URL |
+| --- | --- |
+| Privacy Policy | https://kaiserdem.github.io/ZeroEchelon/legal/privacy.html |
+| Support | https://kaiserdem.github.io/ZeroEchelon/legal/support.html |
+| Terms of Use (опційно) | https://kaiserdem.github.io/ZeroEchelon/legal/terms.html |
+| Hub | https://kaiserdem.github.io/ZeroEchelon/legal/ |
