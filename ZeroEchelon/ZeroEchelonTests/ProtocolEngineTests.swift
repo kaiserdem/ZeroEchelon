@@ -217,13 +217,9 @@ struct ProtocolEngineTests {
         }
         #expect(engine.currentNode.id == "Form")
         #expect(engine.detailBlock?.contains("Вибух") == true)
-
-        _ = try engine.select(edgeWhen: "read")
-        #expect(engine.currentNode.id == "Read")
         #expect(engine.detailBlock == engine.dispatcherDraft)
         #expect(engine.detailBlock?.isEmpty == false)
 
-        _ = try engine.select(edgeWhen: "next")
         _ = try engine.select(edgeWhen: "give")
         #expect(engine.currentNode.id == "Give")
         #expect(engine.showsHandoverQR)

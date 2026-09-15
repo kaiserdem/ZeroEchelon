@@ -10,6 +10,14 @@ enum ContentLocale: String, Codable, Sendable, CaseIterable {
         case .en: "en-US"
         }
     }
+
+    /// Native name of the language (stable across UI locales).
+    var displayName: String {
+        switch self {
+        case .uk: "Українська"
+        case .en: "English"
+        }
+    }
 }
 
 enum SessionRole: String, Codable, Sendable {

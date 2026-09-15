@@ -240,9 +240,10 @@ export class ProtocolEngine {
       case "Call":
       case "CALL-read":
       case "Read":
-      case "Give":
       case "Form":
         return this.dispatcherDraft;
+      case "Give":
+        return null;
       default:
         if (this.currentNode.ui?.showDispatcherDraft) {
           return this.dispatcherDraft;

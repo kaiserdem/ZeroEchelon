@@ -18,6 +18,9 @@ import {
 import type { EngineRules } from "./rules";
 import type { ContentLocale, EdgeSelectionResult, ProtocolGraph } from "./types";
 import { buttonTitle } from "./types";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
 import "./styles.css";
 
 const graph = graphJson as ProtocolGraph;
@@ -56,7 +59,7 @@ if (stored) {
 }
 
 let speakOnAppear = loadSpeak();
-let showSettings = false;
+let settingsPage: null | 'main' | 'language' = null;
 let lastSpokenKey = "";
 
 function dial(number: string): void {
@@ -180,41 +183,81 @@ function render(options?: { keepFocus?: boolean }): void {
     `
     : "";
 
-  const settingsOverlay = showSettings
-    ? `
-    <div class="settings-backdrop">
-      <div class="settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-        <div class="settings-head">
-          <h2 id="settings-title">${escapeHtml(locale === "uk" ? "Налаштування" : "Settings")}</h2>
-          <button type="button" class="settings-done">${escapeHtml(locale === "uk" ? "Готово" : "Done")}</button>
+  if (settingsPage === "language") {
+    const languages: { id: ContentLocale; name: string }[] = [
+      { id: "uk", name: "Українська" },
+      { id: "en", name: "English" },
+    ];
+    root.innerHTML = `
+    <div class="frame settings-screen">
+      <header class="top-bar">
+        <button type="button" class="back-btn" data-settings-back-main>‹ ${locale === "uk" ? "Назад" : "Back"}</button>
+        <span class="top-spacer"></span>
+        <span class="top-brand settings-title">${escapeHtml(locale === "uk" ? "Мова" : "Language")}</span>
+        <span class="top-spacer"></span>
+      </header>
+      <main class="content settings-content">
+        <p class="settings-hint">${escapeHtml(locale === "uk" ? "Оберіть мову додатку" : "Choose app language")}</p>
+        <div class="settings-card" role="listbox" aria-label="${escapeAttr(locale === "uk" ? "Мова" : "Language")}">
+          ${languages
+            .map(
+              (item) => `
+            <button type="button" class="settings-choice${locale === item.id ? " selected" : ""}" data-locale="${item.id}" role="option" aria-selected="${locale === item.id}">
+              <span>${escapeHtml(item.name)}</span>
+              ${locale === item.id ? '<span class="settings-check" aria-hidden="true">✓</span>' : ""}
+            </button>
+          `,
+            )
+            .join("")}
         </div>
-        <section class="settings-section">
+      </main>
+    </div>
+  `;
+    bind();
+    return;
+  }
+
+  if (settingsPage === "main") {
+    const languageName = locale === "uk" ? "Українська" : "English";
+    root.innerHTML = `
+    <div class="frame settings-screen">
+      <header class="top-bar">
+        <button type="button" class="back-btn" data-settings-close>‹ ${locale === "uk" ? "Назад" : "Back"}</button>
+        <span class="top-spacer"></span>
+        <span class="top-brand settings-title">${escapeHtml(locale === "uk" ? "Налаштування" : "Settings")}</span>
+        <span class="top-spacer"></span>
+      </header>
+      <main class="content settings-content">
+        <section class="settings-block">
           <h3>${escapeHtml(locale === "uk" ? "Інтерфейс" : "Interface")}</h3>
-          <div class="settings-row">
-            <span>${escapeHtml(locale === "uk" ? "Мова" : "Language")}</span>
-            <div class="locale" role="group" aria-label="Language">
-              <button type="button" data-locale="uk" class="${locale === "uk" ? "active" : ""}">UA</button>
-              <button type="button" data-locale="en" class="${locale === "en" ? "active" : ""}">EN</button>
+          <div class="settings-card">
+            <button type="button" class="settings-nav-row" data-open-language>
+              <span>${escapeHtml(locale === "uk" ? "Мова" : "Language")}</span>
+              <span class="settings-nav-value">${escapeHtml(languageName)} ›</span>
+            </button>
+            <div class="settings-row settings-row-pad">
+              <span>${escapeHtml(locale === "uk" ? "Озвучення екранів" : "Speak screens aloud")}</span>
+              <button type="button" class="settings-toggle${speakOnAppear ? " on" : ""}" data-voice data-in-settings>
+                ${speakOnAppear ? (locale === "uk" ? "Увімк" : "On") : locale === "uk" ? "Вимк" : "Off"}
+              </button>
             </div>
           </div>
-          <div class="settings-row">
-            <span>${escapeHtml(locale === "uk" ? "Озвучення екранів" : "Speak screens aloud")}</span>
-            <button type="button" class="settings-toggle${speakOnAppear ? " on" : ""}" data-voice data-in-settings>
-              ${speakOnAppear ? (locale === "uk" ? "Увімк" : "On") : locale === "uk" ? "Вимк" : "Off"}
-            </button>
-          </div>
         </section>
-        <section class="settings-section">
+        <section class="settings-block">
           <h3>${escapeHtml(locale === "uk" ? "Про додаток" : "About")}</h3>
-          <a class="settings-link" href="${LEGAL.privacy}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Політика конфіденційності" : "Privacy Policy")}</a>
-          <a class="settings-link" href="${LEGAL.support}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Підтримка" : "Support")}</a>
-          <a class="settings-link" href="${LEGAL.terms}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Умови користування" : "Terms of Use")}</a>
-          <p class="settings-version">Line 24 · web demo</p>
+          <div class="settings-card">
+            <a class="settings-link" href="${LEGAL.privacy}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Політика конфіденційності" : "Privacy Policy")}</a>
+            <a class="settings-link" href="${LEGAL.support}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Підтримка" : "Support")}</a>
+            <a class="settings-link" href="${LEGAL.terms}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Умови користування" : "Terms of Use")}</a>
+          </div>
+          <p class="settings-version">Line 24 · web</p>
         </section>
-      </div>
+      </main>
     </div>
-  `
-    : "";
+  `;
+    bind();
+    return;
+  }
 
   root.innerHTML = `
     <div class="frame${isVeto ? " is-veto" : ""}">
@@ -230,10 +273,6 @@ function render(options?: { keepFocus?: boolean }): void {
       </header>
       <div class="divider"></div>
       <main class="content">
-        <div class="badge-row">
-          <span class="badge">${escapeHtml(engine.screenBadge)}</span>
-          <span class="badge-mark" aria-hidden="true"></span>
-        </div>
         <h1 class="voice">${escapeHtml(engine.voiceText)}</h1>
         ${helper ? `<p class="helper">${escapeHtml(helper)}</p>` : ""}
         ${
@@ -251,7 +290,6 @@ function render(options?: { keepFocus?: boolean }): void {
         ${lastEvent}
       </main>
       <footer class="emergency">${emergencyHtml}</footer>
-      ${settingsOverlay}
     </div>
   `;
 
@@ -289,22 +327,23 @@ function bind(): void {
   });
 
   root.querySelector("[data-settings]")?.addEventListener("click", () => {
-    showSettings = true;
+    settingsPage = "main";
     render();
   });
 
-  root.querySelector(".settings-backdrop")?.addEventListener("click", (event) => {
-    if (event.target === event.currentTarget) {
-      showSettings = false;
-      render();
-    }
+  root.querySelector("[data-settings-close]")?.addEventListener("click", () => {
+    settingsPage = null;
+    render();
   });
 
-  root.querySelectorAll(".settings-done").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      showSettings = false;
-      render();
-    });
+  root.querySelector("[data-settings-back-main]")?.addEventListener("click", () => {
+    settingsPage = "main";
+    render();
+  });
+
+  root.querySelector("[data-open-language]")?.addEventListener("click", () => {
+    settingsPage = "language";
+    render();
   });
 
   root.querySelectorAll<HTMLButtonElement>("[data-locale]").forEach((btn) => {

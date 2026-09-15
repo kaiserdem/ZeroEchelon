@@ -1,19 +1,37 @@
-/* Civic Signal — locked visual system (same tokens as iOS CivicTheme). */
+/* Zero Echelon — visual system mapped from the Figma "Line 24 (Copy)" UI kit.
+   Tokens: Inter type ramp + navy palette (Primary/Dark Navy #08324A),
+   dark-red emergency (Feedback #801717), navy-tint fills and borders. */
 :root {
-  --canvas: #f5f7fc;
-  --veto-canvas: #fcf5f2;
+  /* palette */
   --surface: #ffffff;
-  --ink: #0d1f47;
-  --muted: #52617a;
-  --accent: #0d449e;
-  --danger: #d91f29;
-  --warning: #f2b814;
-  --anti-fill: #fff0f0;
-  --bar-fill: #edf0f7;
-  --secondary-fill: #e0e8f5;
-  --corner: 10px;
-  --button-corner: 12px;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --canvas: #ffffff;
+  --veto-canvas: #ffffff; /* kit stays white; veto is signalled by the callout + 101 bar */
+  --darkest: #010f17;      /* headings / primary text */
+  --navy: #08324a;         /* primary fills, accent text, active segment */
+  --text-primary: #292b3d; /* tile labels */
+  --muted: #5b617f;        /* secondary text, back button */
+  --mid-gray: #99a1b7;     /* input placeholder */
+  --green: #0e7b46;        /* voice-on accent */
+  --danger: #801717;       /* 103 / 101 bar, error text */
+  --navy-06: rgba(8, 50, 74, 0.06);
+  --navy-08: rgba(8, 50, 74, 0.08);
+  --navy-20: rgba(8, 50, 74, 0.2);
+  --danger-06: rgba(128, 23, 23, 0.06);
+  --danger-20: rgba(128, 23, 23, 0.2);
+  --scrim: rgba(1, 15, 23, 0.35);
+  /* radii */
+  --r-button: 16px;
+  --r-card: 16px;
+  --r-pill: 10px;
+  --r-seg: 8px;
+  --r-small: 12px;
+  /* legacy aliases (kept so nothing references a dead var) */
+  --accent: var(--navy);
+  --ink: var(--darkest);
+  --secondary-fill: var(--navy-06);
+  --corner: var(--r-card);
+  --button-corner: var(--r-button);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 *,
@@ -28,7 +46,7 @@ body {
   min-height: 100%;
   font-family: var(--font);
   background: var(--canvas);
-  color: var(--ink);
+  color: var(--darkest);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -57,11 +75,12 @@ body {
   background: var(--veto-canvas);
 }
 
+/* ---------- Top bar ---------- */
 .top-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px 12px;
+  gap: 8px;
+  padding: 16px 20px;
 }
 
 .back-btn,
@@ -69,342 +88,223 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-width: 88px;
   border: 0;
   background: transparent;
-  color: var(--accent);
-  font: 700 0.9rem/1 var(--font);
   padding: 0;
 }
 
 .back-btn {
-  font-weight: 600;
+  color: var(--muted);
+  font: 600 17px/1 var(--font);
   cursor: pointer;
+}
+
+.top-brand {
+  color: var(--darkest);
+  font: 700 18px/1 var(--font);
 }
 
 .top-spacer {
   flex: 1;
 }
 
+/* segmented UA / EN control (kit "lang") */
 .locale {
   display: inline-flex;
-  background: var(--secondary-fill);
-  border-radius: 999px;
+  gap: 2px;
+  background: var(--navy-06);
+  border-radius: var(--r-pill);
   padding: 2px;
 }
 
 .locale button {
   border: 0;
   background: transparent;
-  color: var(--accent);
-  font: 700 0.85rem/1 var(--font);
-  padding: 6px 10px;
-  border-radius: 999px;
+  color: var(--muted);
+  font: 600 15px/1 var(--font);
+  padding: 8px 12px;
+  border-radius: var(--r-seg);
   cursor: pointer;
 }
 
 .locale button.active {
-  background: var(--accent);
+  background: var(--navy);
   color: #fff;
 }
 
+/* voice + settings pills (kit navy-tint squircles) */
 .voice-toggle,
 .settings-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border: 0;
-  border-radius: 50%;
-  background: var(--secondary-fill);
-  color: var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--navy-06);
+  color: var(--navy);
   cursor: pointer;
   font-size: 1rem;
 }
 
-.settings-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: rgba(13, 31, 71, 0.35);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.settings-sheet {
-  width: min(480px, 100%);
-  max-height: min(86dvh, 640px);
-  overflow: auto;
-  background: var(--surface);
-  border-radius: 18px 18px 0 0;
-  padding: 16px 18px 28px;
-  box-shadow: 0 -12px 40px rgba(13, 31, 71, 0.18);
-}
-
-.settings-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.settings-head h2 {
-  margin: 0;
-  font: 800 1.2rem/1.2 var(--font);
-  color: var(--ink);
-}
-
-.settings-done {
-  border: 0;
-  background: var(--secondary-fill);
-  color: var(--accent);
-  font: 700 0.95rem/1 var(--font);
-  padding: 10px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.settings-section {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(13, 31, 71, 0.08);
-}
-
-.settings-section h3 {
-  margin: 0 0 10px;
-  font: 700 0.8rem/1.2 var(--font);
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.settings-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  font: 600 1rem/1.3 var(--font);
-  color: var(--ink);
-}
-
-.settings-toggle {
-  border: 0;
-  border-radius: 999px;
-  padding: 8px 12px;
-  background: var(--secondary-fill);
-  color: var(--accent);
-  font: 700 0.85rem/1 var(--font);
-  cursor: pointer;
-}
-
-.settings-toggle.on {
-  background: var(--accent);
-  color: #fff;
-}
-
-.settings-link {
-  display: block;
-  padding: 12px 0;
-  font: 700 1rem/1.3 var(--font);
-  color: var(--accent);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(13, 31, 71, 0.06);
-}
-
-.settings-version {
-  margin: 14px 0 0;
-  font: 600 0.85rem/1.3 var(--font);
-  color: var(--muted);
-}
-
+/* kit has no rule under the top bar */
 .divider {
-  height: 1px;
-  background: rgba(13, 31, 71, 0.12);
+  display: none;
 }
 
+/* ---------- Content ---------- */
 .content {
   flex: 1;
   overflow: auto;
-  padding: 16px 20px 24px;
+  padding: 8px 24px 24px;
   -webkit-overflow-scrolling: touch;
 }
 
+/* small caption above the heading (kit secondary label) */
 .badge-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .badge {
-  font: 700 0.7rem/1 var(--font);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.badge-mark {
-  width: 28px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--warning);
-}
-
-.voice {
-  margin: 0 0 12px;
-  font: 700 2rem/1.2 var(--font);
-  color: var(--ink);
-}
-
-.last-event {
-  margin: 16px 0 0;
-  padding: 14px;
-  border-radius: var(--corner);
-  background: var(--surface);
-  border: 1px solid var(--secondary-fill);
-}
-
-.last-event-title {
-  margin: 0 0 8px;
-  font: 700 1rem/1.3 var(--font);
-  color: var(--ink);
-}
-
-.last-event-loc {
-  margin: 0 0 12px;
-  font: 500 0.95rem/1.35 var(--font);
+  font: 600 15px/1.3 var(--font);
   color: var(--muted);
 }
 
-.last-event-btn {
-  width: 100%;
-  border: 0;
-  border-radius: var(--button-corner, 12px);
-  padding: 12px 14px;
-  background: var(--secondary-fill);
-  color: var(--accent);
-  font: 700 1rem/1.2 var(--font);
-  cursor: pointer;
+.badge-mark {
+  display: none;
+}
+
+/* screen heading (kit Inter Medium 24 / line 30) */
+.voice {
+  margin: 0 0 16px;
+  font: 600 28px/34px var(--font);
+  color: var(--darkest);
 }
 
 .helper {
   margin: 0 0 16px;
-  font: 500 1rem/1.4 var(--font);
+  font: 500 17px/1.4 var(--font);
   color: var(--muted);
 }
 
+/* attention / anti-pattern callout (kit System message · Attention) */
 .anti {
   display: flex;
   gap: 10px;
   align-items: flex-start;
   margin: 0 0 16px;
-  padding: 14px;
-  border-radius: var(--corner);
-  background: var(--anti-fill);
+  padding: 16px;
+  border-radius: var(--r-card);
+  background: var(--danger-06);
+  border: 1px solid var(--danger-20);
   color: var(--danger);
-  font: 700 1.05rem/1.3 var(--font);
+  font: 700 17px/1.35 var(--font);
 }
 
+/* info card (kit coords / script / report — navy-tint) */
 .detail {
   margin: 0 0 16px;
-  padding: 16px;
-  border-radius: var(--corner);
-  background: var(--surface);
-  border: 1px solid var(--secondary-fill);
-  font: 600 1.1rem/1.4 var(--font);
+  padding: 18px;
+  border-radius: var(--r-card);
+  background: var(--navy-06);
+  color: var(--darkest);
+  font: 600 22px/1.45 var(--font);
   white-space: pre-line;
 }
 
 .detail.coords {
-  font-size: 2rem;
-  font-weight: 700;
+  font: 700 32px/1.25 var(--font);
   font-variant-numeric: tabular-nums;
 }
 
+/* manual location field (kit input · Default) */
 .loc-input-row {
   display: flex;
   gap: 10px;
   align-items: stretch;
-  margin-top: 4px;
-  margin-bottom: 12px;
+  margin: 4px 0 16px;
 }
 
 .loc-input {
   flex: 1;
   min-width: 0;
-  border: 1.5px solid rgba(13, 68, 158, 0.35);
-  border-radius: var(--corner);
-  padding: 14px;
-  font: 600 1.1rem/1.3 var(--font);
-  color: var(--ink);
+  border: 1.5px solid var(--navy-20);
+  border-radius: var(--r-card);
+  padding: 15px 16px;
+  font: 500 17px/1.3 var(--font);
+  color: var(--darkest);
   background: var(--surface);
 }
 
+.loc-input::placeholder {
+  color: var(--mid-gray);
+}
+
 .loc-input:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(8, 50, 74, 0.15);
 }
 
 .mic-btn {
   width: 52px;
   flex-shrink: 0;
-  border: 0;
-  border-radius: var(--button-corner);
-  background: var(--secondary-fill);
-  color: var(--accent);
+  border: 1.5px solid var(--navy-20);
+  border-radius: var(--r-card);
+  background: var(--navy-06);
+  color: var(--navy);
   font-size: 1.25rem;
   cursor: pointer;
 }
 
 .mic-btn.listening {
   background: var(--danger);
+  border-color: var(--danger);
   color: #fff;
 }
 
+/* ---------- Actions (kit Button) ---------- */
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: 4px;
 }
 
 .actions.grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 .actions.type-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
+/* event-type tile (kit tile/*) */
 .type-icon-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  aspect-ratio: 1 / 1;
+  justify-content: space-between;
+  aspect-ratio: 107 / 112;
   width: 100%;
-  box-sizing: border-box;
-  border: 1.5px solid var(--secondary-fill);
-  border-radius: var(--button-corner);
-  padding: 6px 0;
-  background: var(--surface);
-  color: var(--ink);
-  font: 700 1rem/1.15 var(--font);
+  border: 0;
+  border-radius: var(--r-card);
+  padding: 16px 6px;
+  background: var(--navy-06);
+  color: var(--text-primary);
+  font: 600 15px/1.2 var(--font);
   cursor: pointer;
   text-align: center;
 }
 
 .type-icon-btn img {
-  width: 48%;
-  height: 48%;
-  max-width: 56px;
-  max-height: 56px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   pointer-events: none;
 }
@@ -412,98 +312,270 @@ body {
 .type-icon-btn span {
   display: block;
   width: 100%;
-  max-width: 100%;
-  padding: 0;
   overflow-wrap: anywhere;
   hyphens: auto;
 }
 
 .action-btn {
+  width: 100%;
   border: 0;
-  border-radius: var(--button-corner);
-  padding: 16px 12px;
-  font: 700 1.15rem/1.25 var(--font);
+  border-radius: var(--r-button);
+  padding: 18px 14px;
+  font: 700 20px/1.25 var(--font);
   cursor: pointer;
   text-align: center;
 }
 
 .action-btn.primary {
-  background: var(--accent);
+  background: var(--navy);
   color: #fff;
 }
 
 .action-btn.secondary {
-  background: var(--secondary-fill);
-  color: var(--accent);
+  background: var(--surface);
+  color: var(--navy);
+  border: 1.5px solid var(--navy-20);
 }
 
+/* kit veto screens use the standard primary button (no separate yellow) */
 .action-btn.veto {
-  background: var(--warning);
-  color: var(--ink);
+  background: var(--navy);
+  color: #fff;
 }
 
-.emergency {
-  padding: 10px 20px 29px;
-  background: var(--bar-fill);
+/* ---------- Last event (kit last-event card) ---------- */
+.last-event {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: var(--r-small);
+  background: var(--navy-06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 0;
 }
 
-.emergency-hint {
-  margin: 0 0 8px;
-  text-align: center;
-  font: 600 0.75rem/1.35 var(--font);
+.last-event-title,
+.last-event-loc {
+  margin: 0;
+  font: 500 15px/1.35 var(--font);
   color: var(--muted);
 }
 
+.last-event-btn {
+  align-self: flex-start;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--navy);
+  font: 700 17px/1.3 var(--font);
+  cursor: pointer;
+}
+
+/* ---------- Emergency dock (kit Bar / 103 · Bar / 101) ---------- */
+.emergency {
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: transparent;
+}
+
+.emergency-hint {
+  margin: 0;
+  padding: 12px 20px 8px;
+  text-align: center;
+  font: 600 15px/1.35 var(--font);
+  color: var(--muted);
+}
+
+/* full-width dark-red emergency bar */
 .dial-103 {
   display: block;
   width: 100%;
   border: 0;
-  border-radius: var(--button-corner);
-  padding: 17px 12px;
+  border-radius: 0;
+  padding: 24px 12px;
   background: var(--danger);
   color: #fff;
-  font: 700 1.35rem/1 var(--font);
+  font: 700 20px/1 var(--font);
   text-decoration: none;
   text-align: center;
   cursor: pointer;
 }
 
 .dial-103.emphasis {
-  padding: 20px 12px;
+  padding: 26px 12px;
 }
 
+/* secondary 101 option in the default state (navy-tint bar) */
 .dial-101 {
   display: block;
   width: 100%;
-  margin-top: 8px;
   border: 0;
-  border-radius: var(--button-corner);
-  padding: 12px;
-  background: var(--secondary-fill);
-  color: var(--accent);
-  font: 600 1rem/1.2 var(--font);
+  border-radius: 0;
+  padding: 18px 12px;
+  background: var(--navy-06);
+  color: var(--navy);
+  font: 700 18px/1.2 var(--font);
   text-decoration: none;
   text-align: center;
   cursor: pointer;
 }
 
+/* rescue-first mode: 101 becomes the primary red bar */
 .dial-101.primary {
-  background: var(--warning);
-  color: var(--ink);
-  font: 700 1.35rem/1 var(--font);
-  padding: 18px 12px;
-  margin-top: 0;
+  background: var(--danger);
+  color: #fff;
+  font: 700 20px/1 var(--font);
+  padding: 24px 12px;
 }
 
+/* rescue-first mode: 103 becomes the quiet outline bar */
 .dial-103.outline {
   background: transparent;
   color: var(--danger);
-  border: 2px solid var(--danger);
-  margin-top: 8px;
-  padding: 12px;
-  font: 600 1rem/1.2 var(--font);
+  border-top: 1px solid var(--danger-20);
+  font: 700 18px/1.2 var(--font);
+  padding: 18px 12px;
 }
 
+/* ---------- Settings (full screen) ---------- */
+.settings-screen .settings-title {
+  text-align: center;
+  pointer-events: none;
+}
+
+.settings-content {
+  padding-top: 8px;
+}
+
+.settings-hint {
+  margin: 0 0 12px;
+  font: 500 15px/1.35 var(--font);
+  color: var(--muted);
+}
+
+.settings-block {
+  margin: 0 0 28px;
+}
+
+.settings-block h3 {
+  margin: 0 0 10px;
+  padding: 0 4px;
+  font: 700 13px/1.2 var(--font);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.settings-card {
+  background: var(--navy-06);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  padding: 4px 0;
+}
+
+.settings-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 16px 16px;
+  font: 600 17px/1.3 var(--font);
+  color: var(--darkest);
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px solid var(--navy-08);
+}
+
+.settings-nav-value {
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font: 600 17px/1.3 var(--font);
+  color: var(--darkest);
+}
+
+.settings-row-pad {
+  padding: 12px 16px 14px;
+}
+
+.settings-toggle {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: var(--surface);
+  color: var(--navy);
+  font: 700 15px/1 var(--font);
+  cursor: pointer;
+  border: 1.5px solid var(--navy-20);
+}
+
+.settings-toggle.on {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.settings-link {
+  display: block;
+  padding: 16px;
+  font: 600 17px/1.3 var(--font);
+  color: var(--navy);
+  text-decoration: none;
+  border-bottom: 1px solid var(--navy-08);
+}
+
+.settings-link:last-of-type {
+  border-bottom: 0;
+}
+
+.settings-version {
+  margin: 14px 4px 0;
+  font: 500 15px/1.3 var(--font);
+  color: var(--muted);
+}
+
+.settings-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 18px 16px;
+  font: 700 20px/1.25 var(--font);
+  color: var(--darkest);
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px solid var(--navy-08);
+}
+
+.settings-choice:last-child {
+  border-bottom: 0;
+}
+
+.settings-choice.selected {
+  color: var(--navy);
+}
+
+.settings-check {
+  color: var(--navy);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* ---------- States ---------- */
 .error,
 .loading {
   padding: 40px 24px;

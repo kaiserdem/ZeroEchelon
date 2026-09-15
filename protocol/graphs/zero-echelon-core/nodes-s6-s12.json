@@ -2606,12 +2606,8 @@
       "B1"
     ],
     "voice": {
-      "ua": "Покажіть екран медику. Або дайте відсканувати код.",
-      "en": "Show the screen to the medic. Or let them scan the code."
-    },
-    "antiPattern": {
-      "ua": "Тут немає імен. Не надсилайте стороннім у месенджер.",
-      "en": "There are no names here. Do not send this to strangers in chat."
+      "ua": "QR для медика.",
+      "en": "QR for the medic."
     },
     "edges": [
       {
@@ -2637,7 +2633,8 @@
           "ua": "Чек-лист 24 год",
           "en": "24h checklist"
         }
-      ]
+      ],
+      "showDispatcherDraft": false
     }
   }
 ]

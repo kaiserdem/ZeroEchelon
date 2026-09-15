@@ -1,29 +1,43 @@
 import SwiftUI
 import UIKit
 
-/// Locked product visual system: Civic Signal (design proposal C).
+/// Line 24 visual system — tokens from Figma UI kit (navy / danger / Inter ramp via SF).
 enum CivicTheme {
-    static let canvas = Color(red: 0.96, green: 0.97, blue: 0.99)
-    static let vetoCanvas = Color(red: 0.99, green: 0.96, blue: 0.95)
+    static let canvas = Color.white
+    static let vetoCanvas = Color.white
     static let surface = Color.white
-    static let ink = Color(red: 0.05, green: 0.12, blue: 0.28)
-    static let muted = Color(red: 0.32, green: 0.38, blue: 0.48)
-    static let accent = Color(red: 0.05, green: 0.27, blue: 0.62)
-    static let danger = Color(red: 0.85, green: 0.12, blue: 0.16)
+    /// Headings / primary text `#010F17`
+    static let ink = Color(red: 1 / 255, green: 15 / 255, blue: 23 / 255)
+    /// Secondary `#5B617F`
+    static let muted = Color(red: 91 / 255, green: 97 / 255, blue: 127 / 255)
+    /// Primary Dark Navy `#08324A`
+    static let accent = Color(red: 8 / 255, green: 50 / 255, blue: 74 / 255)
+    /// Tile labels `#292B3D`
+    static let textPrimary = Color(red: 41 / 255, green: 43 / 255, blue: 61 / 255)
+    /// Feedback / emergency `#801717`
+    static let danger = Color(red: 128 / 255, green: 23 / 255, blue: 23 / 255)
+    /// Voice-on accent `#0E7B46`
+    static let success = Color(red: 14 / 255, green: 123 / 255, blue: 70 / 255)
+    /// Kept for rare emphasis; kit prefers navy for veto CTAs
     static let warning = Color(red: 0.95, green: 0.72, blue: 0.08)
-    static let antiFill = Color(red: 1.0, green: 0.94, blue: 0.94)
-    static let barFill = Color(red: 0.93, green: 0.94, blue: 0.97)
-    static let secondaryFill = Color(red: 0.88, green: 0.91, blue: 0.96)
+    static let antiFill = danger.opacity(0.06)
+    static let antiBorder = danger.opacity(0.2)
+    static let barFill = Color.white
+    /// Navy @ 6%
+    static let secondaryFill = accent.opacity(0.06)
+    static let border = accent.opacity(0.2)
 
-    static let corner: CGFloat = 10
-    static let buttonCorner: CGFloat = 12
+    static let corner: CGFloat = 16
+    static let buttonCorner: CGFloat = 16
+    static let pillCorner: CGFloat = 10
 
-    static let voiceFont = Font.system(size: 33, weight: .bold)
-    static let helperFont = Font.system(size: 16, weight: .medium)
-    static let buttonFont = Font.system(size: 19, weight: .bold)
-    static let badgeFont = Font.system(size: 11, weight: .bold)
-    static let emergencyLabel = Font.system(size: 12, weight: .semibold)
-    static let emergencyTitle = Font.system(size: 22, weight: .bold)
+    static let voiceFont = Font.system(size: 28, weight: .semibold)
+    static let helperFont = Font.system(size: 17, weight: .medium)
+    static let buttonFont = Font.system(size: 20, weight: .bold)
+    static let badgeFont = Font.system(size: 15, weight: .semibold)
+    static let emergencyLabel = Font.system(size: 15, weight: .semibold)
+    static let emergencyTitle = Font.system(size: 20, weight: .bold)
+    static let typeLabelFont = Font.system(size: 15, weight: .semibold)
 }
 
 struct NodeFrameView: View {
@@ -38,14 +52,25 @@ struct NodeFrameView: View {
     private var isVeto: Bool { engine.currentNode.veto }
 
     var body: some View {
+        Group {
+            if showSettings {
+                SettingsView(
+                    locale: $engine.locale,
+                    speakOnAppear: $speakOnAppear,
+                    onClose: { showSettings = false }
+                )
+            } else {
+                protocolFrame
+            }
+        }
+    }
+
+    private var protocolFrame: some View {
         VStack(spacing: 0) {
             topBar
-            Divider().opacity(0.35)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    badge
-
                     Text(engine.voiceText)
                         .font(CivicTheme.voiceFont)
                         .foregroundStyle(CivicTheme.ink)
@@ -54,32 +79,33 @@ struct NodeFrameView: View {
 
                     if let anti = engine.antiPatternText {
                         Label(anti, systemImage: "exclamationmark.triangle.fill")
-                            .font(.title3.weight(.bold))
+                            .font(.body.weight(.bold))
                             .foregroundStyle(CivicTheme.danger)
-                            .padding(14)
+                            .padding(16)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(
                                 CivicTheme.antiFill,
                                 in: RoundedRectangle(cornerRadius: CivicTheme.corner)
                             )
+                            .overlay {
+                                RoundedRectangle(cornerRadius: CivicTheme.corner)
+                                    .stroke(CivicTheme.antiBorder, lineWidth: 1)
+                            }
                     }
 
                     if let detail = engine.detailBlock {
                         Text(detail)
                             .font(engine.currentNode.id == "Loc-2"
-                                  ? .system(size: 36, weight: .bold, design: .rounded)
-                                  : .title3.weight(.semibold))
+                                  ? .system(size: 32, weight: .bold, design: .rounded)
+                                  : .system(size: 22, weight: .semibold))
                             .foregroundStyle(CivicTheme.ink)
-                            .padding(16)
+                            .lineSpacing(4)
+                            .padding(18)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(
-                                CivicTheme.surface,
+                                CivicTheme.secondaryFill,
                                 in: RoundedRectangle(cornerRadius: CivicTheme.corner)
                             )
-                            .overlay {
-                                RoundedRectangle(cornerRadius: CivicTheme.corner)
-                                    .stroke(CivicTheme.secondaryFill, lineWidth: 1)
-                            }
                     }
 
                     if engine.showsHandoverQR {
@@ -94,18 +120,18 @@ struct NodeFrameView: View {
                         if engine.currentNode.id == "Type" {
                             LazyVGrid(
                                 columns: [
-                                    GridItem(.flexible(), spacing: 10),
-                                    GridItem(.flexible(), spacing: 10),
-                                    GridItem(.flexible(), spacing: 10),
+                                    GridItem(.flexible(), spacing: 12),
+                                    GridItem(.flexible(), spacing: 12),
+                                    GridItem(.flexible(), spacing: 12),
                                 ],
-                                spacing: 10
+                                spacing: 12
                             ) {
                                 ForEach(engine.visibleButtons, id: \.id) { button in
                                     typeIconButton(button)
                                 }
                             }
                         } else {
-                            VStack(spacing: 10) {
+                            VStack(spacing: 12) {
                                 ForEach(Array(engine.visibleButtons.enumerated()), id: \.element.id) { index, button in
                                     actionButton(button, index: index)
                                 }
@@ -120,8 +146,8 @@ struct NodeFrameView: View {
                         lastEventCard(summary)
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
                 .padding(.bottom, 24)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -152,9 +178,6 @@ struct NodeFrameView: View {
             AppPreferences.locale = newLocale
             speakCurrent()
         }
-        .sheet(isPresented: $showSettings) {
-            SettingsView(locale: $engine.locale, speakOnAppear: $speakOnAppear)
-        }
     }
 
     private var handoverQRBlock: some View {
@@ -164,7 +187,7 @@ struct NodeFrameView: View {
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 260, maxHeight: 260)
+                    .frame(maxWidth: 280, maxHeight: 280)
                     .padding(12)
                     .background(
                         Color.white,
@@ -175,19 +198,13 @@ struct NodeFrameView: View {
                                         : "Report QR code for medic")
             } else {
                 Text(engine.locale == .uk
-                     ? "QR зараз недоступний. Покажіть текст вище."
-                     : "QR unavailable. Show the text above.")
-                    .font(.footnote.weight(.medium))
+                     ? "QR зараз недоступний. Поверніться до звіту."
+                     : "QR unavailable. Go back to the report.")
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(CivicTheme.muted)
             }
-
-            Text(engine.locale == .uk
-                 ? "Код містить текст звіту. Мережа не потрібна."
-                 : "The code holds the report text. No network needed.")
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(CivicTheme.muted)
-                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var manualLocationInput: some View {
@@ -208,7 +225,7 @@ struct NodeFrameView: View {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: CivicTheme.corner)
-                        .stroke(CivicTheme.accent.opacity(0.35), lineWidth: 1.5)
+                        .stroke(CivicTheme.border, lineWidth: 1.5)
                 }
 
                 Button {
@@ -222,6 +239,12 @@ struct NodeFrameView: View {
                             speech.isListening ? CivicTheme.danger : CivicTheme.secondaryFill,
                             in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
                         )
+                        .overlay {
+                            if !speech.isListening {
+                                RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                                    .stroke(CivicTheme.border, lineWidth: 1.5)
+                            }
+                        }
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(engine.locale == .uk ? "Диктовка" : "Dictate")
@@ -249,20 +272,6 @@ struct NodeFrameView: View {
         isVeto ? CivicTheme.vetoCanvas : CivicTheme.canvas
     }
 
-    private var badge: some View {
-        HStack(spacing: 8) {
-            Text(engine.screenBadge)
-                .font(CivicTheme.badgeFont)
-                .foregroundStyle(CivicTheme.accent)
-                .textCase(.uppercase)
-                .tracking(0.6)
-
-            Capsule()
-                .fill(CivicTheme.warning)
-                .frame(width: 28, height: 6)
-        }
-    }
-
     @ViewBuilder
     private func typeIconButton(_ button: ProtocolButton) -> some View {
         let title = button.title(for: engine.locale)
@@ -277,29 +286,25 @@ struct NodeFrameView: View {
                         Image("type_\(button.when)")
                             .resizable()
                             .scaledToFit()
-                            .frame(maxWidth: 56, maxHeight: 56)
+                            .frame(maxWidth: 40, maxHeight: 40)
                             .accessibilityHidden(true)
 
                         Text(title)
-                            .font(.body.weight(.bold))
+                            .font(CivicTheme.typeLabelFont)
                             .multilineTextAlignment(.center)
-                            .foregroundStyle(CivicTheme.ink)
+                            .foregroundStyle(CivicTheme.textPrimary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.65)
                             .frame(maxWidth: .infinity)
                         Spacer(minLength: 0)
                     }
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 0)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 4)
                 }
                 .background(
-                    CivicTheme.surface,
+                    CivicTheme.secondaryFill,
                     in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
                 )
-                .overlay {
-                    RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                        .stroke(CivicTheme.secondaryFill, lineWidth: 1.5)
-                }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
@@ -316,25 +321,29 @@ struct NodeFrameView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(buttonInk(primary: primary))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .padding(.horizontal, 12)
+                .padding(.vertical, 18)
+                .padding(.horizontal, 14)
                 .background(
                     buttonFill(primary: primary),
                     in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
                 )
+                .overlay {
+                    if !primary && !isVeto {
+                        RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                            .stroke(CivicTheme.border, lineWidth: 1.5)
+                    }
+                }
         }
         .buttonStyle(.plain)
     }
 
     private func buttonFill(primary: Bool) -> Color {
-        if isVeto { return CivicTheme.warning }
-        if primary { return CivicTheme.accent }
-        return CivicTheme.secondaryFill
+        if primary || isVeto { return CivicTheme.accent }
+        return CivicTheme.surface
     }
 
     private func buttonInk(primary: Bool) -> Color {
-        if isVeto { return CivicTheme.ink }
-        if primary { return .white }
+        if primary || isVeto { return .white }
         return CivicTheme.accent
     }
 
@@ -351,13 +360,13 @@ struct NodeFrameView: View {
                             Text(engine.locale == .uk ? "Назад" : "Back")
                                 .font(.subheadline.weight(.semibold))
                         }
-                        .foregroundStyle(CivicTheme.accent)
+                        .foregroundStyle(CivicTheme.muted)
                     }
                     .buttonStyle(.plain)
                 } else {
                     Text("Line 24")
-                        .font(.subheadline.weight(.heavy))
-                        .foregroundStyle(CivicTheme.accent)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(CivicTheme.ink)
                         .accessibilityAddTraits(.isHeader)
                 }
             }
@@ -373,9 +382,12 @@ struct NodeFrameView: View {
                 }
             } label: {
                 Image(systemName: speakOnAppear ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                    .foregroundStyle(CivicTheme.accent)
-                    .frame(width: 36, height: 36)
-                    .background(CivicTheme.secondaryFill, in: Circle())
+                    .foregroundStyle(speakOnAppear ? CivicTheme.success : CivicTheme.accent)
+                    .frame(width: 40, height: 40)
+                    .background(
+                        CivicTheme.secondaryFill,
+                        in: RoundedRectangle(cornerRadius: CivicTheme.pillCorner)
+                    )
             }
             .buttonStyle(.plain)
             .accessibilityLabel(engine.locale == .uk ? "Голос" : "Voice")
@@ -385,15 +397,18 @@ struct NodeFrameView: View {
             } label: {
                 Image(systemName: "gearshape.fill")
                     .foregroundStyle(CivicTheme.accent)
-                    .frame(width: 36, height: 36)
-                    .background(CivicTheme.secondaryFill, in: Circle())
+                    .frame(width: 40, height: 40)
+                    .background(
+                        CivicTheme.secondaryFill,
+                        in: RoundedRectangle(cornerRadius: CivicTheme.pillCorner)
+                    )
             }
             .buttonStyle(.plain)
             .accessibilityLabel(engine.locale == .uk ? "Налаштування" : "Settings")
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
         .background(screenBackground)
     }
 
@@ -424,16 +439,12 @@ struct NodeFrameView: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(16)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            CivicTheme.surface,
-            in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+            CivicTheme.secondaryFill,
+            in: RoundedRectangle(cornerRadius: 12)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: CivicTheme.corner)
-                .stroke(CivicTheme.secondaryFill, lineWidth: 1)
-        }
         .accessibilityElement(children: .contain)
     }
 
@@ -472,7 +483,7 @@ struct EmergencyBar: View {
     var onDial: (String) -> Void
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 0) {
             if prioritize101 {
                 Text(locale == .uk
                      ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
@@ -480,6 +491,9 @@ struct EmergencyBar: View {
                     .font(CivicTheme.emergencyLabel)
                     .foregroundStyle(CivicTheme.muted)
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 8)
             }
 
             if prioritize101, show101 {
@@ -488,13 +502,10 @@ struct EmergencyBar: View {
                 } label: {
                     Text(locale == .uk ? "ВИКЛИКАТИ 101 (ДСНС)" : "CALL 101 (rescue)")
                         .font(CivicTheme.emergencyTitle)
-                        .foregroundStyle(CivicTheme.ink)
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
-                        .background(
-                            CivicTheme.warning,
-                            in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                        )
+                        .padding(.vertical, 22)
+                        .background(CivicTheme.danger)
                 }
                 .buttonStyle(.plain)
 
@@ -502,13 +513,14 @@ struct EmergencyBar: View {
                     onDial("103")
                 } label: {
                     Text(locale == .uk ? "Викликати 103" : "Call 103")
-                        .font(.headline.weight(.semibold))
+                        .font(.body.weight(.bold))
                         .foregroundStyle(CivicTheme.danger)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                                .stroke(CivicTheme.danger, lineWidth: 2)
+                        .padding(.vertical, 16)
+                        .overlay(alignment: .top) {
+                            Rectangle()
+                                .fill(CivicTheme.antiBorder)
+                                .frame(height: 1)
                         }
                 }
                 .buttonStyle(.plain)
@@ -520,11 +532,8 @@ struct EmergencyBar: View {
                         .font(CivicTheme.emergencyTitle)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, emphasizeCall ? 20 : 17)
-                        .background(
-                            CivicTheme.danger,
-                            in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                        )
+                        .padding(.vertical, emphasizeCall ? 26 : 22)
+                        .background(CivicTheme.danger)
                 }
                 .buttonStyle(.plain)
 
@@ -533,22 +542,17 @@ struct EmergencyBar: View {
                         onDial("101")
                     } label: {
                         Text(locale == .uk ? "Викликати 101 (ДСНС)" : "Call 101 (rescue)")
-                            .font(.headline.weight(.semibold))
+                            .font(.body.weight(.bold))
                             .foregroundStyle(CivicTheme.accent)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(
-                                CivicTheme.secondaryFill,
-                                in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                            )
+                            .padding(.vertical, 16)
+                            .background(CivicTheme.secondaryFill)
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .padding(.bottom, 29) // +~5mm above home indicator / screen edge
+        .safeAreaPadding(.bottom, 8)
         .background(CivicTheme.barFill)
     }
 }

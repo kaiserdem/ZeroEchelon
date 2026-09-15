@@ -20,7 +20,7 @@ enum DesignProposal: String, CaseIterable, Identifiable {
         switch self {
         case .instrument: "Архів · не використовується в продукті"
         case .guide: "Архів · не використовується в продукті"
-        case .civic: "Зафіксовано для iOS + web (CivicTheme)"
+        case .civic: "Зафіксовано для iOS + web (Line 24 UI kit)"
         }
     }
 }
@@ -109,28 +109,28 @@ private struct DesignTokens {
             )
         case .civic:
             return DesignTokens(
-                canvas: Color(red: 0.96, green: 0.97, blue: 0.99),
+                canvas: Color.white,
                 surface: Color.white,
-                ink: Color(red: 0.05, green: 0.12, blue: 0.28),
-                muted: Color(red: 0.32, green: 0.38, blue: 0.48),
-                accent: Color(red: 0.05, green: 0.27, blue: 0.62),
-                danger: Color(red: 0.85, green: 0.12, blue: 0.16),
+                ink: Color(red: 1 / 255, green: 15 / 255, blue: 23 / 255),
+                muted: Color(red: 91 / 255, green: 97 / 255, blue: 127 / 255),
+                accent: Color(red: 8 / 255, green: 50 / 255, blue: 74 / 255),
+                danger: Color(red: 128 / 255, green: 23 / 255, blue: 23 / 255),
                 warning: Color(red: 0.95, green: 0.72, blue: 0.08),
-                antiFill: Color(red: 1.0, green: 0.94, blue: 0.94),
-                barFill: Color(red: 0.93, green: 0.94, blue: 0.97),
-                voiceFont: .system(size: 33, weight: .bold, design: .default),
-                helperFont: .system(size: 16, weight: .medium, design: .default),
-                buttonFont: .system(size: 19, weight: .bold, design: .default),
-                badgeFont: .system(size: 11, weight: .bold, design: .default),
-                corner: 10,
-                buttonCorner: 12,
-                buttonFill: Color(red: 0.05, green: 0.27, blue: 0.62),
+                antiFill: Color(red: 128 / 255, green: 23 / 255, blue: 23 / 255).opacity(0.06),
+                barFill: Color.white,
+                voiceFont: .system(size: 24, weight: .medium, design: .default),
+                helperFont: .system(size: 15, weight: .regular, design: .default),
+                buttonFont: .system(size: 15, weight: .semibold, design: .default),
+                badgeFont: .system(size: 13, weight: .medium, design: .default),
+                corner: 16,
+                buttonCorner: 16,
+                buttonFill: Color(red: 8 / 255, green: 50 / 255, blue: 74 / 255),
                 buttonInk: .white,
-                secondaryButtonFill: Color(red: 0.88, green: 0.91, blue: 0.96),
-                secondaryButtonInk: Color(red: 0.05, green: 0.27, blue: 0.62),
+                secondaryButtonFill: Color(red: 8 / 255, green: 50 / 255, blue: 74 / 255).opacity(0.06),
+                secondaryButtonInk: Color(red: 8 / 255, green: 50 / 255, blue: 74 / 255),
                 topBarStyle: .civic,
-                emergencyLabel: .system(size: 12, weight: .semibold, design: .default),
-                emergencyTitle: .system(size: 22, weight: .bold, design: .default)
+                emergencyLabel: .system(size: 13, weight: .medium, design: .default),
+                emergencyTitle: .system(size: 17, weight: .semibold, design: .default)
             )
         }
     }

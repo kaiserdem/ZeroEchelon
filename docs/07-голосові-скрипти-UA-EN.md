@@ -179,8 +179,8 @@
 | --- | --- | --- |
 | Form | Звіт для служб готовий. | The report for responders is ready. |
 | Read | Зачитайте диспетчеру текст на екрані. | Read the on-screen text to the dispatcher. |
-| Give | Покажіть екран медику. Або дайте відсканувати код. | Show the screen to the medic. Or let them scan the code. |
-| Give-warn | Тут немає імен. Не надсилайте стороннім у месенджер. | There are no names here. Do not send this to strangers in chat. |
+| Give | QR для медика. | QR for the medic. |
+| Give-warn | *(прибрано з екрана — дубль попередження; текст звіту лишається на Form)* | *(removed from screen)* |
 | Handed | Передали медику. Лишити журнал для нагадувань через 24 і 48 годин — чи стерти зараз? | Handed to the medic. Keep the log for 24 and 48 hour reminders — or erase now? |
 | Erase | Стерти журнал зараз. | Erase the log now. |
 

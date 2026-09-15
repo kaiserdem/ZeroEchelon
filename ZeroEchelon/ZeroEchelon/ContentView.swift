@@ -118,9 +118,15 @@ struct ContentView: View {
                     systemImage: "exclamationmark.triangle",
                     description: Text(loadError)
                 )
+                .foregroundStyle(CivicTheme.ink)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(CivicTheme.canvas)
             } else {
                 ProgressView("Завантаження протоколу…")
                     .tint(CivicTheme.accent)
+                    .foregroundStyle(CivicTheme.muted)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(CivicTheme.canvas)
             }
         }
         .task { model.load() }

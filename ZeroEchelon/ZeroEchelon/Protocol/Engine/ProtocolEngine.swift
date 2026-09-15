@@ -265,8 +265,10 @@ final class ProtocolEngine {
             return demoCoordinatesDisplay
         case "Loc-3":
             return manualLocationSummary
-        case "Call", "CALL-read", "Read", "Give", "Form":
+        case "Call", "CALL-read", "Read", "Form":
             return dispatcherDraft
+        case "Give":
+            return nil
         default:
             if currentNode.ui?.showDispatcherDraft == true {
                 return dispatcherDraft

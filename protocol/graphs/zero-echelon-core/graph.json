@@ -1345,10 +1345,6 @@
           "to": "Out-trapped"
         },
         {
-          "when": "read",
-          "to": "Read"
-        },
-        {
           "when": "give",
           "to": "Give"
         },
@@ -1370,11 +1366,6 @@
         "template": "handover",
         "markUnreachable": true,
         "buttons": [
-          {
-            "when": "read",
-            "ua": "Зачитати диспетчеру",
-            "en": "Read to dispatcher"
-          },
           {
             "when": "give",
             "ua": "Показати медика / QR",
@@ -5276,12 +5267,8 @@
         "B1"
       ],
       "voice": {
-        "ua": "Покажіть екран медику. Або дайте відсканувати код.",
-        "en": "Show the screen to the medic. Or let them scan the code."
-      },
-      "antiPattern": {
-        "ua": "Тут немає імен. Не надсилайте стороннім у месенджер.",
-        "en": "There are no names here. Do not send this to strangers in chat."
+        "ua": "QR для медика.",
+        "en": "QR for the medic."
       },
       "edges": [
         {
@@ -5300,7 +5287,7 @@
       "ui": {
         "screenId": "S11",
         "template": "handover",
-        "showDispatcherDraft": true,
+        "showDispatcherDraft": false,
         "buttons": [
           {
             "when": "handed",
