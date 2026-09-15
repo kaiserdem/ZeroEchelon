@@ -148,17 +148,31 @@ function render(options?: { keepFocus?: boolean }): void {
   const anti = engine.antiPatternText;
   const detail = engine.detailBlock;
   const helper = engine.helperText;
+  const brigadeCard = engine.showsBrigadeReportCard
+    ? `
+      <div class="report-card">
+        <h2 class="report-card-title">${escapeHtml(engine.brigadeReportTitle)}</h2>
+        <dl class="report-card-fields">
+          ${engine.brigadeReportFields
+            .map(
+              (field) => `
+            <div class="report-card-row">
+              <dt>${escapeHtml(field.label)}</dt>
+              <dd><span class="report-card-sep">—</span> ${escapeHtml(field.value)}</dd>
+            </div>
+          `,
+            )
+            .join("")}
+        </dl>
+      </div>
+    `
+    : "";
   const lastEvent =
     engine.currentNode.id === "Home" && engine.lastEventSummaryLine
       ? `
       <div class="last-event">
         <p class="last-event-title">${escapeHtml(engine.lastEventSummaryLine)}</p>
-        ${
-          engine.locationLine
-            ? `<p class="last-event-loc">${escapeHtml(engine.locationLine)}</p>`
-            : ""
-        }
-        <button type="button" class="last-event-btn" data-open-report>${escapeHtml(locale === "uk" ? "Відкрити звіт" : "Open report")}</button>
+        <button type="button" class="last-event-btn" data-open-report>${escapeHtml(locale === "uk" ? "Відкрити звіт ›" : "Open report ›")}</button>
       </div>
     `
       : "";
@@ -280,8 +294,9 @@ function render(options?: { keepFocus?: boolean }): void {
             ? `<div class="anti" role="alert">⚠ ${escapeHtml(anti)}</div>`
             : ""
         }
+        ${brigadeCard}
         ${
-          detail
+          !brigadeCard && detail
             ? `<div class="detail${engine.currentNode.id === "Loc-2" ? " coords" : ""}">${escapeHtml(detail)}</div>`
             : ""
         }

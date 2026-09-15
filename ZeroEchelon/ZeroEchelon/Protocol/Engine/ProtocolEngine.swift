@@ -249,7 +249,12 @@ final class ProtocolEngine {
     }
 
     /// Extra UI tips under the voice line — disabled (noise on emergency screens).
-    var helperText: String? { nil }
+    var helperText: String? {
+        guard currentNode.id == "Disclaimer" else { return nil }
+        return locale == .uk
+            ? "Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає."
+            : "This app only suggests steps — the decisions are yours. The law alone does not protect you for helping."
+    }
 
     /// True on the medic handover screen — show an offline QR of the draft.
     var showsHandoverQR: Bool { currentNode.id == "Give" }
@@ -265,9 +270,9 @@ final class ProtocolEngine {
             return demoCoordinatesDisplay
         case "Loc-3":
             return manualLocationSummary
-        case "Call", "CALL-read", "Read", "Form":
+        case "Call", "CALL-read", "Read":
             return dispatcherDraft
-        case "Give":
+        case "Form", "Give":
             return nil
         default:
             if currentNode.ui?.showDispatcherDraft == true {
@@ -275,6 +280,81 @@ final class ProtocolEngine {
             }
             return nil
         }
+    }
+
+    /// Structured brigade draft card on Form (Figma: «Чернетка для бригади»).
+    var showsBrigadeReportCard: Bool { currentNode.id == "Form" }
+
+    var brigadeReportTitle: String {
+        locale == .uk ? "Чернетка для бригади" : "Draft for responders"
+    }
+
+    var brigadeReportFields: [(id: String, label: String, value: String)] {
+        let dash = "—"
+        let typeValue = localizedIncidentTypeLabel() ?? dash
+        let placeValue = locationLine ?? dash
+        let roleValue: String = {
+            switch sessionRole {
+            case .witness: locale == .uk ? "Свідок" : "Witness"
+            case .casualty: locale == .uk ? "Постраждалий" : "Casualty"
+            case nil: dash
+            }
+        }()
+        let casualtiesValue = saltCasualtiesShort() ?? dash
+        let tourniquetValue: String = {
+            if let tq = tourniquetOn {
+                return Self.clockFormatter(locale: locale).string(from: tq)
+            }
+            return locale == .uk ? "Не накладено" : "Not applied"
+        }()
+        let facts = keyFactLines()
+        let keyValue = facts.isEmpty
+            ? dash
+            : facts.joined(separator: locale == .uk ? "; " : "; ")
+
+        if locale == .uk {
+            return [
+                ("type", "Тип події", typeValue),
+                ("place", "Місце", placeValue),
+                ("role", "Роль", roleValue),
+                ("casualties", "Постраждалі", casualtiesValue),
+                ("tourniquet", "Час джгута", tourniquetValue),
+                ("key", "Ключове", keyValue),
+            ]
+        }
+        return [
+            ("type", "Event type", typeValue),
+            ("place", "Location", placeValue),
+            ("role", "Role", roleValue),
+            ("casualties", "Casualties", casualtiesValue),
+            ("tourniquet", "Tourniquet time", tourniquetValue),
+            ("key", "Key info", keyValue),
+        ]
+    }
+
+    private func saltCasualtiesShort() -> String? {
+        let red = saltRedCount
+        let yellow = saltYellowCount
+        let green = saltGreenCount
+        let unreachable = unreachableMarked ? 1 : 0
+        let total = red + yellow + green + unreachable
+        guard total > 0 else { return nil }
+        if locale == .uk {
+            if total == 1 { return "Один" }
+            var parts: [String] = []
+            if red > 0 { parts.append("червоних \(red)") }
+            if yellow > 0 { parts.append("жовтих \(yellow)") }
+            if green > 0 { parts.append("зелених \(green)") }
+            if unreachable > 0 { parts.append("недосяжних \(unreachable)") }
+            return parts.isEmpty ? "Кілька" : parts.joined(separator: ", ")
+        }
+        if total == 1 { return "One" }
+        var parts: [String] = []
+        if red > 0 { parts.append("red \(red)") }
+        if yellow > 0 { parts.append("yellow \(yellow)") }
+        if green > 0 { parts.append("green \(green)") }
+        if unreachable > 0 { parts.append("unreachable \(unreachable)") }
+        return parts.isEmpty ? "Several" : parts.joined(separator: ", ")
     }
 
     private func demoAddressLine(for locale: ContentLocale) -> String {
@@ -734,18 +814,22 @@ final class ProtocolEngine {
     /// Short line for Home: when the last event started.
     var lastEventSummaryLine: String? {
         guard let eventStartedAt else { return nil }
-        let formatted = Self.eventDateFormatter(locale: locale).string(from: eventStartedAt)
+        let day: String
+        if Calendar.current.isDateInToday(eventStartedAt) {
+            day = locale == .uk ? "сьогодні" : "today"
+        } else if Calendar.current.isDateInYesterday(eventStartedAt) {
+            day = locale == .uk ? "вчора" : "yesterday"
+        } else {
+            let dayFormatter = DateFormatter()
+            dayFormatter.locale = Locale(identifier: locale == .uk ? "uk_UA" : "en_GB")
+            dayFormatter.dateStyle = .medium
+            dayFormatter.timeStyle = .none
+            day = dayFormatter.string(from: eventStartedAt)
+        }
+        let time = Self.clockFormatter(locale: locale).string(from: eventStartedAt)
         return locale == .uk
-            ? "Остання подія: \(formatted)"
-            : "Last event: \(formatted)"
-    }
-
-    private static func eventDateFormatter(locale: ContentLocale) -> DateFormatter {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: locale == .uk ? "uk_UA" : "en_GB")
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter
+            ? "Остання подія · \(time), \(day)"
+            : "Last event · \(time), \(day)"
     }
 
     private func beginEventIfNeeded() {

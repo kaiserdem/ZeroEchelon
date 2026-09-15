@@ -26,7 +26,8 @@
 | --- | --- | --- |
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
 | Home | Оберіть. Що потрібно зараз? | Choose. What do you need now? |
-| Disclaimer | Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. | Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. |
+| Disclaimer | Спочатку викличте 103, якщо можете. | Call 103 first if you can. |
+| Disclaimer-note | Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. *(менший текст під заголовком)* | This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. *(smaller helper under title)* |
 | Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
@@ -177,7 +178,7 @@
 
 | id | UA | EN |
 | --- | --- | --- |
-| Form | Звіт для служб готовий. | The report for responders is ready. |
+| Form | Звіт для служб | Report for responders |
 | Read | Зачитайте диспетчеру текст на екрані. | Read the on-screen text to the dispatcher. |
 | Give | QR для медика. | QR for the medic. |
 | Give-warn | *(прибрано з екрана — дубль попередження; текст звіту лишається на Form)* | *(removed from screen)* |

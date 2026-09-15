@@ -76,8 +76,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Спочатку викличте 103, якщо можете. Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає.",
-        "en": "Call 103 first if you can. This app only suggests steps — the decisions are yours. The law alone does not protect you for helping."
+        "ua": "Спочатку викличте 103, якщо можете.",
+        "en": "Call 103 first if you can."
       },
       "edges": [
         {
@@ -1328,8 +1328,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Звіт для служб готовий.",
-        "en": "The report for responders is ready."
+        "ua": "Звіт для служб",
+        "en": "Report for responders"
       },
       "edges": [
         {

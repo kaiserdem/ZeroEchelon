@@ -77,6 +77,13 @@ struct NodeFrameView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
 
+                    if let helper = engine.helperText {
+                        Text(helper)
+                            .font(.system(size: 19, weight: .medium))
+                            .foregroundStyle(CivicTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
                     if let anti = engine.antiPatternText {
                         Label(anti, systemImage: "exclamationmark.triangle.fill")
                             .font(.body.weight(.bold))
@@ -93,7 +100,9 @@ struct NodeFrameView: View {
                             }
                     }
 
-                    if let detail = engine.detailBlock {
+                    if engine.showsBrigadeReportCard {
+                        brigadeReportCard
+                    } else if let detail = engine.detailBlock {
                         Text(detail)
                             .font(engine.currentNode.id == "Loc-2"
                                   ? .system(size: 32, weight: .bold, design: .rounded)
@@ -178,6 +187,38 @@ struct NodeFrameView: View {
             AppPreferences.locale = newLocale
             speakCurrent()
         }
+    }
+
+    private var brigadeReportCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(engine.brigadeReportTitle)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(CivicTheme.ink)
+
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(engine.brigadeReportFields, id: \.id) { field in
+                    (
+                        Text("\(field.label) — ")
+                            .foregroundStyle(CivicTheme.muted)
+                        + Text(field.value)
+                            .foregroundStyle(CivicTheme.ink)
+                    )
+                    .font(.system(size: 20, weight: .semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            CivicTheme.surface,
+            in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: CivicTheme.corner)
+                .stroke(CivicTheme.border, lineWidth: 1.5)
+        }
+        .accessibilityElement(children: .combine)
     }
 
     private var handoverQRBlock: some View {
@@ -413,39 +454,37 @@ struct NodeFrameView: View {
     }
 
     private func lastEventCard(_ summary: String) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(summary)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(CivicTheme.ink)
-
-            if let line = engine.locationLine, !line.isEmpty {
-                Text(line)
-                    .font(CivicTheme.helperFont)
-                    .foregroundStyle(CivicTheme.muted)
-            }
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(CivicTheme.muted)
 
             Button {
                 onOpenLastReport?()
             } label: {
-                Text(engine.locale == .uk ? "Відкрити звіт" : "Open report")
-                    .font(CivicTheme.buttonFont)
-                    .foregroundStyle(CivicTheme.accent)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(
-                        CivicTheme.secondaryFill,
-                        in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
-                    )
+                HStack(spacing: 4) {
+                    Text(engine.locale == .uk ? "Відкрити звіт" : "Open report")
+                        .font(.system(size: 17, weight: .semibold))
+                    Image(systemName: "chevron.forward")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .foregroundStyle(CivicTheme.accent)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(engine.locale == .uk ? "Відкрити звіт" : "Open report")
         }
-        .padding(14)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             CivicTheme.secondaryFill,
             in: RoundedRectangle(cornerRadius: 12)
         )
-        .accessibilityElement(children: .contain)
+        .contentShape(RoundedRectangle(cornerRadius: 12))
+        .onTapGesture {
+            onOpenLastReport?()
+        }
+        .accessibilityElement(children: .combine)
     }
 
     private func speakCurrent() {

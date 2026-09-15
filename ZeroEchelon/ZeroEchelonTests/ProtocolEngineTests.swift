@@ -216,9 +216,10 @@ struct ProtocolEngineTests {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Form")
-        #expect(engine.detailBlock?.contains("Вибух") == true)
-        #expect(engine.detailBlock == engine.dispatcherDraft)
-        #expect(engine.detailBlock?.isEmpty == false)
+        #expect(engine.showsBrigadeReportCard)
+        #expect(engine.brigadeReportFields.contains(where: { $0.value.contains("Вибух") }))
+        #expect(engine.dispatcherDraft.contains("Вибух"))
+        #expect(!engine.dispatcherDraft.isEmpty)
 
         _ = try engine.select(edgeWhen: "give")
         #expect(engine.currentNode.id == "Give")

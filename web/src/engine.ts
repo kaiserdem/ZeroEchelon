@@ -217,7 +217,10 @@ export class ProtocolEngine {
   }
 
   get helperText(): string | null {
-    return null;
+    if (this.currentNode.id !== "Disclaimer") return null;
+    return this.locale === "uk"
+      ? "Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає."
+      : "This app only suggests steps — the decisions are yours. The law alone does not protect you for helping.";
   }
 
   get showsHandoverQR(): boolean {
@@ -240,8 +243,8 @@ export class ProtocolEngine {
       case "Call":
       case "CALL-read":
       case "Read":
-      case "Form":
         return this.dispatcherDraft;
+      case "Form":
       case "Give":
         return null;
       default:
@@ -250,6 +253,87 @@ export class ProtocolEngine {
         }
         return null;
     }
+  }
+
+  get showsBrigadeReportCard(): boolean {
+    return this.currentNode.id === "Form";
+  }
+
+  get brigadeReportTitle(): string {
+    return this.locale === "uk"
+      ? "Чернетка для бригади"
+      : "Draft for responders";
+  }
+
+  get brigadeReportFields(): { id: string; label: string; value: string }[] {
+    const dash = "—";
+    const typeValue = this.localizedIncidentTypeLabel() ?? dash;
+    const placeValue = this.locationLine ?? dash;
+    let roleValue = dash;
+    if (this.sessionRole === "witness") {
+      roleValue = this.locale === "uk" ? "Свідок" : "Witness";
+    } else if (this.sessionRole === "casualty") {
+      roleValue = this.locale === "uk" ? "Постраждалий" : "Casualty";
+    }
+    const casualtiesValue = this.saltCasualtiesShort() ?? dash;
+    const tourniquetValue = this.tourniquetOn
+      ? this.tourniquetClock(this.tourniquetOn)
+      : this.locale === "uk"
+        ? "Не накладено"
+        : "Not applied";
+    const facts = this.keyFactLines();
+    const keyValue = facts.length === 0 ? dash : facts.join("; ");
+
+    if (this.locale === "uk") {
+      return [
+        { id: "type", label: "Тип події", value: typeValue },
+        { id: "place", label: "Місце", value: placeValue },
+        { id: "role", label: "Роль", value: roleValue },
+        { id: "casualties", label: "Постраждалі", value: casualtiesValue },
+        { id: "tourniquet", label: "Час джгута", value: tourniquetValue },
+        { id: "key", label: "Ключове", value: keyValue },
+      ];
+    }
+    return [
+      { id: "type", label: "Event type", value: typeValue },
+      { id: "place", label: "Location", value: placeValue },
+      { id: "role", label: "Role", value: roleValue },
+      { id: "casualties", label: "Casualties", value: casualtiesValue },
+      { id: "tourniquet", label: "Tourniquet time", value: tourniquetValue },
+      { id: "key", label: "Key info", value: keyValue },
+    ];
+  }
+
+  private saltCasualtiesShort(): string | null {
+    const red = this.saltRedCount;
+    const yellow = this.saltYellowCount;
+    const green = this.saltGreenCount;
+    const unreachable = this.unreachableMarked ? 1 : 0;
+    const total = red + yellow + green + unreachable;
+    if (total === 0) return null;
+    if (this.locale === "uk") {
+      if (total === 1) return "Один";
+      const parts: string[] = [];
+      if (red > 0) parts.push(`червоних ${red}`);
+      if (yellow > 0) parts.push(`жовтих ${yellow}`);
+      if (green > 0) parts.push(`зелених ${green}`);
+      if (unreachable > 0) parts.push(`недосяжних ${unreachable}`);
+      return parts.length === 0 ? "Кілька" : parts.join(", ");
+    }
+    if (total === 1) return "One";
+    const parts: string[] = [];
+    if (red > 0) parts.push(`red ${red}`);
+    if (yellow > 0) parts.push(`yellow ${yellow}`);
+    if (green > 0) parts.push(`green ${green}`);
+    if (unreachable > 0) parts.push(`unreachable ${unreachable}`);
+    return parts.length === 0 ? "Several" : parts.join(", ");
+  }
+
+  private tourniquetClock(iso: string): string {
+    return new Intl.DateTimeFormat(
+      this.locale === "uk" ? "uk-UA" : "en-GB",
+      { hour: "2-digit", minute: "2-digit" },
+    ).format(new Date(iso));
   }
 
   private demoAddressLine(): string {
@@ -670,13 +754,31 @@ export class ProtocolEngine {
 
   get lastEventSummaryLine(): string | null {
     if (!this.eventStartedAt) return null;
-    const formatted = new Intl.DateTimeFormat(
+    const started = new Date(this.eventStartedAt);
+    const now = new Date();
+    const startDay = new Date(started.getFullYear(), started.getMonth(), started.getDate());
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.round(
+      (today.getTime() - startDay.getTime()) / (24 * 60 * 60 * 1000),
+    );
+    let day: string;
+    if (diffDays === 0) {
+      day = this.locale === "uk" ? "сьогодні" : "today";
+    } else if (diffDays === 1) {
+      day = this.locale === "uk" ? "вчора" : "yesterday";
+    } else {
+      day = new Intl.DateTimeFormat(
+        this.locale === "uk" ? "uk-UA" : "en-GB",
+        { dateStyle: "medium" },
+      ).format(started);
+    }
+    const time = new Intl.DateTimeFormat(
       this.locale === "uk" ? "uk-UA" : "en-GB",
-      { dateStyle: "medium", timeStyle: "short" },
-    ).format(new Date(this.eventStartedAt));
+      { hour: "2-digit", minute: "2-digit" },
+    ).format(started);
     return this.locale === "uk"
-      ? `Остання подія: ${formatted}`
-      : `Last event: ${formatted}`;
+      ? `Остання подія · ${time}, ${day}`
+      : `Last event · ${time}, ${day}`;
   }
 
   makeEventSnapshot(): LocalEventRecord | null {
