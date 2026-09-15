@@ -1402,7 +1402,7 @@
             "en": "Back"
           }
         ],
-        "note": "Повний S11. Рушій фільтрує back-* за lastVetoNodeId. Handed — кінець гайду."
+        "note": "S11: give/handed/wave/erase. back-* лишаються в edges для історії; у UI не показуємо (є top bar Назад). Handed — кінець гайду."
       }
     },
     {

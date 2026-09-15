@@ -399,17 +399,9 @@ final class ProtocolEngine {
         }
 
         if currentNode.id == "Form" {
-            if lastVetoNodeId != nil {
-                let backWhen: String
-                switch lastVetoNodeId {
-                case "Cont": backWhen = "back-cont"
-                case "Out-trapped": backWhen = "back-trapped"
-                default: backWhen = "back-out"
-                }
-                buttons = buttons.filter { $0.when == backWhen || $0.when == "erase" || $0.when == "handed" }
-            } else {
-                buttons = buttons.filter { ["read", "give", "handed", "wave", "erase"].contains($0.when) }
-            }
+            // Top bar «Назад» covers history; never duplicate back-* here.
+            // Always keep QR (give) — including after veto path Out/Cont/Out-trapped.
+            buttons = buttons.filter { ["give", "handed", "wave", "erase"].contains($0.when) }
         }
 
         if currentNode.id == "Loc-3" {

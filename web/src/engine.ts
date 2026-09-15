@@ -382,18 +382,11 @@ export class ProtocolEngine {
     }
 
     if (this.currentNode.id === "Form") {
-      if (this.lastVetoNodeId) {
-        let backWhen = "back-out";
-        if (this.lastVetoNodeId === "Cont") backWhen = "back-cont";
-        if (this.lastVetoNodeId === "Out-trapped") backWhen = "back-trapped";
-        buttons = buttons.filter(
-          (b) => b.when === backWhen || b.when === "erase" || b.when === "handed",
-        );
-      } else {
-        buttons = buttons.filter((b) =>
-          ["read", "give", "handed", "wave", "erase"].includes(b.when),
-        );
-      }
+      // Top bar «Назад» covers history; never duplicate back-* here.
+      // Always keep QR (give) — including after veto path Out/Cont/Out-trapped.
+      buttons = buttons.filter((b) =>
+        ["give", "handed", "wave", "erase"].includes(b.when),
+      );
     }
 
     if (this.currentNode.id === "Loc-3") {
