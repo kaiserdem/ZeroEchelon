@@ -65,102 +65,54 @@ struct NodeFrameView: View {
         }
     }
 
+    /// Home / Type / Form / Give: title + body + actions share one ScrollView.
+    /// Other screens: body top, actions docked above 103.
+    private var docksActionsAtBottom: Bool {
+        switch engine.currentNode.id {
+        case "Home", "Type", "Form", "Give":
+            return false
+        default:
+            return true
+        }
+    }
+
     private var protocolFrame: some View {
         VStack(spacing: 0) {
             topBar
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text(engine.voiceText)
-                        .font(CivicTheme.voiceFont)
-                        .foregroundStyle(CivicTheme.ink)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityAddTraits(.isHeader)
+            if docksActionsAtBottom {
+                ScrollView {
+                    protocolContentStack
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
-                    if let helper = engine.helperText {
-                        Text(helper)
-                            .font(.system(size: 19, weight: .medium))
-                            .foregroundStyle(CivicTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    if let anti = engine.antiPatternText {
-                        Label(anti, systemImage: "exclamationmark.triangle.fill")
-                            .font(.body.weight(.bold))
-                            .foregroundStyle(CivicTheme.danger)
-                            .padding(16)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                CivicTheme.antiFill,
-                                in: RoundedRectangle(cornerRadius: CivicTheme.corner)
-                            )
-                            .overlay {
-                                RoundedRectangle(cornerRadius: CivicTheme.corner)
-                                    .stroke(CivicTheme.antiBorder, lineWidth: 1)
-                            }
-                    }
-
-                    if engine.showsBrigadeReportCard {
-                        brigadeReportCard
-                    } else if let detail = engine.detailBlock {
-                        Text(detail)
-                            .font(engine.currentNode.id == "Loc-2"
-                                  ? .system(size: 32, weight: .bold, design: .rounded)
-                                  : .system(size: 22, weight: .semibold))
-                            .foregroundStyle(CivicTheme.ink)
-                            .lineSpacing(4)
-                            .padding(18)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                CivicTheme.secondaryFill,
-                                in: RoundedRectangle(cornerRadius: CivicTheme.corner)
-                            )
-                    }
-
-                    if engine.showsHandoverQR {
-                        handoverQRBlock
-                    }
-
-                    if engine.isManualLocationEntry {
-                        manualLocationInput
-                    }
-
-                    Group {
-                        if engine.currentNode.id == "Type" {
-                            LazyVGrid(
-                                columns: [
-                                    GridItem(.flexible(), spacing: 12),
-                                    GridItem(.flexible(), spacing: 12),
-                                    GridItem(.flexible(), spacing: 12),
-                                ],
-                                spacing: 12
-                            ) {
-                                ForEach(engine.visibleButtons, id: \.id) { button in
-                                    typeIconButton(button)
-                                }
-                            }
-                        } else {
-                            VStack(spacing: 12) {
-                                ForEach(Array(engine.visibleButtons.enumerated()), id: \.element.id) { index, button in
-                                    actionButton(button, index: index)
-                                }
-                            }
+                protocolActionsStack
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    .padding(.bottom, 12)
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        protocolContentStack
+                        protocolActionsStack
+                        if engine.currentNode.id == "Home",
+                           let summary = engine.lastEventSummaryLine
+                        {
+                            lastEventCard(summary)
                         }
                     }
-                    .padding(.top, 4)
-
-                    if engine.currentNode.id == "Home",
-                       let summary = engine.lastEventSummaryLine
-                    {
-                        lastEventCard(summary)
-                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    .padding(.bottom, 24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-                .padding(.bottom, 24)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .scrollBounceBehavior(.basedOnSize)
             }
-            .scrollBounceBehavior(.basedOnSize)
 
             EmergencyBar(
                 locale: engine.locale,
@@ -186,6 +138,91 @@ struct NodeFrameView: View {
         .onChange(of: engine.locale) { _, newLocale in
             AppPreferences.locale = newLocale
             speakCurrent()
+        }
+    }
+
+    @ViewBuilder
+    private var protocolContentStack: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(engine.voiceText)
+                .font(CivicTheme.voiceFont)
+                .foregroundStyle(CivicTheme.ink)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityAddTraits(.isHeader)
+
+            if let helper = engine.helperText {
+                Text(helper)
+                    .font(.system(size: 19, weight: .medium))
+                    .foregroundStyle(CivicTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let anti = engine.antiPatternText {
+                Label(anti, systemImage: "exclamationmark.triangle.fill")
+                    .font(.body.weight(.bold))
+                    .foregroundStyle(CivicTheme.danger)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        CivicTheme.antiFill,
+                        in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: CivicTheme.corner)
+                            .stroke(CivicTheme.antiBorder, lineWidth: 1)
+                    }
+            }
+
+            if engine.showsBrigadeReportCard {
+                brigadeReportCard
+            } else if let detail = engine.detailBlock {
+                Text(detail)
+                    .font(engine.currentNode.id == "Loc-2"
+                          ? .system(size: 32, weight: .bold, design: .rounded)
+                          : .system(size: 22, weight: .semibold))
+                    .foregroundStyle(CivicTheme.ink)
+                    .lineSpacing(4)
+                    .padding(18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        CivicTheme.secondaryFill,
+                        in: RoundedRectangle(cornerRadius: CivicTheme.corner)
+                    )
+            }
+
+            if engine.showsHandoverQR {
+                handoverQRBlock
+            }
+
+            if engine.isManualLocationEntry {
+                manualLocationInput
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var protocolActionsStack: some View {
+        Group {
+            if engine.currentNode.id == "Type" {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12),
+                    ],
+                    spacing: 12
+                ) {
+                    ForEach(engine.visibleButtons, id: \.id) { button in
+                        typeIconButton(button)
+                    }
+                }
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(Array(engine.visibleButtons.enumerated()), id: \.element.id) { index, button in
+                        actionButton(button, index: index)
+                    }
+                }
+            }
         }
     }
 
@@ -353,7 +390,7 @@ struct NodeFrameView: View {
 
     @ViewBuilder
     private func actionButton(_ button: ProtocolButton, index: Int) -> some View {
-        let primary = index == 0
+        let primary = isVeto || (!engine.usesEqualChoiceButtons && index == 0)
         Button {
             handle(button.when)
         } label: {
@@ -369,7 +406,7 @@ struct NodeFrameView: View {
                     in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
                 )
                 .overlay {
-                    if !primary && !isVeto {
+                    if !primary {
                         RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
                             .stroke(CivicTheme.border, lineWidth: 1.5)
                     }
@@ -379,12 +416,12 @@ struct NodeFrameView: View {
     }
 
     private func buttonFill(primary: Bool) -> Color {
-        if primary || isVeto { return CivicTheme.accent }
+        if primary { return CivicTheme.accent }
         return CivicTheme.surface
     }
 
     private func buttonInk(primary: Bool) -> Color {
-        if primary || isVeto { return .white }
+        if primary { return .white }
         return CivicTheme.accent
     }
 

@@ -401,7 +401,25 @@ export class ProtocolEngine {
       });
     }
 
+    // Top bar already has «Назад» — never duplicate content Back buttons.
+    if (this.canGoBack) {
+      buttons = buttons.filter((button) => {
+        if (button.when.startsWith("back-")) return false;
+        const title = buttonTitle(button, this.locale);
+        return title !== "Назад" && title !== "Back";
+      });
+    }
+
     return buttons;
+  }
+
+  /** Three or more peer choices — all secondary. Home/Form keep first button primary. */
+  get usesEqualChoiceButtons(): boolean {
+    if (this.currentNode.veto) return false;
+    if (this.currentNode.id === "Home" || this.currentNode.id === "Form") {
+      return false;
+    }
+    return this.visibleButtons.length >= 3;
   }
 
   get showsRescue101(): boolean {

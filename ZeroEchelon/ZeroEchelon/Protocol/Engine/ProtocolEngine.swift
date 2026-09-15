@@ -415,7 +415,28 @@ final class ProtocolEngine {
             }
         }
 
+        // Top bar already has «Назад» — never duplicate content Back buttons.
+        if canGoBack {
+            buttons = buttons.filter { button in
+                if button.when.hasPrefix("back-") { return false }
+                let title = button.title(for: locale)
+                return title != "Назад" && title != "Back"
+            }
+        }
+
         return buttons
+    }
+
+    /// Three or more peer choices (e.g. stroke / poison / bite) — all secondary (white).
+    /// Home and Form keep the first action primary.
+    var usesEqualChoiceButtons: Bool {
+        guard !currentNode.veto else { return false }
+        switch currentNode.id {
+        case "Home", "Form":
+            return false
+        default:
+            return visibleButtons.count >= 3
+        }
     }
 
     var showsRescue101: Bool {

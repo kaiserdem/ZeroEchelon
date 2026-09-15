@@ -11,8 +11,9 @@
   height: 72px !important;
   margin: 0 auto !important;
   background: transparent !important;
-  border-radius: 0 !important;
+  border-radius: 14px !important;
   box-shadow: none !important;
+  overflow: hidden !important;
 }
 .brand-mark-solo img {
   display: block !important;
@@ -29,9 +30,9 @@
 }
 .brand-title {
   display: block !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   font-size: 1.45rem !important;
-  color: #0d449e !important;
+  color: #08324a !important;
   text-decoration: none !important;
 }
 .brand-tagline {
@@ -39,8 +40,8 @@
   margin: 0 !important;
   width: 100% !important;
   font-size: 0.95rem !important;
-  font-weight: 600 !important;
-  color: #52617a !important;
+  font-weight: 500 !important;
+  color: #5b617f !important;
 }
 .brand-tagline[hidden],
 .i18n[hidden] {

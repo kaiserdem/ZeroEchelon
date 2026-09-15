@@ -1,16 +1,23 @@
+/* Line 24 legal — CivicTheme tokens (aligned with app / web UI kit) */
 :root {
-  --canvas: #eef3fb;
-  --canvas-deep: #dfe8f6;
   --surface: #ffffff;
-  --ink: #0d1f47;
-  --muted: #52617a;
-  --accent: #0d449e;
-  --accent-soft: #e0e8f5;
-  --danger: #d91f29;
-  --line: rgba(13, 68, 158, 0.14);
-  --shadow: 0 18px 40px rgba(13, 31, 71, 0.08);
-  --font: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --canvas: #ffffff;
+  --canvas-soft: #f4f6f8;
+  --darkest: #010f17;
+  --navy: #08324a;
+  --ink: #010f17;
+  --muted: #5b617f;
+  --accent: #08324a;
+  --accent-soft: rgba(8, 50, 74, 0.06);
+  --accent-border: rgba(8, 50, 74, 0.2);
+  --danger: #801717;
+  --danger-soft: rgba(128, 23, 23, 0.06);
+  --danger-border: rgba(128, 23, 23, 0.2);
+  --line: rgba(8, 50, 74, 0.12);
+  --shadow: 0 8px 24px rgba(1, 15, 23, 0.06);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --radius: 16px;
+  --r-pill: 10px;
 }
 
 * { box-sizing: border-box; }
@@ -22,14 +29,15 @@ html, body {
   color: var(--ink);
   font: 500 1.05rem/1.6 var(--font);
   background:
-    radial-gradient(1200px 500px at 10% -10%, #ffffff 0%, transparent 55%),
-    radial-gradient(900px 420px at 100% 0%, #d7e4fb 0%, transparent 50%),
-    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-deep) 100%);
+    radial-gradient(900px 420px at 8% -8%, rgba(8, 50, 74, 0.05) 0%, transparent 55%),
+    radial-gradient(700px 360px at 100% 0%, rgba(128, 23, 23, 0.04) 0%, transparent 50%),
+    linear-gradient(180deg, var(--canvas) 0%, var(--canvas-soft) 100%);
   background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--accent);
+  color: var(--navy);
   text-underline-offset: 0.15em;
 }
 
@@ -45,11 +53,10 @@ a {
   gap: 1rem;
   margin-bottom: 1.75rem;
   padding: 1.25rem 1.2rem 1.3rem;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: calc(var(--radius) + 4px);
+  border-radius: calc(var(--radius) + 2px);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
 }
 
 .brand-mark-solo {
@@ -57,8 +64,8 @@ a {
   width: 72px;
   height: 72px;
   margin: 0 auto;
-  border-radius: 0;
-  overflow: visible;
+  border-radius: 14px;
+  overflow: hidden;
   box-shadow: none;
   background: transparent;
   text-decoration: none;
@@ -75,8 +82,8 @@ a {
   width: 112px;
   height: 112px;
   margin: 0 auto 1rem;
-  border-radius: 0;
-  overflow: visible;
+  border-radius: 18px;
+  overflow: hidden;
   background: transparent;
   box-shadow: none;
 }
@@ -96,10 +103,10 @@ a {
 }
 
 .brand-title {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 1.45rem;
   letter-spacing: -0.03em;
-  color: var(--accent);
+  color: var(--navy);
   line-height: 1.1;
   text-decoration: none;
 }
@@ -108,7 +115,7 @@ a {
   margin: 0;
   font-size: 0.95rem;
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -117,7 +124,8 @@ a {
 .lang-switch {
   display: inline-flex;
   background: var(--accent-soft);
-  border-radius: 999px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
   padding: 3px;
   flex-shrink: 0;
 }
@@ -125,15 +133,15 @@ a {
 .lang-switch button {
   border: 0;
   background: transparent;
-  color: var(--accent);
-  font: 700 0.85rem/1 var(--font);
+  color: var(--navy);
+  font: 600 0.85rem/1 var(--font);
   padding: 7px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .lang-switch button[aria-pressed="true"] {
-  background: var(--accent);
+  background: var(--navy);
   color: #fff;
 }
 
@@ -146,25 +154,26 @@ nav {
 nav a {
   display: inline-flex;
   align-items: center;
-  padding: 0.45rem 0.85rem;
-  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius);
   background: var(--accent-soft);
-  color: var(--accent);
+  border: 1px solid transparent;
+  color: var(--navy);
   font-size: 0.88rem;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 nav a:hover {
-  background: var(--accent);
-  color: #fff;
-  transform: translateY(-1px);
+  border-color: var(--accent-border);
+  background: rgba(8, 50, 74, 0.1);
 }
 
 nav a[aria-current="page"] {
-  background: var(--accent);
+  background: var(--navy);
   color: #fff;
+  border-color: var(--navy);
 }
 
 .hero {
@@ -186,21 +195,23 @@ h1 {
   line-height: 1.2;
   letter-spacing: -0.03em;
   margin: 0 0 0.45rem;
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--darkest);
 }
 
 .meta {
   color: var(--muted);
   font-size: 0.9rem;
   margin: 0 0 1.35rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 h2 {
   font-size: 1.08rem;
   margin: 1.6rem 0 0.55rem;
   letter-spacing: -0.02em;
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--navy);
 }
 
 .page-panel > .i18n > h2:first-of-type {
@@ -230,17 +241,18 @@ li + li { margin-top: 0.35rem; }
   text-decoration: none;
   color: inherit;
   box-shadow: var(--shadow);
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  border-color: rgba(13, 68, 158, 0.35);
+  border-color: var(--accent-border);
+  background: rgba(8, 50, 74, 0.02);
 }
 
 .card strong {
   display: block;
-  color: var(--accent);
+  color: var(--navy);
   font-size: 1.05rem;
   margin-bottom: 0.25rem;
 }
@@ -248,12 +260,12 @@ li + li { margin-top: 0.35rem; }
 .card span {
   color: var(--muted);
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .alert {
-  background: #fff6f6;
-  border: 1px solid rgba(217, 31, 41, 0.22);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
   border-left: 4px solid var(--danger);
   border-radius: 12px;
   padding: 0.95rem 1rem;
@@ -271,10 +283,10 @@ footer {
   padding: 1rem 0.25rem 0;
   color: var(--muted);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
-footer a { font-weight: 700; }
+footer a { font-weight: 600; color: var(--navy); }
 
 @media (min-width: 720px) {
   nav { justify-content: flex-start; }

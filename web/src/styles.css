@@ -153,8 +153,36 @@ body {
 /* ---------- Content ---------- */
 .content {
   flex: 1;
-  overflow: auto;
+  min-height: 0;
   padding: 8px 24px 24px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Home: title + buttons flow from the top */
+.content-home {
+  overflow: auto;
+}
+
+/* Other screens: body top, actions docked above emergency bar */
+.content-dock {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 12px;
+}
+
+.content-dock .content-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.content-dock .actions-dock {
+  flex-shrink: 0;
+  margin-top: 12px;
+  max-height: 55%;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 

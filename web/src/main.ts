@@ -119,7 +119,8 @@ function render(options?: { keepFocus?: boolean }): void {
         const src = `type-icons/type_${encodeURIComponent(button.when)}.png`;
         return `<button type="button" class="type-icon-btn" data-when="${escapeAttr(button.when)}" aria-label="${escapeAttr(title)}"><img src="${src}" alt="" width="56" height="56" decoding="async" /><span>${escapeHtml(title)}</span></button>`;
       }
-      const primary = index === 0 || isVeto;
+      const equalChoices = engine.usesEqualChoiceButtons;
+      const primary = isVeto || (!equalChoices && index === 0);
       let cls = "action-btn secondary";
       if (isVeto) cls = "action-btn veto";
       else if (primary) cls = "action-btn primary";
@@ -273,6 +274,10 @@ function render(options?: { keepFocus?: boolean }): void {
     return;
   }
 
+  const docksActions = !["Home", "Type", "Form", "Give"].includes(
+    engine.currentNode.id,
+  );
+
   root.innerHTML = `
     <div class="frame${isVeto ? " is-veto" : ""}">
       <header class="top-bar">
@@ -286,23 +291,33 @@ function render(options?: { keepFocus?: boolean }): void {
         <button type="button" class="settings-btn" data-settings aria-label="${locale === "uk" ? "Налаштування" : "Settings"}">⚙</button>
       </header>
       <div class="divider"></div>
-      <main class="content">
-        <h1 class="voice">${escapeHtml(engine.voiceText)}</h1>
-        ${helper ? `<p class="helper">${escapeHtml(helper)}</p>` : ""}
+      <main class="content${docksActions ? " content-dock" : " content-home"}">
+        <div class="content-body">
+          <h1 class="voice">${escapeHtml(engine.voiceText)}</h1>
+          ${helper ? `<p class="helper">${escapeHtml(helper)}</p>` : ""}
+          ${
+            anti
+              ? `<div class="anti" role="alert">⚠ ${escapeHtml(anti)}</div>`
+              : ""
+          }
+          ${brigadeCard}
+          ${
+            !brigadeCard && detail
+              ? `<div class="detail${engine.currentNode.id === "Loc-2" ? " coords" : ""}">${escapeHtml(detail)}</div>`
+              : ""
+          }
+          ${manual}
+          ${
+            !docksActions
+              ? `<div class="${actionsClass}">${actionHtml}</div>${lastEvent}`
+              : ""
+          }
+        </div>
         ${
-          anti
-            ? `<div class="anti" role="alert">⚠ ${escapeHtml(anti)}</div>`
+          docksActions
+            ? `<div class="actions-dock"><div class="${actionsClass}">${actionHtml}</div></div>`
             : ""
         }
-        ${brigadeCard}
-        ${
-          !brigadeCard && detail
-            ? `<div class="detail${engine.currentNode.id === "Loc-2" ? " coords" : ""}">${escapeHtml(detail)}</div>`
-            : ""
-        }
-        ${manual}
-        <div class="${actionsClass}">${actionHtml}</div>
-        ${lastEvent}
       </main>
       <footer class="emergency">${emergencyHtml}</footer>
     </div>
