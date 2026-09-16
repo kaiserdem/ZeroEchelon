@@ -421,7 +421,7 @@ body {
 
 /* ---------- Last event (kit last-event card) ---------- */
 .last-event {
-  margin-top: 0;
+  margin-top: 20px;
   padding: 12px 14px;
   border-radius: 12px;
   background: var(--navy-06);
