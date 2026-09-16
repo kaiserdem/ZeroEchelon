@@ -176,7 +176,7 @@ struct NodeFrameView: View {
             } else if let detail = engine.detailBlock {
                 Text(detail)
                     .font(engine.currentNode.id == "Loc-2"
-                          ? .system(size: 32, weight: .bold, design: .rounded)
+                          ? .system(size: 26, weight: .bold, design: .rounded)
                           : .system(size: 22, weight: .semibold))
                     .foregroundStyle(CivicTheme.ink)
                     .lineSpacing(4)
@@ -578,7 +578,7 @@ struct EmergencyBar: View {
                         .font(CivicTheme.emergencyTitle)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 22)
+                        .padding(.vertical, contentVerticalPadding)
                         .background(CivicTheme.danger)
                 }
                 .buttonStyle(.plain)
@@ -590,7 +590,7 @@ struct EmergencyBar: View {
                         .font(.body.weight(.bold))
                         .foregroundStyle(CivicTheme.danger)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
+                        .padding(.vertical, secondaryVerticalPadding)
                         .padding(.bottom, bottomSafePadding)
                         .frame(maxWidth: .infinity)
                         .background(CivicTheme.canvas.ignoresSafeArea(edges: .bottom))
@@ -609,8 +609,8 @@ struct EmergencyBar: View {
                         .font(CivicTheme.emergencyTitle)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, emphasizeCall ? 26 : 22)
-                        .padding(.bottom, show101 ? 0 : bottomSafePadding)
+                        .padding(.top, primaryBarTopPadding)
+                        .padding(.bottom, primaryBarBottomPadding)
                         .frame(maxWidth: .infinity)
                         .background(
                             CivicTheme.danger.ignoresSafeArea(edges: show101 ? [] : .bottom)
@@ -626,7 +626,7 @@ struct EmergencyBar: View {
                             .font(.body.weight(.bold))
                             .foregroundStyle(CivicTheme.accent)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
+                            .padding(.vertical, secondaryVerticalPadding)
                             .padding(.bottom, bottomSafePadding)
                             .frame(maxWidth: .infinity)
                             .background(
@@ -647,6 +647,26 @@ struct EmergencyBar: View {
             .first(where: \.isKeyWindow)?
             .safeAreaInsets.bottom ?? 0
         return max(inset, 0)
+    }
+
+    /// On home-indicator phones the safe-area fill already adds height — keep content padding tighter.
+    private var hasHomeIndicator: Bool { bottomSafePadding > 0 }
+
+    private var contentVerticalPadding: CGFloat { hasHomeIndicator ? 14 : 22 }
+
+    private var emphasizedVerticalPadding: CGFloat { hasHomeIndicator ? 16 : 26 }
+
+    private var secondaryVerticalPadding: CGFloat { hasHomeIndicator ? 12 : 16 }
+
+    /// Extra top inset so the label sits a bit lower inside the tall safe-area bar.
+    private var primaryBarTopPadding: CGFloat {
+        let base = emphasizeCall ? emphasizedVerticalPadding : contentVerticalPadding
+        return base + (hasHomeIndicator && !show101 ? 10 : 0)
+    }
+
+    private var primaryBarBottomPadding: CGFloat {
+        let base = emphasizeCall ? emphasizedVerticalPadding : contentVerticalPadding
+        return base + (show101 ? 0 : bottomSafePadding)
     }
 }
 
