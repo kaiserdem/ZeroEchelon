@@ -66,7 +66,7 @@ struct NodeFrameView: View {
     }
 
     /// Home / Type / Form / Give: title + body + actions share one ScrollView.
-    /// Other screens: body top, actions docked above 103.
+    /// Other screens: body top, actions docked above 112.
     private var docksActionsAtBottom: Bool {
         switch engine.currentNode.id {
         case "Home", "Type", "Form", "Give":
@@ -560,8 +560,8 @@ struct EmergencyBar: View {
         VStack(spacing: 0) {
             if prioritize101 {
                 Text(locale == .uk
-                     ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
-                     : "101 first. 103 — if casualties are at a safe distance")
+                     ? "Спочатку 101. 112 — якщо є поранені на безпечній відстані"
+                     : "101 first. 112 — if casualties are at a safe distance")
                     .font(CivicTheme.emergencyLabel)
                     .foregroundStyle(CivicTheme.muted)
                     .multilineTextAlignment(.center)
@@ -584,9 +584,9 @@ struct EmergencyBar: View {
                 .buttonStyle(.plain)
 
                 Button {
-                    onDial("103")
+                    onDial("112")
                 } label: {
-                    Text(locale == .uk ? "Викликати 103" : "Call 103")
+                    Text(locale == .uk ? "Викликати 112" : "Call 112")
                         .font(.body.weight(.bold))
                         .foregroundStyle(CivicTheme.danger)
                         .frame(maxWidth: .infinity)
@@ -603,9 +603,9 @@ struct EmergencyBar: View {
                 .buttonStyle(.plain)
             } else {
                 Button {
-                    onDial("103")
+                    onDial("112")
                 } label: {
-                    Text(locale == .uk ? "ВИКЛИКАТИ 103" : "CALL 103")
+                    Text(locale == .uk ? "ВИКЛИКАТИ 112" : "CALL 112")
                         .font(CivicTheme.emergencyTitle)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)

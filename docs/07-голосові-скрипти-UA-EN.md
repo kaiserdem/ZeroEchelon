@@ -26,7 +26,7 @@
 | --- | --- | --- |
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
 | Home | Оберіть. Що потрібно зараз? | Choose. What do you need now? |
-| Disclaimer | Спочатку викличте 103, якщо можете. | Call 103 first if you can. |
+| Disclaimer | Спочатку викличте 112, якщо можете. | Call 112 first if you can. |
 | Disclaimer-note | Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. *(менший текст під заголовком)* | This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. *(smaller helper under title)* |
 | Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
 | Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
@@ -34,10 +34,10 @@
 | Loc-3 | Назвіть населений пункт. Далі — вулицю. | Name the town or city. Then the street. |
 | Type | Що сталося. Один вибір. | What happened. One choice. |
 | Role | Ви допомагаєте іншим — чи допомога потрібна вам? | Are you helping others — or do you need help yourself? |
-| Role-witness | Режим свідка. Спершу викличте 103, якщо можете. | Bystander mode. Call 103 first if you can. |
-| Role-casualty | Режим постраждалого. Викличте 103. Далі — що зробити для себе. | Casualty mode. Call 103. Next — what to do for yourself. |
+| Role-witness | Режим свідка. Спершу викличте 112, якщо можете. | Bystander mode. Call 112 first if you can. |
+| Role-casualty | Режим постраждалого. Викличте 112. Далі — що зробити для себе. | Casualty mode. Call 112. Next — what to do for yourself. |
 | Casualty-menu | Що потрібно вам зараз. Оберіть одне. | What do you need right now. Choose one. |
-| Call | Викличте 103. Зачитайте текст на екрані. | Call 103. Read the text on the screen. |
+| Call | Викличте 112. Зачитайте текст на екрані. | Call 112. Read the text on the screen. |
 | NEXT-PHASE | Вхід завершено. Далі — допомога за роллю. | Entry done. Next — help by role. |
 
 ---
@@ -46,7 +46,7 @@
 
 | id | UA | EN |
 | --- | --- | --- |
-| CALL-103 | Викликати 103. | Call 103. |
+| CALL-112 | Викликати 112. | Call 112. |
 | CALL-101 | Викликати 101. | Call 101. |
 | CALL-read | Зачитайте текст на екрані. Не вигадуйте. | Read the text on the screen. Do not invent. |
 
@@ -167,7 +167,7 @@
 | G2 | Скажіть правду, яку знаєте. Допоможіть знайти близьких, якщо це безпечно. | Tell the truth you know. Help find family if that is safe. |
 | G3 | Людина каже, що важко дихати? | Does the person say it is hard to breathe? |
 | Flags | Є кров у кашлі? Біль у грудях? Сині губи? Набряк обличчя? Шумне дихання? | Blood in the cough? Chest pain? Blue lips? Face swelling? Noisy breathing? |
-| Organic | Це не просто страх. Викличте 103. Не заспокоюйте диханням. | This is not just fear. Call 103. Do not treat this with breathing. |
+| Organic | Це не просто страх. Викличте 112. Не заспокоюйте диханням. | This is not just fear. Call 112. Do not treat this with breathing. |
 | Ground | Поставте стопи на підлогу. Постукайте пальцями по колінах. Назвіть три речі, які бачите. | Put your feet on the floor. Tap your knees. Name three things you can see. |
 | Slow | Дихайте повільніше. Я з вами. Не рахуйте. | Breathe more slowly. I am with you. Do not count. |
 | Ban | Не питайте, що сталося. Не просіть описати почуття. | Do not ask what happened. Do not ask them to describe feelings. |
@@ -198,7 +198,7 @@
 | I2 | Сеча темна, як чай? Сечі стало менше? Кінцівка пухне і болить сильніше? | Is urine dark like tea? Less urine than usual? Is a limb more swollen and more painful? |
 | I3 | Головний біль не минає або наростає? Було блювання? Сонливість, плутана мова? | Headache that stays or grows? Any vomiting? Sleepiness, confused speech? |
 | I4 | Біль у животі? Кров у блювоті або в стільці? | Belly pain? Blood in vomit or stool? |
-| Go | Негайно 103 або до лікарні. Не чекайте. | Call 103 or go to hospital now. Do not wait. |
+| Go | Негайно 112 або до лікарні. Не чекайте. | Call 112 or go to hospital now. Do not wait. |
 | I5 | Немає цих ознак — спостереження триває. Це не висновок «усе добре». Повтор через двадцять чотири години. | No such signs — watching continues. This is not an all-clear. Repeat in twenty-four hours. |
 
 ---
@@ -209,11 +209,11 @@
 | --- | --- | --- |
 | J0 | Що бачите. Оберіть одне. | What do you see. Choose one. |
 | Kit | Відкрийте аптечку. Позначте, що в ній є. Не вигадуйте решти. | Open the kit. Mark what is there. Do not assume the rest. |
-| Str | Усмішка крива? Рука не піднімається? Мова плутана? Коли це почалося — запамʼятайте годину. Викличте 103. Не давайте їсти і пити. | Crooked smile? Arm will not rise? Speech jumbled? Remember when this started. Call 103. Give nothing to eat or drink. |
-| Poi | Приберіть речовину. Викличте 103. Збережіть упаковку. | Remove the substance. Call 103. Keep the container. |
+| Str | Усмішка крива? Рука не піднімається? Мова плутана? Коли це почалося — запамʼятайте годину. Викличте 112. Не давайте їсти і пити. | Crooked smile? Arm will not rise? Speech jumbled? Remember when this started. Call 112. Give nothing to eat or drink. |
+| Poi | Приберіть речовину. Викличте 112. Збережіть упаковку. | Remove the substance. Call 112. Keep the container. |
 | Poi-anti | Не викликайте блювання. Не промивайте шлунок. Не давайте пити. | Do not make them vomit. Do not wash out the stomach. Give nothing to drink. |
 | Ana | Свист у диханні? Набряк обличчя? Людина каже, що зараз втратить свідомість? | Wheeze? Face swelling? Does the person say they will pass out? |
-| Adr | Адреналін — у зовнішню сторону стегна, крізь одяг якщо треба. Тримати. Викликати 103. Сидіти або лежати. Не вставати. | Adrenaline — into the outer thigh, through clothes if needed. Hold. Call 103. Sit or lie down. Do not stand up. |
+| Adr | Адреналін — у зовнішню сторону стегна, крізь одяг якщо треба. Тримати. Викликати 112. Сидіти або лежати. Не вставати. | Adrenaline — into the outer thigh, through clothes if needed. Hold. Call 112. Sit or lie down. Do not stand up. |
 | Adr-2 | Пʼять хвилин. Симптоми тяжкі? Друга доза так само в стегно. | Five minutes. Still severe? A second dose, same way, into the thigh. |
 | NoAnti | Таблетка від алергії не замінює адреналін і не дає права чекати. | An allergy tablet does not replace adrenaline and is not a reason to wait. |
 | Local | Холод на місце укусу. Дивіться, чи не зʼявиться свист або набряк обличчя. | Cold on the sting. Watch for wheeze or face swelling. |

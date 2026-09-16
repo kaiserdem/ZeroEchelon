@@ -264,7 +264,7 @@ private struct MockProtocolScreen: View {
     private var helperCopy: String {
         isVeto
             ? "Люди біля загрози — у звіті як недосяжні. Не йдіть допомагати."
-            : "Один дотик = відповідь. 103 завжди внизу екрана."
+            : "Один дотик = відповідь. 112 завжди внизу екрана."
     }
 
     private var badge: some View {
@@ -376,7 +376,7 @@ private struct MockProtocolScreen: View {
     private var emergencyBar: some View {
         VStack(spacing: 8) {
             Text(isVeto
-                 ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
+                 ? "Спочатку 101. 112 — якщо є поранені на безпечній відстані"
                  : "Екстрений виклик — завжди на екрані")
                 .font(tokens.emergencyLabel)
                 .foregroundStyle(tokens.muted)
@@ -390,7 +390,7 @@ private struct MockProtocolScreen: View {
                     .padding(.vertical, 18)
                     .background(tokens.warning, in: RoundedRectangle(cornerRadius: tokens.buttonCorner))
 
-                Text("Викликати 103")
+                Text("Викликати 112")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(tokens.danger)
                     .frame(maxWidth: .infinity)
@@ -400,7 +400,7 @@ private struct MockProtocolScreen: View {
                             .stroke(tokens.danger, lineWidth: 2)
                     }
             } else {
-                Text(proposal == .guide ? "Викликати 103" : "ВИКЛИКАТИ 103")
+                Text(proposal == .guide ? "Викликати 112" : "ВИКЛИКАТИ 112")
                     .font(tokens.emergencyTitle)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)

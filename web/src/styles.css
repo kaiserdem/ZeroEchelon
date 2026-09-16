@@ -12,7 +12,7 @@
   --muted: #5b617f;        /* secondary text, back button */
   --mid-gray: #99a1b7;     /* input placeholder */
   --green: #0e7b46;        /* voice-on accent */
-  --danger: #801717;       /* 103 / 101 bar, error text */
+  --danger: #801717;       /* 112 / 101 bar, error text */
   --navy-06: rgba(8, 50, 74, 0.06);
   --navy-08: rgba(8, 50, 74, 0.08);
   --navy-20: rgba(8, 50, 74, 0.2);
@@ -472,7 +472,7 @@ body {
   cursor: pointer;
 }
 
-/* ---------- Emergency dock (kit Bar / 103 · Bar / 101) ---------- */
+/* ---------- Emergency dock (kit Bar / 112 · Bar / 101) ---------- */
 .emergency {
   padding: 0;
   padding-bottom: env(safe-area-inset-bottom);
@@ -529,7 +529,7 @@ body {
   padding: 24px 12px;
 }
 
-/* rescue-first mode: 103 becomes the quiet outline bar */
+/* rescue-first mode: 112 becomes the quiet outline bar */
 .dial-103.outline {
   background: transparent;
   color: var(--danger);

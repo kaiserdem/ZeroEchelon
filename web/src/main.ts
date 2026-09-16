@@ -134,11 +134,11 @@ function render(options?: { keepFocus?: boolean }): void {
     emergencyHtml = `
       <p class="emergency-hint">${escapeHtml(priorityHint(locale))}</p>
       <button type="button" class="dial-101 primary" data-dial="101">${escapeHtml(locale === "uk" ? "ВИКЛИКАТИ 101 (ДСНС)" : "CALL 101 (rescue)")}</button>
-      <button type="button" class="dial-103 outline" data-dial="103">${escapeHtml(locale === "uk" ? "Викликати 103" : "Call 103")}</button>
+      <button type="button" class="dial-103 outline" data-dial="112">${escapeHtml(locale === "uk" ? "Викликати 112" : "Call 112")}</button>
     `;
   } else {
     emergencyHtml = `
-      <button type="button" class="dial-103${emphasizeCall ? " emphasis" : ""}" data-dial="103">${escapeHtml(locale === "uk" ? "ВИКЛИКАТИ 103" : "CALL 103")}</button>
+      <button type="button" class="dial-103${emphasizeCall ? " emphasis" : ""}" data-dial="112">${escapeHtml(locale === "uk" ? "ВИКЛИКАТИ 112" : "CALL 112")}</button>
       ${
         show101
           ? `<button type="button" class="dial-101" data-dial="101">${escapeHtml(locale === "uk" ? "Викликати 101 (ДСНС)" : "Call 101 (rescue)")}</button>`
@@ -375,8 +375,8 @@ async function fillHandoverQR(): Promise<void> {
 
 function priorityHint(locale: ContentLocale): string {
   return locale === "uk"
-    ? "Спочатку 101. 103 — якщо є поранені на безпечній відстані"
-    : "101 first. 103 — if casualties are at a safe distance";
+    ? "Спочатку 101. 112 — якщо є поранені на безпечній відстані"
+    : "101 first. 112 — if casualties are at a safe distance";
 }
 
 function bind(): void {

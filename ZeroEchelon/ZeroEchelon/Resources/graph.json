@@ -16,7 +16,7 @@
   },
   "entry": "Start",
   "alwaysAvailable": [
-    "CALL-103",
+    "CALL-112",
     "CALL-101"
   ],
   "invariants": [
@@ -76,8 +76,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Спочатку викличте 103, якщо можете.",
-        "en": "Call 103 first if you can."
+        "ua": "Спочатку викличте 112, якщо можете.",
+        "en": "Call 112 first if you can."
       },
       "edges": [
         {
@@ -529,8 +529,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Режим свідка. Спершу викличте 103, якщо можете.",
-        "en": "Bystander mode. Call 103 first if you can."
+        "ua": "Режим свідка. Спершу викличте 112, якщо можете.",
+        "en": "Bystander mode. Call 112 first if you can."
       },
       "edges": [
         {
@@ -560,8 +560,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Режим постраждалого. Викличте 103. Далі — що зробити для себе.",
-        "en": "Casualty mode. Call 103. Next — what to do for yourself."
+        "ua": "Режим постраждалого. Викличте 112. Далі — що зробити для себе.",
+        "en": "Casualty mode. Call 112. Next — what to do for yourself."
       },
       "edges": [
         {
@@ -1163,13 +1163,13 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Викличте 103. Зачитайте текст на екрані.",
-        "en": "Call 103. Read the text on the screen."
+        "ua": "Викличте 112. Зачитайте текст на екрані.",
+        "en": "Call 112. Read the text on the screen."
       },
       "edges": [
         {
           "when": "dial",
-          "to": "CALL-103"
+          "to": "CALL-112"
         },
         {
           "when": "read",
@@ -1241,7 +1241,7 @@
       }
     },
     {
-      "id": "CALL-103",
+      "id": "CALL-112",
       "type": "action",
       "branch": "entry",
       "roles": [
@@ -1258,8 +1258,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Викликати 103.",
-        "en": "Call 103."
+        "ua": "Викликати 112.",
+        "en": "Call 112."
       },
       "edges": [
         {
@@ -1270,7 +1270,7 @@
       "ui": {
         "screenId": "always",
         "template": "call",
-        "external": "tel:103",
+        "external": "tel:112",
         "note": "alwaysAvailable: клієнт відкриває набір і лишає попередній вузол у стеку."
       }
     },
@@ -4399,8 +4399,8 @@
       "id": "Organic",
       "type": "action",
       "voice": {
-        "ua": "Це не просто страх. Викличте 103. Не заспокоюйте диханням.",
-        "en": "This is not just fear. Call 103. Do not treat this with breathing."
+        "ua": "Це не просто страх. Викличте 112. Не заспокоюйте диханням.",
+        "en": "This is not just fear. Call 112. Do not treat this with breathing."
       },
       "antiPattern": {
         "ua": "Не робіть дихальних вправ і не кажіть «заспокойся».",
@@ -4795,13 +4795,13 @@
         "A3"
       ],
       "voice": {
-        "ua": "Негайно 103 або до лікарні. Не чекайте.",
-        "en": "Call 103 or go to hospital now. Do not wait."
+        "ua": "Негайно 112 або до лікарні. Не чекайте.",
+        "en": "Call 112 or go to hospital now. Do not wait."
       },
       "edges": [
         {
           "when": "dial",
-          "to": "CALL-103"
+          "to": "CALL-112"
         },
         {
           "when": "next",
@@ -4933,8 +4933,8 @@
         "A3"
       ],
       "voice": {
-        "ua": "Усмішка крива? Рука не піднімається? Мова плутана? Коли це почалося — запамʼятайте годину. Викличте 103. Не давайте їсти і пити.",
-        "en": "Crooked smile? Arm will not rise? Speech jumbled? Remember when this started. Call 103. Give nothing to eat or drink."
+        "ua": "Усмішка крива? Рука не піднімається? Мова плутана? Коли це почалося — запамʼятайте годину. Викличте 112. Не давайте їсти і пити.",
+        "en": "Crooked smile? Arm will not rise? Speech jumbled? Remember when this started. Call 112. Give nothing to eat or drink."
       },
       "edges": [
         {
@@ -4971,8 +4971,8 @@
         "C4"
       ],
       "voice": {
-        "ua": "Приберіть речовину. Викличте 103. Збережіть упаковку.",
-        "en": "Remove the substance. Call 103. Keep the container."
+        "ua": "Приберіть речовину. Викличте 112. Збережіть упаковку.",
+        "en": "Remove the substance. Call 112. Keep the container."
       },
       "antiPattern": {
         "ua": "Не викликайте блювання. Не промивайте шлунок. Не давайте пити.",
@@ -5107,8 +5107,8 @@
         "A3"
       ],
       "voice": {
-        "ua": "Адреналін — у зовнішню сторону стегна, крізь одяг якщо треба. Тримати. Викликати 103. Сидіти або лежати. Не вставати.",
-        "en": "Adrenaline — into the outer thigh, through clothes if needed. Hold. Call 103. Sit or lie down. Do not stand up."
+        "ua": "Адреналін — у зовнішню сторону стегна, крізь одяг якщо треба. Тримати. Викликати 112. Сидіти або лежати. Не вставати.",
+        "en": "Adrenaline — into the outer thigh, through clothes if needed. Hold. Call 112. Sit or lie down. Do not stand up."
       },
       "timers": [
         {
@@ -5205,8 +5205,8 @@
         "buttons": [
           {
             "when": "next",
-            "ua": "Викликаю 103",
-            "en": "Calling 103"
+            "ua": "Викликаю 112",
+            "en": "Calling 112"
           }
         ]
       }

@@ -42,7 +42,7 @@ final class ProtocolEngine: ObservableObject {
     @Published var locale: ContentLocale
     @Published private(set) var sessionRole: SessionRole?
     @Published private(set) var incidentType: String?
-    /// Location line captured from Loc-1 / Loc-2 / Loc-3 for the 103 draft.
+    /// Location line captured from Loc-1 / Loc-2 / Loc-3 for the 112 draft.
     @Published private(set) var locationLine: String?
     @Published private(set) var locationLevel: Int?
     /// Draft text for the current Loc-3 field (bound to the text field).
@@ -153,8 +153,8 @@ final class ProtocolEngine: ObservableObject {
         case "NoCpr" where sessionRole == .casualty || !multipleCasualties:
             // P0 from audit: do not order "go to the next person" when there is no next / cannot leave
             return locale == .uk
-                ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 103 внизу."
-                : "CPR will not help here. Stay. Tap 103 below."
+                ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 112 внизу."
+                : "CPR will not help here. Stay. Tap 112 below."
         default:
             return currentNode.voice.text(for: locale)
         }
@@ -375,7 +375,7 @@ final class ProtocolEngine: ObservableObject {
         !history.isEmpty
     }
 
-    /// Content actions only. Dial 103/101 live exclusively in the bottom emergency bar.
+    /// Content actions only. Dial 112/101 live exclusively in the bottom emergency bar.
     var visibleButtons: [ProtocolButton] {
         var buttons = currentNode.primaryButtons(locale: locale)
             .filter { !["dial", "dial-101"].contains($0.when) }

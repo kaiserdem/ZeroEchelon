@@ -108,8 +108,8 @@ export class ProtocolEngine {
       case "NoCpr":
         if (this.sessionRole === "casualty" || !this.multipleCasualties) {
           return this.locale === "uk"
-            ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 103 внизу."
-            : "CPR will not help here. Stay. Tap 103 below.";
+            ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 112 внизу."
+            : "CPR will not help here. Stay. Tap 112 below.";
         }
         return textFor(this.currentNode.voice, this.locale);
       default:
