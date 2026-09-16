@@ -272,7 +272,6 @@ private struct MockProtocolScreen: View {
             Text(isVeto ? "S5a · ВЕТО" : "S8 · КРОВОТЕЧА")
                 .font(tokens.badgeFont)
                 .foregroundStyle(proposal == .civic ? tokens.accent : tokens.muted)
-                .tracking(proposal == .instrument ? 1.2 : 0.4)
                 .textCase(.uppercase)
 
             if proposal == .civic {

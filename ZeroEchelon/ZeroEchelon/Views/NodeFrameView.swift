@@ -41,8 +41,8 @@ enum CivicTheme {
 }
 
 struct NodeFrameView: View {
-    @Bindable var engine: ProtocolEngine
-    var speech: SpeechController
+    @ObservedObject var engine: ProtocolEngine
+    @ObservedObject var speech: SpeechController
     @Binding var speakOnAppear: Bool
     var onSelect: ((String) -> Void)?
     var onOpenLastReport: (() -> Void)?
@@ -88,7 +88,6 @@ struct NodeFrameView: View {
                         .padding(.bottom, 16)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .scrollBounceBehavior(.basedOnSize)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
                 protocolActionsStack
@@ -111,7 +110,6 @@ struct NodeFrameView: View {
                     .padding(.bottom, 24)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .scrollBounceBehavior(.basedOnSize)
             }
 
             EmergencyBar(
@@ -126,16 +124,16 @@ struct NodeFrameView: View {
         .background(screenBackground)
         .ignoresSafeArea(edges: .bottom)
         .onAppear { speakCurrent() }
-        .onChange(of: engine.currentNode.id) { _, _ in
+        .onChange(of: engine.currentNode.id) { _ in
             speech.stopDictation()
             speakCurrent()
         }
-        .onChange(of: engine.manualLocationFieldIndex) { _, _ in
+        .onChange(of: engine.manualLocationFieldIndex) { _ in
             if engine.isManualLocationEntry {
                 speakCurrent()
             }
         }
-        .onChange(of: engine.locale) { _, newLocale in
+        .onChange(of: engine.locale) { newLocale in
             AppPreferences.locale = newLocale
             speakCurrent()
         }
@@ -236,9 +234,9 @@ struct NodeFrameView: View {
                 ForEach(engine.brigadeReportFields, id: \.id) { field in
                     (
                         Text("\(field.label) — ")
-                            .foregroundStyle(CivicTheme.muted)
+                            .foregroundColor(CivicTheme.muted)
                         + Text(field.value)
-                            .foregroundStyle(CivicTheme.ink)
+                            .foregroundColor(CivicTheme.ink)
                     )
                     .font(.system(size: 20, weight: .semibold))
                     .fixedSize(horizontal: false, vertical: true)
@@ -593,6 +591,9 @@ struct EmergencyBar: View {
                         .foregroundStyle(CivicTheme.danger)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
+                        .padding(.bottom, bottomSafePadding)
+                        .frame(maxWidth: .infinity)
+                        .background(CivicTheme.canvas.ignoresSafeArea(edges: .bottom))
                         .overlay(alignment: .top) {
                             Rectangle()
                                 .fill(CivicTheme.antiBorder)
@@ -609,7 +610,11 @@ struct EmergencyBar: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, emphasizeCall ? 26 : 22)
-                        .background(CivicTheme.danger)
+                        .padding(.bottom, show101 ? 0 : bottomSafePadding)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            CivicTheme.danger.ignoresSafeArea(edges: show101 ? [] : .bottom)
+                        )
                 }
                 .buttonStyle(.plain)
 
@@ -622,14 +627,26 @@ struct EmergencyBar: View {
                             .foregroundStyle(CivicTheme.accent)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(CivicTheme.secondaryFill)
+                            .padding(.bottom, bottomSafePadding)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                CivicTheme.secondaryFill.ignoresSafeArea(edges: .bottom)
+                            )
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .safeAreaPadding(.bottom, 8)
-        .background(CivicTheme.barFill)
+    }
+
+    /// Extra tap padding into the home-indicator area; 0 on iPhone 7 / devices without inset.
+    private var bottomSafePadding: CGFloat {
+        let inset = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first(where: \.isKeyWindow)?
+            .safeAreaInsets.bottom ?? 0
+        return max(inset, 0)
     }
 }
 

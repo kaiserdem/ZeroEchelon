@@ -1,13 +1,13 @@
+import Combine
 import SwiftUI
 import UserNotifications
 
-@Observable
 @MainActor
-final class AppModel {
-    var engine: ProtocolEngine?
-    var loadError: String?
-    var speech = SpeechController()
-    var speakOnAppear = AppPreferences.speakOnAppear
+final class AppModel: ObservableObject {
+    @Published var engine: ProtocolEngine?
+    @Published var loadError: String?
+    @Published var speakOnAppear = AppPreferences.speakOnAppear
+    let speech = SpeechController()
 
     private let waveScheduler = WaveReminderScheduler()
 
@@ -29,6 +29,10 @@ final class AppModel {
 
             waveScheduler.onOpenWaveChecklist = { [weak self] in
                 self?.openWaveFromNotification()
+            }
+
+            Task {
+                await PermissionBootstrap.requestAllOnLaunch()
             }
         } catch {
             loadError = error.localizedDescription
@@ -99,7 +103,7 @@ final class AppModel {
 }
 
 struct ContentView: View {
-    @State private var model = AppModel()
+    @StateObject private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -113,12 +117,18 @@ struct ContentView: View {
                     onOpenLastReport: { model.openLastReport() }
                 )
             } else if let loadError = model.loadError {
-                ContentUnavailableView(
-                    "Граф не завантажився",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text(loadError)
-                )
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                    Text("Граф не завантажився")
+                        .font(.headline)
+                    Text(loadError)
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(CivicTheme.muted)
+                }
                 .foregroundStyle(CivicTheme.ink)
+                .padding(24)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(CivicTheme.canvas)
             } else {
@@ -130,7 +140,7 @@ struct ContentView: View {
             }
         }
         .task { model.load() }
-        .onChange(of: scenePhase) { _, phase in
+        .onChange(of: scenePhase) { phase in
             if phase == .background || phase == .inactive {
                 model.persistNow()
             }
@@ -138,6 +148,10 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
+#if DEBUG
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
+#endif

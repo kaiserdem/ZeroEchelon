@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Binding var locale: ContentLocale
@@ -8,6 +9,10 @@ struct SettingsView: View {
     @State private var showLanguage = false
 
     private var isUkrainian: Bool { locale == .uk }
+
+    private var voiceStatus: (installed: Bool, name: String) {
+        SpeechController.voiceStatus(for: locale.speechLanguageCode)
+    }
 
     var body: some View {
         Group {
@@ -52,9 +57,42 @@ struct SettingsView: View {
                         }
                         .tint(CivicTheme.success)
                         .padding(.vertical, 4)
-                        .onChange(of: speakOnAppear) { _, newValue in
+                        .onChange(of: speakOnAppear) { newValue in
                             AppPreferences.speakOnAppear = newValue
                         }
+
+                        Divider().overlay(CivicTheme.border.opacity(0.5))
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(isUkrainian ? "Голос озвучення" : "Spoken voice")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(CivicTheme.ink)
+
+                            Text(voiceStatusLine)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(CivicTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            if !voiceStatus.installed {
+                                Text(voiceInstallHint)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(CivicTheme.ink.opacity(0.85))
+                                    .fixedSize(horizontal: false, vertical: true)
+
+                                Button {
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                } label: {
+                                    Text(isUkrainian ? "Відкрити Налаштування iPhone" : "Open iPhone Settings")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(CivicTheme.accent)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.top, 2)
+                            }
+                        }
+                        .padding(.vertical, 10)
                     }
 
                     settingsBlock(title: isUkrainian ? "Про додаток" : "About") {
@@ -93,32 +131,7 @@ struct SettingsView: View {
     }
 
     private func settingsChrome(title: String, backTitle: String, action: @escaping () -> Void) -> some View {
-        HStack(spacing: 12) {
-            Button(action: action) {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.backward")
-                        .font(.body.weight(.bold))
-                    Text(backTitle)
-                        .font(.system(size: 17, weight: .semibold))
-                }
-                .foregroundStyle(CivicTheme.muted)
-            }
-            .buttonStyle(.plain)
-
-            Spacer(minLength: 8)
-
-            Text(title)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(CivicTheme.ink)
-
-            Spacer(minLength: 8)
-
-            Color.clear
-                .frame(width: 88, height: 1)
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
-        .padding(.bottom, 8)
+        SettingsChromeBar(title: title, backTitle: backTitle, action: action)
     }
 
     private func settingsBlock<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
@@ -127,7 +140,6 @@ struct SettingsView: View {
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(CivicTheme.muted)
                 .textCase(.uppercase)
-                .tracking(0.6)
                 .padding(.horizontal, 4)
 
             VStack(alignment: .leading, spacing: 0) {
@@ -181,6 +193,24 @@ struct SettingsView: View {
             ? "Line 24 · версія \(short) (\(build))"
             : "Line 24 · version \(short) (\(build))"
     }
+
+    private var voiceStatusLine: String {
+        if voiceStatus.installed {
+            return isUkrainian
+                ? "Зараз: \(voiceStatus.name). Потрібен інтернет."
+                : "Using: \(voiceStatus.name)"
+        }
+        return isUkrainian
+            ? "Український голос недоступний."
+            : "No system voice is installed for this language."
+    }
+
+    private var voiceInstallHint: String {
+        if isUkrainian {
+            return "Озвучення українською йде через окремий онлайн-голос (не системний російський TTS)."
+        }
+        return "Download a system voice in Settings → Accessibility → Spoken Content → Voices."
+    }
 }
 
 struct LanguageSettingsView: View {
@@ -191,32 +221,11 @@ struct LanguageSettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Button(action: onClose) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.backward")
-                            .font(.body.weight(.bold))
-                        Text(isUkrainian ? "Назад" : "Back")
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                    .foregroundStyle(CivicTheme.muted)
-                }
-                .buttonStyle(.plain)
-
-                Spacer(minLength: 8)
-
-                Text(isUkrainian ? "Мова" : "Language")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(CivicTheme.ink)
-
-                Spacer(minLength: 8)
-
-                Color.clear
-                    .frame(width: 88, height: 1)
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            SettingsChromeBar(
+                title: isUkrainian ? "Мова" : "Language",
+                backTitle: isUkrainian ? "Назад" : "Back",
+                action: onClose
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
@@ -266,6 +275,48 @@ struct LanguageSettingsView: View {
     }
 }
 
-#Preview {
-    SettingsView(locale: .constant(.uk), speakOnAppear: .constant(true), onClose: {})
+/// Centered title that stays on one line on narrow phones (e.g. iPhone 7).
+private struct SettingsChromeBar: View {
+    var title: String
+    var backTitle: String
+    var action: () -> Void
+
+    var body: some View {
+        ZStack {
+            Text(title)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(CivicTheme.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .padding(.horizontal, 96)
+
+            HStack(spacing: 0) {
+                Button(action: action) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.backward")
+                            .font(.body.weight(.bold))
+                        Text(backTitle)
+                            .font(.system(size: 17, weight: .semibold))
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(CivicTheme.muted)
+                }
+                .buttonStyle(.plain)
+
+                Spacer(minLength: 0)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
+    }
 }
+
+#if DEBUG
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsView(locale: .constant(.uk), speakOnAppear: .constant(true), onClose: {})
+    }
+}
+#endif

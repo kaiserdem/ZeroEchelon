@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 struct ProtocolLogStep: Codable, Hashable, Sendable, Identifiable {
@@ -34,44 +35,43 @@ struct EdgeSelectionResult: Sendable {
 }
 
 /// Pure navigation over the protocol graph. Policy remaps come from shared `EngineRules`.
-@Observable
-final class ProtocolEngine {
+final class ProtocolEngine: ObservableObject {
     private(set) var graph: ProtocolGraph
     private(set) var rules: EngineRules
-    private(set) var currentNode: ProtocolNode
-    var locale: ContentLocale
-    private(set) var sessionRole: SessionRole?
-    private(set) var incidentType: String?
+    @Published private(set) var currentNode: ProtocolNode
+    @Published var locale: ContentLocale
+    @Published private(set) var sessionRole: SessionRole?
+    @Published private(set) var incidentType: String?
     /// Location line captured from Loc-1 / Loc-2 / Loc-3 for the 103 draft.
-    private(set) var locationLine: String?
-    private(set) var locationLevel: Int?
+    @Published private(set) var locationLine: String?
+    @Published private(set) var locationLevel: Int?
     /// Draft text for the current Loc-3 field (bound to the text field).
-    var manualLocationDraft: String = ""
+    @Published var manualLocationDraft: String = ""
     /// Index into `manualLocationFieldKeys` while on Loc-3.
-    private(set) var manualLocationFieldIndex: Int = 0
+    @Published private(set) var manualLocationFieldIndex: Int = 0
     private var manualLocationValues: [String: String] = [:]
-    private(set) var steps: [ProtocolLogStep]
-    private(set) var unreachableMarked: Bool
-    private(set) var lastVetoNodeId: String?
+    @Published private(set) var steps: [ProtocolLogStep]
+    @Published private(set) var unreachableMarked: Bool
+    @Published private(set) var lastVetoNodeId: String?
     /// True after Count→many/unknown (SALT multi-casualty context).
-    private(set) var multipleCasualties: Bool
+    @Published private(set) var multipleCasualties: Bool
 
     /// Single offline event (docs/06). Nil until Home → incident.
-    private(set) var eventId: UUID?
-    private(set) var eventStartedAt: Date?
-    private(set) var reachedFormAt: Date?
-    private(set) var waveRemindersScheduled: Bool
+    @Published private(set) var eventId: UUID?
+    @Published private(set) var eventStartedAt: Date?
+    @Published private(set) var reachedFormAt: Date?
+    @Published private(set) var waveRemindersScheduled: Bool
     /// First confirmed tourniquet application (Tq → Tq-time).
-    private(set) var tourniquetOn: Date?
-    private(set) var saltRedCount: Int
-    private(set) var saltYellowCount: Int
-    private(set) var saltGreenCount: Int
+    @Published private(set) var tourniquetOn: Date?
+    @Published private(set) var saltRedCount: Int
+    @Published private(set) var saltYellowCount: Int
+    @Published private(set) var saltGreenCount: Int
 
     /// Seconds between scene re-checks while in care branches (overridable in tests).
     var sceneRecheckInterval: TimeInterval
     /// Clock injection for tests.
     var now: () -> Date = { Date() }
-    private(set) var lastSceneCheckAt: Date?
+    @Published private(set) var lastSceneCheckAt: Date?
 
     private var returnStack: [String]
     private var history: [String]
