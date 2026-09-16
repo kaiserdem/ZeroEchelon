@@ -419,6 +419,31 @@ body {
   color: #fff;
 }
 
+/* ---------- Handover QR (Give screen) ---------- */
+.qr-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px 0 20px;
+}
+
+.qr-image {
+  width: min(280px, 72vw);
+  height: auto;
+  aspect-ratio: 1;
+  padding: 12px;
+  background: #fff;
+  border-radius: var(--r-card);
+  image-rendering: pixelated;
+}
+
+.qr-fallback {
+  margin: 0;
+  font: 600 16px/1.35 var(--font);
+  color: var(--muted);
+  text-align: center;
+}
+
 /* ---------- Last event (kit last-event card) ---------- */
 .last-event {
   margin-top: 20px;

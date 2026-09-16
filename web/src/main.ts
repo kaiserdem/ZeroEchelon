@@ -1,5 +1,6 @@
 import graphJson from "@protocol/graphs/zero-echelon-core/graph.json";
 import rulesJson from "@protocol/graphs/zero-echelon-core/engine-rules.json";
+import QRCode from "qrcode";
 import { ProtocolEngine } from "./engine";
 import {
   clearLocalEvent,
@@ -177,6 +178,14 @@ function render(options?: { keepFocus?: boolean }): void {
       </div>
     `
       : "";
+  const handoverQR = engine.showsHandoverQR
+    ? `
+      <div class="qr-block">
+        <img class="qr-image" data-qr-image alt="${escapeAttr(locale === "uk" ? "QR-код звіту для медика" : "Report QR code for medic")}" width="280" height="280" />
+        <p class="qr-fallback" hidden data-qr-fallback>${escapeHtml(locale === "uk" ? "QR зараз недоступний. Поверніться до звіту." : "QR unavailable. Go back to the report.")}</p>
+      </div>
+    `
+    : "";
   const manual = engine.isManualLocationEntry
     ? `
       <div class="loc-input-row">
@@ -306,6 +315,7 @@ function render(options?: { keepFocus?: boolean }): void {
               ? `<div class="detail${engine.currentNode.id === "Loc-2" ? " coords" : ""}">${escapeHtml(detail)}</div>`
               : ""
           }
+          ${handoverQR}
           ${manual}
           ${
             !docksActions
@@ -324,6 +334,7 @@ function render(options?: { keepFocus?: boolean }): void {
   `;
 
   bind();
+  void fillHandoverQR();
   if (options?.keepFocus) {
     const input = root.querySelector<HTMLInputElement>("[data-loc-input]");
     input?.focus();
@@ -335,6 +346,30 @@ function render(options?: { keepFocus?: boolean }): void {
   if (speakOnAppear && spokenKey !== lastSpokenKey) {
     lastSpokenKey = spokenKey;
     speak(engine.voiceText, locale);
+  }
+}
+
+async function fillHandoverQR(): Promise<void> {
+  const img = root.querySelector<HTMLImageElement>("[data-qr-image]");
+  if (!img || !engine.showsHandoverQR) return;
+
+  const fallback = root.querySelector<HTMLElement>("[data-qr-fallback]");
+  try {
+    const url = await QRCode.toDataURL(engine.handoverQRPayload, {
+      errorCorrectionLevel: "M",
+      margin: 2,
+      width: 280,
+      color: { dark: "#0a0f2d", light: "#ffffff" },
+    });
+    if (!root.contains(img)) return;
+    img.src = url;
+    img.hidden = false;
+    if (fallback) fallback.hidden = true;
+  } catch (error) {
+    console.error(error);
+    if (!root.contains(img)) return;
+    img.hidden = true;
+    if (fallback) fallback.hidden = false;
   }
 }
 
