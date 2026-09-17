@@ -32,6 +32,7 @@
 | [line-24-shcho-vzhe-ye.pdf](line-24-shcho-vzhe-ye.pdf) | Готовий PDF |
 | [міжвідомча-група.md](міжвідомча-група.md) | Склад групи, ролі, навіщо |
 | [тести-пілоту.md](тести-пілоту.md) | Три кола тестів, сценарії, фіксація |
+| [вставити-у-тетрадку.md](вставити-у-тетрадку.md) | Чернетка блоків для вкладок Google Doc (копіпаст) |
 | [майстер-план.md](майстер-план.md) | Стратегічні 4 блоки |
 | [ai-маніфест.md](ai-маніфест.md) | Контекстний маніфест для ІІ (Safe by Design + модулі) — **робочий промпт**, не канон протоколів |
 | [світовий-досвід.md](світовий-досвід.md) | Реєстр «звідки ідея» (MSB, Home Front, J-Alert, FEMA, SGSecure, NHS 111) з перевіркою |
@@ -49,4 +50,4 @@
 | Дата | Джерело | Статус |
 | --- | --- | --- |
 | 17.09.2026 | Майстер-план + маніфест + світовий досвід | Структуровано в файли; канон **не** змінено; рішення D1–D6 очікують |
-| 17.09.2026 | Робоча тетрадка на Google Drive | [Папка](https://drive.google.com/drive/folders/1Fx1XvDTvwdbF6AZCFVDCioA4RrFQ_dla) · [Робоча тетрадка](https://docs.google.com/document/d/1ygIVN8hQQmSCTvHKKcplq6_r8lNMsycAvFG5rJTqlmw/edit) |
+| 17.09.2026 | Робоча тетрадка на Google Drive | [Папка](https://drive.google.com/drive/folders/1Fx1XvDTvwdbF6AZCFVDCioA4RrFQ_dla) · [Робоча тетрадка (з вкладками)](https://docs.google.com/document/d/1ygIVN8hQQmSCTvHKKcplq6_r8lNMsycAvFG5rJTqlmw/edit) |

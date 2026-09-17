@@ -56,7 +56,8 @@ struct SettingsView: View {
                                 .foregroundStyle(CivicTheme.ink)
                         }
                         .tint(CivicTheme.success)
-                        .padding(.vertical, 4)
+                        .frame(minHeight: Self.settingsRowMinHeight)
+                        .padding(.vertical, 0)
                         .onChange(of: speakOnAppear) { newValue in
                             AppPreferences.speakOnAppear = newValue
                         }
@@ -178,6 +179,8 @@ struct SettingsView: View {
         }
     }
 
+    private static let settingsRowMinHeight: CGFloat = 52
+
     private func settingsNavRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
@@ -191,7 +194,7 @@ struct SettingsView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(CivicTheme.muted)
         }
-        .padding(.vertical, 14)
+        .frame(minHeight: Self.settingsRowMinHeight)
         .contentShape(Rectangle())
     }
 
@@ -205,7 +208,7 @@ struct SettingsView: View {
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(CivicTheme.muted)
         }
-        .padding(.vertical, 14)
+        .frame(minHeight: Self.settingsRowMinHeight)
         .contentShape(Rectangle())
     }
 
