@@ -96,6 +96,29 @@ struct SettingsView: View {
                     }
 
                     settingsBlock(title: isUkrainian ? "Про додаток" : "About") {
+                        VStack(spacing: 10) {
+                            Image("kova_arms")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 56, height: 70)
+                                .accessibilityHidden(true)
+
+                            Text(
+                                isUkrainian
+                                    ? "За підтримки Київської обласної військової адміністрації"
+                                    : "Supported by Kyiv Oblast Military Administration"
+                            )
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(CivicTheme.muted)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .accessibilityElement(children: .combine)
+
+                        Divider().overlay(CivicTheme.border.opacity(0.5))
+
                         Link(destination: AppLegalLinks.privacy) {
                             settingsLinkRow(
                                 title: isUkrainian ? "Політика конфіденційності" : "Privacy Policy"

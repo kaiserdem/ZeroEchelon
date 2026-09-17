@@ -270,6 +270,10 @@ function render(options?: { keepFocus?: boolean }): void {
         <section class="settings-block">
           <h3>${escapeHtml(locale === "uk" ? "Про додаток" : "About")}</h3>
           <div class="settings-card">
+            <div class="settings-partner" aria-label="${escapeAttr(locale === "uk" ? "За підтримки Київської обласної військової адміністрації" : "Supported by Kyiv Oblast Military Administration")}">
+              <img class="settings-partner-arms" src="/kova-arms.png" width="56" height="70" alt="" />
+              <p class="settings-partner-caption">${escapeHtml(locale === "uk" ? "За підтримки Київської обласної військової адміністрації" : "Supported by Kyiv Oblast Military Administration")}</p>
+            </div>
             <a class="settings-link" href="${LEGAL.privacy}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Політика конфіденційності" : "Privacy Policy")}</a>
             <a class="settings-link" href="${LEGAL.support}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Підтримка" : "Support")}</a>
             <a class="settings-link" href="${LEGAL.terms}" target="_blank" rel="noopener">${escapeHtml(locale === "uk" ? "Умови користування" : "Terms of Use")}</a>

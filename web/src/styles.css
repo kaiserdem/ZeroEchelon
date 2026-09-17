@@ -574,6 +574,28 @@ body {
   padding: 4px 0;
 }
 
+.settings-partner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid var(--navy-08);
+  text-align: center;
+}
+
+.settings-partner-arms {
+  width: 56px;
+  height: auto;
+  display: block;
+}
+
+.settings-partner-caption {
+  margin: 0;
+  font: 500 14px/1.35 var(--font);
+  color: var(--muted);
+}
+
 .settings-nav-row {
   display: flex;
   align-items: center;
