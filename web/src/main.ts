@@ -134,11 +134,11 @@ function render(options?: { keepFocus?: boolean }): void {
     emergencyHtml = `
       <p class="emergency-hint">${escapeHtml(priorityHint(locale))}</p>
       <button type="button" class="dial-101 primary" data-dial="101">${escapeHtml(locale === "uk" ? "ВИКЛИКАТИ 101 (ДСНС)" : "CALL 101 (rescue)")}</button>
-      <button type="button" class="dial-103 outline" data-dial="112">${escapeHtml(locale === "uk" ? "Викликати 112" : "Call 112")}</button>
+      <button type="button" class="dial-112 outline" data-dial="112">${escapeHtml(locale === "uk" ? "Викликати 112" : "Call 112")}</button>
     `;
   } else {
     emergencyHtml = `
-      <button type="button" class="dial-103${emphasizeCall ? " emphasis" : ""}" data-dial="112">${escapeHtml(locale === "uk" ? "ВИКЛИКАТИ 112" : "CALL 112")}</button>
+      <button type="button" class="dial-112${emphasizeCall ? " emphasis" : ""}" data-dial="112">${escapeHtml(locale === "uk" ? "ВИКЛИКАТИ 112" : "CALL 112")}</button>
       ${
         show101
           ? `<button type="button" class="dial-101" data-dial="101">${escapeHtml(locale === "uk" ? "Викликати 101 (ДСНС)" : "Call 101 (rescue)")}</button>`

@@ -488,7 +488,7 @@ body {
 }
 
 /* full-width dark-red emergency bar */
-.dial-103 {
+.dial-112 {
   display: block;
   width: 100%;
   border: 0;
@@ -502,7 +502,7 @@ body {
   cursor: pointer;
 }
 
-.dial-103.emphasis {
+.dial-112.emphasis {
   padding: 26px 12px;
 }
 
@@ -530,7 +530,7 @@ body {
 }
 
 /* rescue-first mode: 112 becomes the quiet outline bar */
-.dial-103.outline {
+.dial-112.outline {
   background: transparent;
   color: var(--danger);
   border-top: 1px solid var(--danger-20);

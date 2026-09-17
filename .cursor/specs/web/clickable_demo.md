@@ -14,7 +14,7 @@
 - [x] Vite + TypeScript, імпорт канонічного `graph.json` з `protocol/`
 - [x] Порт `ProtocolEngine`: вузол, edges, роль, veto UX, журнал, назад
 - [x] UI: badge, voice, helper, anti-pattern, detail, кнопки, UA|EN
-- [x] Нижня смуга `tel:103` / `tel:101` (без dial у контенті)
+- [x] Нижня смуга `tel:112` / `tel:101` (без dial у контенті)
 - [x] Опційний Web Speech API
 - [x] Одна локальна подія в `localStorage` (до 48 год): гідратація при старті
 - [x] Home: під кнопками (після «Чек-лист…») — «Остання подія» + «Відкрити звіт» → Form

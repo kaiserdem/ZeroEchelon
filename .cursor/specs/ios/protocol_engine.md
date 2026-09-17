@@ -9,7 +9,7 @@ SwiftUI-клієнт у `ZeroEchelon/` читає `graph.json` і показує
 - [x] Моделі `Codable` відповідають docs/06 і graph.json
 - [x] `ProtocolEngine` — вузол, роль, журнал, назад
 - [x] Перехід лише через `edges`
-- [x] 103/101 у нижній смузі без дубля в контенті
+- [x] 112/101 у нижній смузі без дубля в контенті
 - [x] UA/EN + TTS
 - [x] Граф у `ZeroEchelon/Resources/graph.json`
 - [x] Unit-тести в `ZeroEchelon/ZeroEchelonTests`
