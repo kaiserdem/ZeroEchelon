@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Line 24 — що вже в додатку і що пізніше</title>
+  <style>
+    :root {
+      --ink: #010f17;
+      --muted: #5b617f;
+      --navy: #08324a;
+      --line: rgba(8, 50, 74, 0.14);
+      --soft: #f4f6f8;
+      --now: #0d5c3d;
+      --later: #7a4a00;
+      --danger: #801717;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: var(--ink);
+      background: #fff;
+      font: 500 15px/1.45 var(--font);
+    }
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 28px 28px 48px;
+    }
+    header {
+      border-bottom: 2px solid var(--navy);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .brand {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 26px;
+      line-height: 1.2;
+      margin: 8px 0 8px;
+      font-weight: 700;
+    }
+    .lead {
+      color: var(--muted);
+      margin: 0;
+      max-width: 62ch;
+    }
+    .print-hint {
+      margin: 12px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    h2 {
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin: 28px 0 10px;
+      color: var(--navy);
+    }
+    p { margin: 0 0 10px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 8px 10px;
+      border-top: 1px solid var(--line);
+    }
+    th {
+      background: var(--soft);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .tag-now { color: var(--now); background: rgba(13, 92, 61, 0.1); }
+    .tag-later { color: var(--later); background: rgba(122, 74, 0, 0.12); }
+    .quotes {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+    .quotes p {
+      margin: 0;
+      padding: 8px 12px;
+      background: var(--soft);
+      border-left: 3px solid var(--navy);
+    }
+    ol.checks {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    ol.checks li { margin: 4px 0; }
+    .note {
+      padding: 12px 14px;
+      background: rgba(128, 23, 23, 0.06);
+      border: 1px solid rgba(128, 23, 23, 0.18);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .note strong { color: var(--danger); }
+    footer {
+      margin-top: 28px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media print {
+      body { font-size: 11.5px; }
+      .page { padding: 0; max-width: none; }
+      .print-hint { display: none; }
+      h1 { font-size: 20px; }
+      h2 { margin-top: 16px; }
+      .note { break-inside: avoid; }
+      table { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+    @page { margin: 14mm 14mm; }
+  </style>
+</head>
+<body>
+  <article class="page">
+    <header>
+      <div class="brand">Line 24</div>
+      <h1>Що вже в додатку і що пізніше</h1>
+      <p class="lead">
+        Офлайн-алгоритм цивільного порятунку. Веде свідка або постраждалого
+        голосом і великими кнопками, без мережі і без реєстрації. Не замінює бригаду.
+        Те, що в плані називають «блоком&nbsp;2» (голос, довідник, перевірка через 24 і 48&nbsp;годин), уже в продукті.
+      </p>
+      <p class="print-hint">Щоб зробити PDF: у браузері Файл → Друк → «Зберегти як PDF».</p>
+    </header>
+
+    <h2><span class="tag tag-now">Вже є</span> У телефоні зараз</h2>
+    <table>
+      <thead>
+        <tr><th>Що</th><th>Як це виглядає</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Приватність</td><td>Немає акаунта, хмари, імен і номерів. Логіка на пристрої.</td></tr>
+        <tr><td>Головний екран</td><td>«Щось сталось зараз» · «Симптоми / щоденна допомога» · «Чек-лист після події»</td></tr>
+        <tr><td>Шок-інтерфейс</td><td>Одна дія на екран. Так / Ні / Не можу. Меню протоколів немає.</td></tr>
+        <tr><td>Голос</td><td>Читає дослівно текст з екрана. Українська і англійська.</td></tr>
+        <tr><td>Безпека сцени</td><td>Вогонь, дим, завал, підозрілий предмет — спочатку відійти і 101.</td></tr>
+        <tr><td>Сортування</td><td>Спочатку до того, хто не рухається, не до того, хто кричить.</td></tr>
+        <tr><td>Кровотеча</td><td>Тиснути на рану. Джгут із ременя не пропонується.</td></tr>
+        <tr><td>Виклик</td><td>112 завжди на екрані. 101 — коли зона небезпечна.</td></tr>
+        <tr><td>Місце</td><td>QR, або координати в телефоні, або адреса вручну. На сервер координати не йдуть.</td></tr>
+        <tr><td>24 і 48 годин</td><td>Локальний таймер. Короткий чек-лист. Без сервера.</td></tr>
+        <tr><td>Щоденна допомога</td><td>Інсульт, отруєння, анафілаксія — окремий вхід.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Тексти, які не треба писати заново</h2>
+    <p>Голос уже зашитий. Коротка команда + заборона, якщо є типова помилка. Різати все до трьох слів не можна: зникне «не звільняй», «не герметизуй», «не джгут із ременя».</p>
+    <div class="quotes">
+      <p>«Натисніть на рану обома руками. Тисніть сильно. Не відпускайте.»</p>
+      <p>«Не робіть джгут із ременя чи шарфа.»</p>
+      <p>«Ідіть до того, хто не рухається. Не до того, хто кричить.»</p>
+      <p>«Не чіпайте предмет і уламки. Не смикайте. Не звільняйте.»</p>
+    </div>
+    <p>Чек-лист через 24 і 48 годин. Будь-яке «так» → 112 або лікарня. «Ні» не означає «все добре».</p>
+    <ol class="checks">
+      <li>Є кров у кашлі, задишка, біль у грудях, сині губи?</li>
+      <li>Сеча темна, як чай? Сечі стало менше? Кінцівка пухне і болить сильніше?</li>
+      <li>Головний біль не минає або наростає? Було блювання? Сонливість, плутана мова?</li>
+      <li>Біль у животі? Кров у блювоті або в стільці?</li>
+    </ol>
+
+    <h2><span class="tag tag-later">Пізніше</span> Після пілоту ядра</h2>
+    <table>
+      <thead>
+        <tr><th>Черга</th><th>Що</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Поруч із ядром</td><td>Ще більші кнопки, чорний OLED, вібрація в темряві; тест під сирени; замір батареї в холоді.</td></tr>
+        <tr><td>Окремий шар</td><td>Картки води / блекауту / пожежі в побуті. Не заміняють гострий шлях.</td></tr>
+        <tr><td>Окремий шар</td><td>Новини області (лише завантаження). Маршрути вихідного дня. Мапа укриттів громади.</td></tr>
+        <tr><td>Партнери</td><td>Знижки, ваучери, кешбек — після договорів.</td></tr>
+        <tr><td>Окреме ТЗ</td><td>SOS-спалах кодом Морзе. Ультразвук «для собак» — не в пілот без дослідження.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">
+      <strong>Не міняти головний екран</strong> на три кнопки «пожежа / кровотеча / SOS».
+      У паніці людина тоді пропускає виклик 112, місце і перевірку, чи безпечно взагалі діяти.
+    </p>
+
+    <h2>Для слайдів назовні</h2>
+    <p>
+      Основа алгоритму: SALT · TECC Active Bystander (2024) · ERC 2025 First Aid ·
+      Stop the Bleed / ACS COT 2025 · M/ETHANE · WHO PFA · CDC / ISN / NICE.
+    </p>
+    <p>
+      Не казати як факт: SOS-маяк «як у FEMA App» (у FEMA цього немає);
+      «без трекінгу, як SGSecure» (SGSecure якраз бере геолокацію);
+      «4 питання як NHS 111» (там інші, клінічні скрипти);
+      MARCH як ядро для цивільного (у продукті інший рівень).
+    </p>
+
+    <footer>
+      Line 24 · 17.09.2026 · службова сторінка для узгодження обсягу, не медична інструкція і не заміна docs/01–13.
+    </footer>
+  </article>
+</body>
+</html>
