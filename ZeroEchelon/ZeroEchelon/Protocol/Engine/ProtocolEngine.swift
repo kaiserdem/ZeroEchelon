@@ -42,7 +42,7 @@ final class ProtocolEngine: ObservableObject {
     @Published var locale: ContentLocale
     @Published private(set) var sessionRole: SessionRole?
     @Published private(set) var incidentType: String?
-    /// Location line captured from Loc-1 / Loc-2 / Loc-3 for the 112 draft.
+    /// Location line captured from Loc-2 / Loc-3 for the 112 draft.
     @Published private(set) var locationLine: String?
     @Published private(set) var locationLevel: Int?
     /// Draft text for the current Loc-3 field (bound to the text field).
@@ -78,7 +78,7 @@ final class ProtocolEngine: ObservableObject {
     private var pendingRecheckEdge: String?
     private var suppressSceneRecheck = false
 
-    private static let defaultManualFields = ["settlement", "street", "building", "entrance"]
+    private static let defaultManualFields = ["address"]
 
     init(graph: ProtocolGraph, rules: EngineRules, locale: ContentLocale = .uk) throws {
         guard graph.commercial == false else {
@@ -142,19 +142,10 @@ final class ProtocolEngine: ObservableObject {
 
     var voiceText: String {
         switch currentNode.id {
-        case "Loc-1":
-            return locale == .uk
-                ? "Місце з QR-коду на стіні:"
-                : "Location from the wall QR code:"
         case "Loc-3":
             return manualLocationPrompt
         case "A6":
             return a6VoiceForIncidentType()
-        case "NoCpr" where sessionRole == .casualty || !multipleCasualties:
-            // P0 from audit: do not order "go to the next person" when there is no next / cannot leave
-            return locale == .uk
-                ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 112 внизу."
-                : "CPR will not help here. Stay. Tap 112 below."
         default:
             return currentNode.voice.text(for: locale)
         }
@@ -165,21 +156,17 @@ final class ProtocolEngine: ObservableObject {
     var manualLocationFieldKey: String {
         let keys = manualLocationFieldKeys
         guard keys.indices.contains(manualLocationFieldIndex) else {
-            return keys.first ?? "settlement"
+            return keys.first ?? "address"
         }
         return keys[manualLocationFieldIndex]
     }
 
     var manualLocationPrompt: String {
         switch manualLocationFieldKey {
-        case "settlement":
-            return locale == .uk ? "Назвіть населений пункт." : "Name the town or city."
-        case "street":
-            return locale == .uk ? "Вулиця." : "Street."
-        case "building":
-            return locale == .uk ? "Номер будинку." : "Building number."
-        case "entrance":
-            return locale == .uk ? "Підʼїзд, поверх чи орієнтир." : "Entrance, floor, or landmark."
+        case "address":
+            return locale == .uk
+                ? "Назвіть адресу: населений пункт, вулиця, будинок, орієнтир."
+                : "Give the address: town, street, building, landmark."
         default:
             return currentNode.voice.text(for: locale)
         }
@@ -187,14 +174,10 @@ final class ProtocolEngine: ObservableObject {
 
     var manualLocationPlaceholder: String {
         switch manualLocationFieldKey {
-        case "settlement":
-            return locale == .uk ? "наприклад, Бровари" : "e.g. Brovary"
-        case "street":
-            return locale == .uk ? "наприклад, вул. Київська" : "e.g. Kyivska St."
-        case "building":
-            return locale == .uk ? "наприклад, 12" : "e.g. 12"
-        case "entrance":
-            return locale == .uk ? "підʼїзд 3, поверх 2" : "entrance 3, floor 2"
+        case "address":
+            return locale == .uk
+                ? "наприклад, Бровари, вул. Київська 12, підʼїзд 3"
+                : "e.g. Brovary, Kyivska St. 12, entrance 3"
         default:
             return ""
         }
@@ -264,8 +247,6 @@ final class ProtocolEngine: ObservableObject {
 
     var detailBlock: String? {
         switch currentNode.id {
-        case "Loc-1":
-            return demoAddressLine(for: locale)
         case "Loc-2":
             return demoCoordinatesDisplay
         case "Loc-3":
@@ -357,13 +338,6 @@ final class ProtocolEngine: ObservableObject {
         return parts.isEmpty ? "Several" : parts.joined(separator: ", ")
     }
 
-    private func demoAddressLine(for locale: ContentLocale) -> String {
-        switch locale {
-        case .uk: "Київська обл., м. Бровари, вул. Демо 12, підʼїзд 3"
-        case .en: "Kyiv region, Brovary, Demo St. 12, entrance 3"
-        }
-    }
-
     private var demoCoordinatesDisplay: String { "50.51120° N\n30.79090° E" }
     private var demoCoordinatesDraft: String { "50.51120° N, 30.79090° E" }
 
@@ -402,17 +376,6 @@ final class ProtocolEngine: ObservableObject {
             // Top bar «Назад» covers history; never duplicate back-* here.
             // Always keep QR (give) — including after veto path Out/Cont/Out-trapped.
             buttons = buttons.filter { ["give", "handed", "wave", "erase"].contains($0.when) }
-        }
-
-        if currentNode.id == "Loc-3" {
-            let isLast = manualLocationFieldIndex >= manualLocationFieldKeys.count - 1
-            buttons = buttons.map { button in
-                guard button.when == "next" else { return button }
-                if isLast {
-                    return ProtocolButton(when: "next", ua: "Далі", en: "Next")
-                }
-                return ProtocolButton(when: "next", ua: "Наступне поле", en: "Next field")
-            }
         }
 
         // Top bar already has «Назад» — never duplicate content Back buttons.
@@ -927,6 +890,7 @@ final class ProtocolEngine: ObservableObject {
         if sessionRole == .casualty {
             targetId = remapCasualtyTarget(targetId)
         }
+        targetId = remapNoCprTarget(targetId)
 
         guard let next = graph.node(id: targetId) else {
             throw ProtocolGraphError.missingNode(targetId)
@@ -957,9 +921,6 @@ final class ProtocolEngine: ObservableObject {
 
     private func captureLocationIfNeeded(arrivedAt id: String) {
         switch id {
-        case "Loc-1":
-            locationLevel = 1
-            locationLine = demoAddressLine(for: locale)
         case "Loc-2":
             locationLevel = 2
             locationLine = demoCoordinatesDraft
@@ -1002,6 +963,15 @@ final class ProtocolEngine: ObservableObject {
             return rules.casualty.redirectTo
         }
         return rules.casualty.targetRemaps[targetId] ?? targetId
+    }
+
+    /// One casualty or self-help: stay with this person. Several: go to the next.
+    private func remapNoCprTarget(_ targetId: String) -> String {
+        guard targetId == "NoCpr" else { return targetId }
+        if sessionRole == .casualty || !multipleCasualties {
+            return "NoCpr-stay"
+        }
+        return "NoCpr"
     }
 
     /// Remap graph safety chain onto the type-specific queue from shared rules.

@@ -201,55 +201,7 @@
             "en": "I will type the address"
           }
         ],
-        "note": "Loc-1 лишається для deep link з QR на стіні (клієнт пропускає Loc-mode). Тут лише GPS або ручне введення."
-      }
-    },
-    {
-      "id": "Loc-1",
-      "type": "action",
-      "branch": "entry",
-      "roles": [
-        "witness",
-        "casualty"
-      ],
-      "precedence": 2,
-      "registry": [
-        "B1"
-      ],
-      "conflict": [],
-      "veto": false,
-      "handsBusy": false,
-      "delegationRequired": false,
-      "voice": {
-        "ua": "Місце з коду: [адреса].",
-        "en": "Location from the code: [address]."
-      },
-      "edges": [
-        {
-          "when": "next",
-          "to": "Type"
-        },
-        {
-          "when": "edit",
-          "to": "Loc-mode"
-        }
-      ],
-      "ui": {
-        "screenId": "S1",
-        "locationLevel": 1,
-        "template": "action",
-        "buttons": [
-          {
-            "when": "next",
-            "ua": "Далі",
-            "en": "Next"
-          },
-          {
-            "when": "edit",
-            "ua": "Виправити",
-            "en": "Correct"
-          }
-        ]
+        "note": "Лише GPS або адреса вручну одним рядком. QR на стіні немає; QR лишається на Give для передачі звіту."
       }
     },
     {
@@ -317,8 +269,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Назвіть населений пункт. Далі — вулицю.",
-        "en": "Name the town or city. Then the street."
+        "ua": "Назвіть адресу: населений пункт, вулиця, будинок, орієнтир.",
+        "en": "Give the address: town, street, building, landmark."
       },
       "edges": [
         {
@@ -335,10 +287,7 @@
         "locationLevel": 3,
         "template": "report",
         "fields": [
-          "settlement",
-          "street",
-          "building",
-          "entrance"
+          "address"
         ],
         "buttons": [
           {
@@ -3256,7 +3205,50 @@
             "en": "Go next"
           }
         ],
-        "note": "draft K3/K11"
+        "note": "Кілька постраждалих. Один / casualty → NoCpr-stay."
+      }
+    },
+    {
+      "conflict": [
+        "K3",
+        "K11"
+      ],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "id": "NoCpr-stay",
+      "type": "action",
+      "branch": "D",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 5,
+      "registry": [
+        "A3"
+      ],
+      "voice": {
+        "ua": "Реанімація тут не допоможе. Залишайтесь. Натисніть 112 внизу.",
+        "en": "CPR will not help here. Stay. Tap 112 below."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "E0"
+        }
+      ],
+      "ui": {
+        "screenId": "S9",
+        "template": "action",
+        "status": "draft",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Залишаюсь",
+            "en": "I stay"
+          }
+        ],
+        "note": "Один постраждалий або роль casualty. draft K3/K11"
       }
     },
     {
@@ -4939,7 +4931,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "Form"
+          "to": "Pos"
         }
       ],
       "ui": {
@@ -4981,7 +4973,7 @@
       "edges": [
         {
           "when": "next",
-          "to": "Form"
+          "to": "Pos"
         }
       ],
       "ui": {
@@ -5023,7 +5015,7 @@
         },
         {
           "when": "no",
-          "to": "Form"
+          "to": "Local"
         }
       ],
       "ui": {
@@ -5039,6 +5031,167 @@
             "when": "no",
             "ua": "Лише місцеве",
             "en": "Local only"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "id": "Local",
+      "type": "action",
+      "branch": "J",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 2,
+      "registry": [
+        "A3"
+      ],
+      "voice": {
+        "ua": "Холод на місце укусу. Дивіться, чи не зʼявиться свист або набряк обличчя.",
+        "en": "Cold on the sting. Watch for wheeze or face swelling."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Form"
+        }
+      ],
+      "ui": {
+        "screenId": "Daily",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Далі",
+            "en": "Next"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "id": "Pos",
+      "type": "question",
+      "branch": "J",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 2,
+      "registry": [
+        "A3"
+      ],
+      "voice": {
+        "ua": "Людина гірше реагує на вас — і немає травми голови чи шиї?",
+        "en": "Is the person less responsive to you — and no head or neck injury?"
+      },
+      "edges": [
+        {
+          "when": "yes",
+          "to": "Side"
+        },
+        {
+          "when": "no",
+          "to": "Comf"
+        }
+      ],
+      "ui": {
+        "screenId": "Daily",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "yes",
+            "ua": "Так",
+            "en": "Yes"
+          },
+          {
+            "when": "no",
+            "ua": "Ні",
+            "en": "No"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "id": "Side",
+      "type": "action",
+      "branch": "J",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 2,
+      "registry": [
+        "A3"
+      ],
+      "voice": {
+        "ua": "Поверніть на бік. Контролюйте дихання.",
+        "en": "Roll onto the side. Watch the breathing."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Form"
+        }
+      ],
+      "ui": {
+        "screenId": "Daily",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зробив",
+            "en": "Done"
+          }
+        ]
+      }
+    },
+    {
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "id": "Comf",
+      "type": "action",
+      "branch": "J",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 2,
+      "registry": [
+        "A3"
+      ],
+      "voice": {
+        "ua": "Зручно і не рухатися.",
+        "en": "Comfortable and still."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Form"
+        }
+      ],
+      "ui": {
+        "screenId": "Daily",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Зрозумів",
+            "en": "Got it"
           }
         ]
       }

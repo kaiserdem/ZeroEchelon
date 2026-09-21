@@ -62,12 +62,7 @@ export class ProtocolEngine {
   private pendingRecheckEdge: string | null = null;
   private suppressSceneRecheck = false;
 
-  private static readonly defaultManualFields = [
-    "settlement",
-    "street",
-    "building",
-    "entrance",
-  ];
+  private static readonly defaultManualFields = ["address"];
 
   constructor(
     graph: ProtocolGraph,
@@ -97,21 +92,10 @@ export class ProtocolEngine {
 
   get voiceText(): string {
     switch (this.currentNode.id) {
-      case "Loc-1":
-        return this.locale === "uk"
-          ? "Місце з QR-коду на стіні:"
-          : "Location from the wall QR code:";
       case "Loc-3":
         return this.manualLocationPrompt;
       case "A6":
         return this.a6VoiceForIncidentType();
-      case "NoCpr":
-        if (this.sessionRole === "casualty" || !this.multipleCasualties) {
-          return this.locale === "uk"
-            ? "Реанімація тут не допоможе. Залишайтесь. Натисніть 112 внизу."
-            : "CPR will not help here. Stay. Tap 112 below.";
-        }
-        return textFor(this.currentNode.voice, this.locale);
       default:
         return textFor(this.currentNode.voice, this.locale);
     }
@@ -123,23 +107,15 @@ export class ProtocolEngine {
 
   get manualLocationFieldKey(): string {
     const keys = this.manualLocationFieldKeys;
-    return keys[this.manualLocationFieldIndex] ?? keys[0] ?? "settlement";
+    return keys[this.manualLocationFieldIndex] ?? keys[0] ?? "address";
   }
 
   get manualLocationPrompt(): string {
     switch (this.manualLocationFieldKey) {
-      case "settlement":
+      case "address":
         return this.locale === "uk"
-          ? "Назвіть населений пункт."
-          : "Name the town or city.";
-      case "street":
-        return this.locale === "uk" ? "Вулиця." : "Street.";
-      case "building":
-        return this.locale === "uk" ? "Номер будинку." : "Building number.";
-      case "entrance":
-        return this.locale === "uk"
-          ? "Підʼїзд, поверх чи орієнтир."
-          : "Entrance, floor, or landmark.";
+          ? "Назвіть адресу: населений пункт, вулиця, будинок, орієнтир."
+          : "Give the address: town, street, building, landmark.";
       default:
         return textFor(this.currentNode.voice, this.locale);
     }
@@ -147,18 +123,10 @@ export class ProtocolEngine {
 
   get manualLocationPlaceholder(): string {
     switch (this.manualLocationFieldKey) {
-      case "settlement":
-        return this.locale === "uk" ? "наприклад, Бровари" : "e.g. Brovary";
-      case "street":
+      case "address":
         return this.locale === "uk"
-          ? "наприклад, вул. Київська"
-          : "e.g. Kyivska St.";
-      case "building":
-        return this.locale === "uk" ? "наприклад, 12" : "e.g. 12";
-      case "entrance":
-        return this.locale === "uk"
-          ? "підʼїзд 3, поверх 2"
-          : "entrance 3, floor 2";
+          ? "наприклад, Бровари, вул. Київська 12, підʼїзд 3"
+          : "e.g. Brovary, Kyivska St. 12, entrance 3";
       default:
         return "";
     }
@@ -234,8 +202,6 @@ export class ProtocolEngine {
 
   get detailBlock(): string | null {
     switch (this.currentNode.id) {
-      case "Loc-1":
-        return this.demoAddressLine();
       case "Loc-2":
         return this.demoCoordinatesDisplay;
       case "Loc-3":
@@ -336,12 +302,6 @@ export class ProtocolEngine {
     ).format(new Date(iso));
   }
 
-  private demoAddressLine(): string {
-    return this.locale === "uk"
-      ? "Київська обл., м. Бровари, вул. Демо 12, підʼїзд 3"
-      : "Kyiv region, Brovary, Demo St. 12, entrance 3";
-  }
-
   private get demoCoordinatesDisplay(): string {
     return "50.51120° N\n30.79090° E";
   }
@@ -387,18 +347,6 @@ export class ProtocolEngine {
       buttons = buttons.filter((b) =>
         ["give", "handed", "wave", "erase"].includes(b.when),
       );
-    }
-
-    if (this.currentNode.id === "Loc-3") {
-      const isLast =
-        this.manualLocationFieldIndex >=
-        this.manualLocationFieldKeys.length - 1;
-      buttons = buttons.map((button) => {
-        if (button.when !== "next") return button;
-        return isLast
-          ? { when: "next", ua: "Далі", en: "Next" }
-          : { when: "next", ua: "Наступне поле", en: "Next field" };
-      });
     }
 
     // Top bar already has «Назад» — never duplicate content Back buttons.
@@ -928,6 +876,7 @@ export class ProtocolEngine {
     if (this.sessionRole === "casualty") {
       targetId = this.remapCasualtyTarget(targetId);
     }
+    targetId = this.remapNoCprTarget(targetId);
 
     const next = nodeById(this.graph, targetId);
     if (!next) {
@@ -956,10 +905,6 @@ export class ProtocolEngine {
 
   private captureLocationIfNeeded(id: string): void {
     switch (id) {
-      case "Loc-1":
-        this.locationLevel = 1;
-        this.locationLine = this.demoAddressLine();
-        break;
       case "Loc-2":
         this.locationLevel = 2;
         this.locationLine = this.demoCoordinatesDraft;
@@ -1008,6 +953,14 @@ export class ProtocolEngine {
     const branch = nodeById(this.graph, targetId)?.branch;
     if (branch && c.redirectBranches.includes(branch)) return c.redirectTo;
     return c.targetRemaps[targetId] ?? targetId;
+  }
+
+  private remapNoCprTarget(targetId: string): string {
+    if (targetId !== "NoCpr") return targetId;
+    if (this.sessionRole === "casualty" || !this.multipleCasualties) {
+      return "NoCpr-stay";
+    }
+    return "NoCpr";
   }
 
   private remapSafetyTarget(targetId: string, edgeWhen: string): string {

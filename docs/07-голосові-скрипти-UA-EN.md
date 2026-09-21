@@ -8,7 +8,7 @@
 
 ## Принципи формулювання
 
-1. Одна дія на фразу. Не «перевірте дихання і натисніть на рану».
+1. Одна дія на фразу. Не «перевірте дихання і натисніть на рану». Виняток за рішенням продукту: **Str**, **Adr**, **Four**, **One** лишаються багатодієвими.
 2. Наказовий лад, теперішній час. Не «вам слід було б».
 3. Спостережувані ознаки, не діагнози. Не «це пневмоторакс».
 4. Українська і англійська — смислові близнюки, не літеральний підрядник.
@@ -29,16 +29,14 @@
 | Disclaimer | Спочатку викличте 112, якщо можете. | Call 112 first if you can. |
 | Disclaimer-note | Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. *(менший текст під заголовком)* | This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. *(smaller helper under title)* |
 | Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
-| Loc-1 | Місце з коду: [адреса]. | Location from the code: [address]. |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
-| Loc-3 | Назвіть населений пункт. Далі — вулицю. | Name the town or city. Then the street. |
+| Loc-3 | Назвіть адресу: населений пункт, вулиця, будинок, орієнтир. | Give the address: town, street, building, landmark. |
 | Type | Що сталося. Один вибір. | What happened. One choice. |
 | Role | Ви допомагаєте іншим — чи допомога потрібна вам? | Are you helping others — or do you need help yourself? |
 | Role-witness | Режим свідка. Спершу викличте 112, якщо можете. | Bystander mode. Call 112 first if you can. |
 | Role-casualty | Режим постраждалого. Викличте 112. Далі — що зробити для себе. | Casualty mode. Call 112. Next — what to do for yourself. |
 | Casualty-menu | Що потрібно вам зараз. Оберіть одне. | What do you need right now. Choose one. |
 | Call | Викличте 112. Зачитайте текст на екрані. | Call 112. Read the text on the screen. |
-| NEXT-PHASE | Вхід завершено. Далі — допомога за роллю. | Entry done. Next — help by role. |
 
 ---
 
@@ -65,7 +63,12 @@
 | Cont | Вважайте зону небезпечною. Не дійте тут. Натисніть 101 внизу. | Treat the area as unsafe. Do not act here. Tap 101 below. |
 | CanLeave | Чи можете зараз відійти від небезпеки, не чіпаючи предмет і уламки? | Can you move away from the danger now without touching the object or rubble? |
 | Out-trapped | Не чіпайте предмет і уламки. Не смикайте. Не звільняйте. Натисніть 101 внизу. У звіті зазначте: ви або люди тут. | Do not touch the object or rubble. Do not pull. Do not free anyone. Tap 101 below. In the report mark: you or people are here. |
-| A6 | *За типом інциденту (рушій):* ДТП — проїжджа / аварійка / проводи; пожежа — дим; хімія — не чіпати; побут — вимкнути джерело; вибух/завал/потяг/стрілянина — не в завал. У `graph.json` лишається fallback «завал». | *By incident type (engine):* traffic — roadway / hazards / wires; fire — smoke; chemical — do not touch; household — turn off source; explosion/collapse/train/shooting — do not enter collapse. Graph fallback remains collapse wording. |
+| A6 | *(fallback у graph, якщо тип невідомий)* Не заходьте всередину завалу. Не рухайте уламки. | Do not enter the collapse. Do not move rubble. |
+| A6-traffic | Не стійте на проїзджій частині. Увімкніть аварійку. Не чіпайте проводи. | Do not stand in the roadway. Turn on hazard lights. Do not touch wires. |
+| A6-fire | Не заходьте в дим і полумʼя. Тримайтеся з навітряного боку. Не відкривайте гарячі двері. | Do not enter smoke or flames. Stay upwind. Do not open hot doors. |
+| A6-chemical | Не чіпайте рідину і плями. Не нюхайте. Відійдіть проти вітру, якщо можете. | Do not touch liquid or stains. Do not smell it. Move upwind if you can. |
+| A6-household | Вимкніть джерело небезпеки, якщо це безпечно. Не ризикуйте зайвий раз. | Turn off the hazard source if it is safe. Do not take extra risks. |
+| A6-collapse | Не заходьте всередину завалу. Не рухайте уламки. *(також explosion / train / shooting)* | Do not enter the collapse. Do not move rubble. *(also explosion / train / shooting)* |
 | A7 | Перевірте загрози знову. Повторний удар можливий. | Check the threats again. A second strike is possible. |
 
 ---
@@ -80,6 +83,7 @@
 | Green | Зелений. Оглянете пізніше. Може тримати тиск, якщо скажете. | Green. Check later. This person can hold pressure if you ask. |
 | B2 | Скажіть: хто не може йти — помахайте рукою. | Say: if you cannot walk — wave your hand. |
 | B3 | Махає або тягнеться до вас? | Is the person waving or reaching for you? |
+| Second | Цю — другим. Спершу той, хто не рухається. | This one — second. First the person who is not moving. |
 | First | Ідіть до того, хто не рухається. Не до того, хто кричить. | Go to the person who is not moving. Not to the one who is shouting. |
 | Br | Грудна клітка піднімається? Повітря чути? | Does the chest rise? Can you feel air? |
 | Kid | Це дитина? | Is this a child? |
@@ -88,8 +92,10 @@
 | Again | Дихання зʼявилося? | Did breathing start? |
 | NoResp | Не дихає, не реагує. Запамʼятайте місце. Ідіть до наступного. | Not breathing, not responding. Remember the place. Go to the next person. |
 | Four | Чи реагує на голос? Чи є пульс на запʼясті? Чи дихає вільно? Чи кров зупинена? | Does the person respond? Is there a wrist pulse? Is breathing easy? Is bleeding stopped? |
+| Minor | Лише невеликі травми — подряпини, без сильного болю? | Only minor injuries — scrapes, no severe pain? |
 | Red | Червоний. Допомагайте цій людині зараз. | Red. Help this person now. |
 | Yellow | Жовтий. Допомога може зачекати. Повернетесь. | Yellow. Help can wait. You will return. |
+| Green2 | Зелений. Оглянете пізніше. Може тримати тиск, якщо скажете. | Green. Check later. This person can hold pressure if you ask. |
 
 ---
 
@@ -120,7 +126,8 @@
 | --- | --- | --- |
 | D0 | Людина дихає нормально? Грудна клітка піднімається рівно? | Is the person breathing normally? Does the chest rise evenly? |
 | D1 | Був вибух? Або є рана, що проходить у тіло? | Was there an explosion? Or a wound that goes into the body? |
-| NoCpr | Реанімація тут не допоможе. Ідіть до наступного, кого ще можна врятувати. | CPR will not help here. Go to the next person you can still save. |
+| NoCpr | Реанімація тут не допоможе. Ідіть до наступного, кого ще можна врятувати. *(кілька постраждалих)* | CPR will not help here. Go to the next person you can still save. *(several casualties)* |
+| NoCpr-stay | Реанімація тут не допоможе. Залишайтесь. Натисніть 112 внизу. *(один постраждалий або роль casualty)* | CPR will not help here. Stay. Tap 112 below. *(one casualty or self-help)* |
 | Cpr | Кладіть основу долоні на середину грудей. Тисніть глибоко. Часто. Без вдихів. | Heel of the hand on the centre of the chest. Push deep. Push fast. No breaths. |
 | Metron | Слухайте ритм. Не зупиняйтесь, поки не зміниться стан або не приїдуть медики. | Follow the beat. Do not stop until the person changes or medics arrive. |
 | D2 | Ви лишаєтесь біля цієї людини? | Are you staying with this person? |
@@ -142,6 +149,7 @@
 | Vent | Накладіть наліпку з клапаном. Дивіться, як дихає. | Apply the vented seal. Watch the breathing. |
 | E3 | Тривога і задишка наростають? | Are fear and shortness of breath getting worse? |
 | Burp | Зніміть наліпку. Дайте повітрю вийти. Потім накладіть знову, якщо вмієте. | Take the seal off. Let air out. Then put it back if you know how. |
+| Watch | Спостерігайте дихання. Якщо стане гірше — зніміть наліпку. | Watch the breathing. If it gets worse — take the seal off. |
 
 ---
 
@@ -217,6 +225,7 @@
 | Adr-2 | Пʼять хвилин. Симптоми тяжкі? Друга доза так само в стегно. | Five minutes. Still severe? A second dose, same way, into the thigh. |
 | NoAnti | Таблетка від алергії не замінює адреналін і не дає права чекати. | An allergy tablet does not replace adrenaline and is not a reason to wait. |
 | Local | Холод на місце укусу. Дивіться, чи не зʼявиться свист або набряк обличчя. | Cold on the sting. Watch for wheeze or face swelling. |
+| Pos | Людина гірше реагує на вас — і немає травми голови чи шиї? | Is the person less responsive to you — and no head or neck injury? |
 | Side | Поверніть на бік. Контролюйте дихання. | Roll onto the side. Watch the breathing. |
 | Comf | Зручно і не рухатися. | Comfortable and still. |
 

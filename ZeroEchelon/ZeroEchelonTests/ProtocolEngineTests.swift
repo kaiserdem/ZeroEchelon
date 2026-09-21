@@ -58,12 +58,14 @@ struct ProtocolEngineTests {
         for id in [
             "Home", "Count", "Casualty-menu", "C0", "D0", "E0", "Anti", "E2", "Vent", "E3", "Burp", "Watch",
             "F0", "Form", "I0", "J0", "CanLeave", "A7",
-            "B2", "B3", "Second", "Br", "Kid", "Four", "Red", "Yellow", "Green2", "NoResp",
+            "B2", "B3", "Second", "Br", "Kid", "Four", "Red", "Yellow", "Green2", "NoResp", "NoCpr-stay",
             "G2", "G3", "Flags", "Organic", "Ground", "Slow", "Ban",
+            "Local", "Pos", "Side", "Comf",
         ] {
             #expect(graph.node(id: id) != nil, "missing \(id)")
         }
         #expect(graph.node(id: "NEXT-PHASE") == nil)
+        #expect(graph.node(id: "Loc-1") == nil)
     }
 
     @Test func witnessPathReachesBleeding() throws {
@@ -140,6 +142,49 @@ struct ProtocolEngineTests {
         #expect(engine.currentNode.id == "J0")
     }
 
+    @Test func dailyAllergyLocalOnlyGoesLocalThenForm() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "daily")
+        _ = try engine.select(edgeWhen: "allergy")
+        #expect(engine.currentNode.id == "Ana")
+        _ = try engine.select(edgeWhen: "no")
+        #expect(engine.currentNode.id == "Local")
+        #expect(engine.voiceText.contains("Холод"))
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Form")
+    }
+
+    @Test func dailyStrokePosYesGoesSide() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "daily")
+        _ = try engine.select(edgeWhen: "stroke")
+        #expect(engine.currentNode.id == "Str")
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Pos")
+        _ = try engine.select(edgeWhen: "yes")
+        #expect(engine.currentNode.id == "Side")
+        #expect(engine.voiceText.contains("бік"))
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Form")
+    }
+
+    @Test func dailyPoisonPosNoGoesComf() throws {
+        let engine = try makeEngine()
+        try engine.skipEntrySplashIfNeeded()
+        _ = try engine.select(edgeWhen: "daily")
+        _ = try engine.select(edgeWhen: "poison")
+        #expect(engine.currentNode.id == "Poi")
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Pos")
+        _ = try engine.select(edgeWhen: "no")
+        #expect(engine.currentNode.id == "Comf")
+        #expect(engine.voiceText.contains("Зручно"))
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Form")
+    }
+
     @Test func homeWaveGoesToI0() throws {
         let engine = try makeEngine()
         try engine.skipEntrySplashIfNeeded()
@@ -173,18 +218,11 @@ struct ProtocolEngineTests {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Loc-3")
-        #expect(engine.voiceText.contains("населений"))
-        engine.manualLocationDraft = "Бровари"
-        _ = try engine.select(edgeWhen: "next")
-        #expect(engine.manualLocationFieldKey == "street")
-        engine.manualLocationDraft = "вул. Київська"
-        _ = try engine.select(edgeWhen: "next")
-        engine.manualLocationDraft = "12"
-        _ = try engine.select(edgeWhen: "next")
-        engine.manualLocationDraft = "підʼїзд 3"
+        #expect(engine.voiceText.contains("адресу"))
+        engine.manualLocationDraft = "Бровари, вул. Київська 12, підʼїзд 3"
         _ = try engine.select(edgeWhen: "next")
         #expect(engine.currentNode.id == "Type")
-        #expect(engine.locationLine == "Бровари, вул. Київська, 12, підʼїзд 3")
+        #expect(engine.locationLine == "Бровари, вул. Київська 12, підʼїзд 3")
         _ = try engine.select(edgeWhen: "fire")
         _ = try engine.select(edgeWhen: "witness")
         _ = try engine.select(edgeWhen: "next")
@@ -269,10 +307,26 @@ struct ProtocolEngineTests {
         #expect(engine.multipleCasualties == false)
         _ = try engine.select(edgeWhen: "no") // C0 → D0
         _ = try engine.select(edgeWhen: "no") // D0 → D1 (не дихає)
-        _ = try engine.select(edgeWhen: "yes") // D1 → NoCpr
-        #expect(engine.currentNode.id == "NoCpr")
+        _ = try engine.select(edgeWhen: "yes") // D1 → NoCpr-stay
+        #expect(engine.currentNode.id == "NoCpr-stay")
         #expect(!engine.voiceText.lowercased().contains("наступн"))
         #expect(!engine.voiceText.lowercased().contains("next"))
+        #expect(engine.visibleButtons.contains(where: { $0.ua == "Залишаюсь" }))
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "E0")
+    }
+
+    @Test func noCprSeveralCasualtiesGoesToNextPerson() throws {
+        let engine = try makeEngine()
+        try reachCare(engine: engine, role: "witness")
+        _ = try engine.select(edgeWhen: "next") // Count
+        _ = try engine.select(edgeWhen: "many")
+        #expect(engine.multipleCasualties == true)
+        try engine.setCurrentNodeForTesting("D1")
+        _ = try engine.select(edgeWhen: "yes")
+        #expect(engine.currentNode.id == "NoCpr")
+        #expect(engine.voiceText.contains("наступного"))
+        #expect(engine.visibleButtons.contains(where: { $0.ua == "Йду далі" }))
         _ = try engine.select(edgeWhen: "next")
         #expect(engine.currentNode.id == "E0")
     }
