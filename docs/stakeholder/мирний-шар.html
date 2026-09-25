@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Line 24 — лікар, аптека, донор</title>
+  <style>
+    :root {
+      --ink: #010f17;
+      --muted: #5b617f;
+      --navy: #08324a;
+      --line: rgba(8, 50, 74, 0.14);
+      --soft: #f4f6f8;
+      --now: #0d5c3d;
+      --later: #7a4a00;
+      --danger: #801717;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: var(--ink);
+      background: #fff;
+      font: 500 15px/1.45 var(--font);
+    }
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 28px 28px 48px;
+    }
+    header {
+      border-bottom: 2px solid var(--navy);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .brand {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 26px;
+      line-height: 1.2;
+      margin: 8px 0 8px;
+      font-weight: 700;
+    }
+    .lead {
+      color: var(--muted);
+      margin: 0;
+      max-width: 62ch;
+    }
+    .print-hint {
+      margin: 12px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    h2 {
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin: 28px 0 10px;
+      color: var(--navy);
+    }
+    h3 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+    p { margin: 0 0 10px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 8px 10px;
+      border-top: 1px solid var(--line);
+    }
+    th {
+      background: var(--soft);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .tag-now { color: var(--now); background: rgba(13, 92, 61, 0.1); }
+    .tag-later { color: var(--later); background: rgba(122, 74, 0, 0.12); }
+    .status {
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      background: var(--soft);
+      border-left: 3px solid var(--navy);
+      border-radius: 0 8px 8px 0;
+    }
+    .status strong { color: var(--navy); }
+    .split {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px 22px;
+      align-items: start;
+      margin: 0 0 8px;
+    }
+    .section {
+      break-inside: avoid;
+      margin: 22px 0 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .meta {
+      margin: 8px 0 0;
+      font-size: 14px;
+    }
+    .meta dt {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .meta dd { margin: 2px 0 0; }
+    .say {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .say li {
+      margin: 0 0 8px;
+      padding: 8px 12px;
+      background: var(--soft);
+      border-left: 3px solid var(--navy);
+    }
+    .phone {
+      width: 220px;
+      border: 2px solid var(--navy);
+      border-radius: 22px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .phone-bar, .phone-foot {
+      background: var(--navy);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 7px 12px;
+    }
+    .phone-foot {
+      background: var(--danger);
+      text-align: center;
+      letter-spacing: 0.08em;
+    }
+    .phone-body {
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .phone-kicker {
+      margin: 0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .phone-title {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .phone-sub {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+    .btn, .card {
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    .btn {
+      background: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      padding: 8px 8px;
+    }
+    .btn-ghost {
+      background: #fff;
+      color: var(--navy);
+      border: 1.5px solid var(--navy);
+    }
+    .btn-quiet {
+      background: var(--soft);
+      color: var(--navy);
+      font-weight: 600;
+    }
+    .card {
+      background: var(--soft);
+      padding: 8px 10px;
+      display: grid;
+      gap: 2px;
+    }
+    .card strong { font-size: 13px; }
+    .card span, .fine {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .fine { margin: 0; }
+    footer {
+      margin-top: 28px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media (max-width: 640px) {
+      .split { grid-template-columns: 1fr; }
+      .phone { width: min(220px, 100%); }
+    }
+    @media print {
+      body { font-size: 11.5px; }
+      .page { padding: 0; max-width: none; }
+      .print-hint { display: none; }
+      h1 { font-size: 20px; }
+      h2 { margin-top: 16px; }
+      .section, .status, table, .phone { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+    @page { margin: 14mm 14mm; }
+  </style>
+</head>
+<body>
+  <article class="page">
+    <header>
+      <div class="brand">Line 24</div>
+      <h1>Лікар, аптека, донор</h1>
+      <p class="lead">
+        Як можуть виглядати чотири спокійні розділи, якщо місто про них попросить.
+        Орієнтир за сенсом — doc.ua. Це малюнок для розмови, не копія їхнього сервісу і не план розробки.
+      </p>
+      <p class="print-hint">Щоб зробити PDF: у браузері Файл → Друк → «Зберегти як PDF».</p>
+    </header>
+
+    <p class="status">
+      <strong>Бачення.</strong> Зараз ці розділи не розробляємо. Гострий шлях лишається як є: подія, симптоми, чек-лист після події, виклик 112.
+    </p>
+
+    <h2>Де це в додатку</h2>
+    <div class="split">
+      <div class="phone" aria-hidden="true">
+        <div class="phone-bar">Line 24</div>
+        <div class="phone-body">
+          <p class="phone-title">Що потрібно зараз?</p>
+          <div class="btn">Щось сталось зараз</div>
+          <div class="btn btn-ghost">Симптоми</div>
+          <div class="btn btn-ghost">Чек-лист після події</div>
+          <div class="btn btn-quiet">Лікар, аптека, донор</div>
+        </div>
+        <div class="phone-foot">Викликати 112</div>
+      </div>
+      <div>
+        <p>Четверта кнопка тихіша за гостру подію. Вона відкриває окремий екран із чотирма розділами.</p>
+        <p>Всередині події цього екрана немає. Там людина веде допомогу і викликає 112. Ці розділи потребують мережі або чужого сервісу, тому в блекаут і в паніку вони не входять.</p>
+        <p>Назви закладів на малюнках нижче — приклад, не список партнерів.</p>
+      </div>
+    </div>
+
+    <h2>Три глибини</h2>
+    <p>На малюнках показані вітрина і довідник міста. Власний сервіс з’являється лише тоді, коли партнер сам віддає дані.</p>
+    <table>
+      <thead>
+        <tr><th>Глибина</th><th>Що бачить людина</th><th>Що для цього потрібно</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-now">На малюнку</span><br>Вітрина</td>
+          <td>Кнопка відкриває сервіс, який уже працює: запис, пошук ліків, запис донора.</td>
+          <td>Домовленість, куди вести людину. Свій календар, оплата і відео не потрібні.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-now">На малюнку</span><br>Довідник міста</td>
+          <td>Картка: назва, адреса, години, телефон. «Зателефонувати» працює без мережі.</td>
+          <td>Список від адміністрації. Живих вікон запису в ньому немає.</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-later">Лише з партнером</span><br>Свій сервіс</td>
+          <td>Вільний час прийому, оплата, відео з лікарем, ціна і наявність ліків.</td>
+          <td>Дані від клініки, аптеки або центру крові. Писати цю систему з нуля на цьому етапі не треба.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Чотири розділи</h2>
+
+    <section class="section">
+      <div class="split">
+        <div class="phone" aria-hidden="true">
+          <div class="phone-bar">Консультація</div>
+          <div class="phone-body">
+            <p class="phone-kicker">Не виклик 112</p>
+            <p class="phone-title">Онлайн-консультація</p>
+            <p class="phone-sub">Розмова з лікарем. Якщо погано просто зараз — викличте 112.</p>
+            <div class="btn">Зараз</div>
+            <div class="btn btn-ghost">На час</div>
+            <p class="fine">Далі відкривається список фахівців того сервісу, з яким домовилось місто.</p>
+          </div>
+          <div class="phone-foot">Викликати 112</div>
+        </div>
+        <div>
+          <h3>Онлайн-консультація</h3>
+          <p>Людині потрібна розмова з лікарем, коли це не екстрена допомога.</p>
+          <dl class="meta">
+            <dt>Звідки дані</dt>
+            <dd>Сервіс, який місто вже використовує. Власний список лікарів, ціни і кабінет розмови ми не ведемо.</dd>
+            <dt>Чого на екрані немає</dt>
+            <dd>Відео в нашому додатку, оплата в нас, збережена розмова, діагноз, рецепт.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="split">
+        <div class="phone" aria-hidden="true">
+          <div class="phone-bar">Клініка</div>
+          <div class="phone-body">
+            <p class="phone-kicker">Приклад</p>
+            <p class="phone-title">Запис у клініку</p>
+            <p class="phone-sub">Місто · терапевт</p>
+            <div class="card">
+              <strong>Поліклініка № 3</strong>
+              <span>вул. Центральна, 12</span>
+              <span>пн–пт, 8:00–18:00</span>
+            </div>
+            <div class="btn">Зателефонувати</div>
+            <p class="fine">Вільний час прийому з’явиться, коли клініка сама віддає розклад.</p>
+          </div>
+          <div class="phone-foot">Викликати 112</div>
+        </div>
+        <div>
+          <h3>Запис до лікаря в клініку</h3>
+          <p>Людина бачить заклад поруч і або дзвонить, або переходить у їхній запис.</p>
+          <dl class="meta">
+            <dt>Звідки дані</dt>
+            <dd>Список адміністрації: назва, адреса, години, телефон. Картка читається без мережі.</dd>
+            <dt>Чого на екрані немає</dt>
+            <dd>Живий календар, декларація, направлення. Запис у державну систему ЕСОЗ цей екран не створює.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="split">
+        <div class="phone" aria-hidden="true">
+          <div class="phone-bar">Аптека</div>
+          <div class="phone-body">
+            <p class="phone-kicker">Приклад</p>
+            <p class="phone-title">Аптека</p>
+            <div class="btn">Знайти ліки</div>
+            <p class="fine">Пошук відкривається в сервісі аптеки.</p>
+            <div class="card">
+              <strong>Чергова аптека</strong>
+              <span>Аптека на Лесі · цілодобово</span>
+              <span>тел. на картці</span>
+            </div>
+            <div class="btn btn-ghost">Зателефонувати</div>
+          </div>
+          <div class="phone-foot">Викликати 112</div>
+        </div>
+        <div>
+          <h3>Аптека</h3>
+          <p>Два входи: знайти препарат у партнера або побачити чергову аптеку міста. Це окремо від аптечки в гострій допомозі.</p>
+          <dl class="meta">
+            <dt>Звідки дані</dt>
+            <dd>Пошук ліків — у аптечної мережі. Чергові аптеки — список міста: адреса, години, телефон.</dd>
+            <dt>Чого на екрані немає</dt>
+            <dd>Продаж, ціни, наявність на полиці, електронний рецепт.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="split">
+        <div class="phone" aria-hidden="true">
+          <div class="phone-bar">Донор</div>
+          <div class="phone-body">
+            <p class="phone-kicker">Центр крові</p>
+            <p class="phone-title">Донорство крові</p>
+            <p class="phone-sub">18+ · від 50 кг · добре почуваєтесь</p>
+            <div class="card">
+              <strong>Центр крові</strong>
+              <span>вул. Шпитальна, 4</span>
+              <span>пн–сб, 8:00–15:00</span>
+            </div>
+            <div class="btn">Записатися</div>
+            <p class="fine">Запис відкриває канал центру.</p>
+          </div>
+          <div class="phone-foot">Викликати 112</div>
+        </div>
+        <div>
+          <h3>Донорство</h3>
+          <p>Людина записується здати кров у центрі, який працює з містом. На doc.ua плитка «Донорство» відкриває лендінг здачі плазми Biopharma. Для розмови з міською адміністрацією на малюнку інший сенс: центр крові.</p>
+          <dl class="meta">
+            <dt>Звідки дані</dt>
+            <dd>Адреса і години — від центру або від міста. Кнопка «Записатися» веде в їхній канал.</dd>
+            <dt>Чого на екрані немає</dt>
+            <dd>Медичний допуск і перелік протипоказань. Їх пише центр, не цей екран. Немає і виплати за плазму.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <h2>Що сказати місту</h2>
+    <ul class="say">
+      <li>Можемо показати чотири розділи і передати людину в сервіс, який у міста вже є.</li>
+      <li>Довідник з’являється, коли адміністрація дає список: назва, адреса, години, телефон.</li>
+      <li>Власну поліклініку, аптеку і відеолікаря не обіцяємо. Вільний час, оплата і залишки ліків — лише якщо цей сервіс сам віддає дані.</li>
+    </ul>
+
+    <footer>
+      Line 24 · 25.09.2026 · бачення для розмови з містами. Не медична інструкція і не заміна docs/01–13.
+    </footer>
+  </article>
+</body>
+</html>
