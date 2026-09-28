@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		012F8D9014914ACD912971C3 /* CivicHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87288B7BB71173113785A43C /* CivicHubView.swift */; };
 		0E6D30685EC26A816EA36A93 /* DesignPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CCCEA520DA6C1C7787F8085 /* DesignPreviewView.swift */; };
 		14FA8F2A9C6B249649B89B2B /* ZeroEchelonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9741DE836F554912D633B8 /* ZeroEchelonApp.swift */; };
 		1CB8B6C8E7C7BE038173C559 /* ProtocolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6581B8E795C178CCB74238 /* ProtocolEngine.swift */; };
@@ -15,11 +16,14 @@
 		367B95461D502F6985504D1C /* LocalEventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02115DB8354D8BCF88B3FAA0 /* LocalEventStore.swift */; };
 		5AEBBCB13AC344BEA68CE3E4 /* LocalEventAndWaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F671AF299A79301531594B /* LocalEventAndWaveTests.swift */; };
 		7F3E4BFF52FF5C726A3AA76B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5384EB3853BB57753C3752D /* ContentView.swift */; };
+		810AFB8150D5F714DF9D9E99 /* CivicModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF082D1E01D074A44367D63 /* CivicModels.swift */; };
 		88FD530450935033CEFC861A /* EngineRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB404C6811F8117B8621FA4D /* EngineRules.swift */; };
+		8FA9CF284FEE41971111E64C /* civic-mock.json in Resources */ = {isa = PBXBuildFile; fileRef = 8843A1F4EC1819CF9B510100 /* civic-mock.json */; };
 		96A7B8FAB12533F5695165D1 /* engine-rules.json in Resources */ = {isa = PBXBuildFile; fileRef = C4BBC84C4C5E72D276FA46C8 /* engine-rules.json */; };
 		A711345F86E5B2681B08D639 /* ProtocolGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73753821593CD3C4794C04D /* ProtocolGraph.swift */; };
 		AC30840BFA1F5FC1C86CF61B /* UkrainianOnlineTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D23F9E3ED518D6BCE1D5C7 /* UkrainianOnlineTTS.swift */; };
 		AD7CDFA106F761ABF362AECF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F689369F45E52CEE6227BE9D /* SettingsView.swift */; };
+		B313A39C76F95AD7F924DDFD /* CivicMockStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A318122A92064C96E0B106 /* CivicMockStoreTests.swift */; };
 		B7B80B7DC66653CDE28C7D63 /* ProtocolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D186E2830D573480F3E169 /* ProtocolEngineTests.swift */; };
 		C1CC82365982E84AA3D2BAC3 /* graph.json in Resources */ = {isa = PBXBuildFile; fileRef = F97E8BF0BAFCB12E325D0110 /* graph.json */; };
 		CD771ACBDDC91B1E85132644 /* SpeechController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06FA872A1E77683B9B04E506 /* SpeechController.swift */; };
@@ -28,6 +32,8 @@
 		E9725F650A52EDB6EE63B51B /* NodeFrameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B3A9AA135930F69227B747 /* NodeFrameView.swift */; };
 		EB11ED85301098C06389EABD /* PermissionBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014B7C4FA5720F96C0A77291 /* PermissionBootstrap.swift */; };
 		F6A1AB9276CA3AA7C6A19492 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2E7825F10BD05C185A3DFE6 /* Assets.xcassets */; };
+		F8768B51F20A5367C5C52481 /* CivicSectionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D880367C8AFD520FFD875AE7 /* CivicSectionViews.swift */; };
+		FC7F3D6FD418DFB06779E004 /* CivicMockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F1BAACFA24332EB628F1798 /* CivicMockStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,15 +55,21 @@
 		38D23F9E3ED518D6BCE1D5C7 /* UkrainianOnlineTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UkrainianOnlineTTS.swift; sourceTree = "<group>"; };
 		3926DFD739433DA137E4DDAE /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
 		78F671AF299A79301531594B /* LocalEventAndWaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalEventAndWaveTests.swift; sourceTree = "<group>"; };
+		7AF082D1E01D074A44367D63 /* CivicModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CivicModels.swift; sourceTree = "<group>"; };
 		83662B350480C6BB765A322B /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		87288B7BB71173113785A43C /* CivicHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CivicHubView.swift; sourceTree = "<group>"; };
+		87A318122A92064C96E0B106 /* CivicMockStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CivicMockStoreTests.swift; sourceTree = "<group>"; };
+		8843A1F4EC1819CF9B510100 /* civic-mock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "civic-mock.json"; sourceTree = "<group>"; };
 		8CCCEA520DA6C1C7787F8085 /* DesignPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignPreviewView.swift; sourceTree = "<group>"; };
 		92FDA6C03FF503AA02360C4E /* ZeroEchelon.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ZeroEchelon.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F1BAACFA24332EB628F1798 /* CivicMockStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CivicMockStore.swift; sourceTree = "<group>"; };
 		A77966F0DA2E496609176DF0 /* GraphLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphLoader.swift; sourceTree = "<group>"; };
 		B2E7825F10BD05C185A3DFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C4786387513041387C635F8A /* WaveReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveReminderScheduler.swift; sourceTree = "<group>"; };
 		C4BBC84C4C5E72D276FA46C8 /* engine-rules.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "engine-rules.json"; sourceTree = "<group>"; };
 		C6902271C0E2FB136488681E /* ZeroEchelonTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ZeroEchelonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5384EB3853BB57753C3752D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D880367C8AFD520FFD875AE7 /* CivicSectionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CivicSectionViews.swift; sourceTree = "<group>"; };
 		DA9741DE836F554912D633B8 /* ZeroEchelonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZeroEchelonApp.swift; sourceTree = "<group>"; };
 		DB404C6811F8117B8621FA4D /* EngineRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRules.swift; sourceTree = "<group>"; };
 		E0B3A9AA135930F69227B747 /* NodeFrameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFrameView.swift; sourceTree = "<group>"; };
@@ -124,6 +136,7 @@
 		58C6A2A1C3640F85104EAE77 /* ZeroEchelonTests */ = {
 			isa = PBXGroup;
 			children = (
+				87A318122A92064C96E0B106 /* CivicMockStoreTests.swift */,
 				78F671AF299A79301531594B /* LocalEventAndWaveTests.swift */,
 				33D186E2830D573480F3E169 /* ProtocolEngineTests.swift */,
 			);
@@ -157,9 +170,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		B1D07AA3E36043E53BA30922 /* Civic */ = {
+			isa = PBXGroup;
+			children = (
+				8843A1F4EC1819CF9B510100 /* civic-mock.json */,
+				87288B7BB71173113785A43C /* CivicHubView.swift */,
+				9F1BAACFA24332EB628F1798 /* CivicMockStore.swift */,
+				7AF082D1E01D074A44367D63 /* CivicModels.swift */,
+				D880367C8AFD520FFD875AE7 /* CivicSectionViews.swift */,
+			);
+			path = Civic;
+			sourceTree = "<group>";
+		};
 		B7AA3DB53669836BEFD6E9A3 /* ZeroEchelon */ = {
 			isa = PBXGroup;
 			children = (
+				B1D07AA3E36043E53BA30922 /* Civic */,
 				54C7198CE63A53AA453BF2B1 /* Event */,
 				7A93207C955C64A5B0AFE8EB /* Protocol */,
 				CCC5AF3F3E1FC9DC44578397 /* Resources */,
@@ -269,6 +295,7 @@
 			files = (
 				F6A1AB9276CA3AA7C6A19492 /* Assets.xcassets in Resources */,
 				D68B44063F055FBDCD1A08E7 /* LaunchScreen.storyboard in Resources */,
+				8FA9CF284FEE41971111E64C /* civic-mock.json in Resources */,
 				96A7B8FAB12533F5695165D1 /* engine-rules.json in Resources */,
 				C1CC82365982E84AA3D2BAC3 /* graph.json in Resources */,
 			);
@@ -281,6 +308,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B313A39C76F95AD7F924DDFD /* CivicMockStoreTests.swift in Sources */,
 				5AEBBCB13AC344BEA68CE3E4 /* LocalEventAndWaveTests.swift in Sources */,
 				B7B80B7DC66653CDE28C7D63 /* ProtocolEngineTests.swift in Sources */,
 			);
@@ -291,6 +319,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2044880A56AD36FAEBA96986 /* AppPreferences.swift in Sources */,
+				012F8D9014914ACD912971C3 /* CivicHubView.swift in Sources */,
+				FC7F3D6FD418DFB06779E004 /* CivicMockStore.swift in Sources */,
+				810AFB8150D5F714DF9D9E99 /* CivicModels.swift in Sources */,
+				F8768B51F20A5367C5C52481 /* CivicSectionViews.swift in Sources */,
 				7F3E4BFF52FF5C726A3AA76B /* ContentView.swift in Sources */,
 				0E6D30685EC26A816EA36A93 /* DesignPreviewView.swift in Sources */,
 				88FD530450935033CEFC861A /* EngineRules.swift in Sources */,
