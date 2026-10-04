@@ -4,6 +4,8 @@
 
 Терміни звіряються з [глосарієм](01-обсяг-роли-глосарій.md). Заборонена лексика — інваріант 7 валідатора графа.
 
+**Активний продукт (civilianSafeMode):** озвучуються вхід, виклик, A (безпека), **Safe-civil**, H (звіт), I (друга хвиля). Розділи **B–G** і **J** нижче — архів / приховані в продукті: тексти лишаються каноном графа, але рушій їх не веде, поки `civilianSafeMode.enabled`.
+
 ---
 
 ## Принципи формулювання
@@ -37,6 +39,7 @@
 | Role-casualty | Режим постраждалого. Викличте 112. Далі — що зробити для себе. | Casualty mode. Call 112. Next — what to do for yourself. |
 | Casualty-menu | Що потрібно вам зараз. Оберіть одне. | What do you need right now. Choose one. |
 | Call | Викличте 112. Зачитайте текст на екрані. | Call 112. Read the text on the screen. |
+| Safe-civil | Не надавайте медичну допомогу за вказівками цього додатка. Якщо щойно було влучання або тривога — не заходьте в зону ураження. Викличте 112. Далі — звіт для служб. | Do not give medical care from this app's instructions. If there was just a strike or an alert — do not enter the impact zone. Call 112. Next — the report for responders. |
 
 ---
 
@@ -75,6 +78,8 @@
 
 ## B. Сортування
 
+*(Архів / приховано в продукті при civilianSafeMode.)*
+
 | id | UA | EN |
 | --- | --- | --- |
 | Count | Скільки людей постраждало. Один — чи двоє і більше? | How many people are hurt. One — or two or more? |
@@ -101,6 +106,8 @@
 
 ## C. Кровотеча
 
+*(Архів / приховано в продукті при civilianSafeMode.)*
+
 | id | UA | EN |
 | --- | --- | --- |
 | C0 | Кров фонтанує? Є калюжа? Одяг мокрий від крові? Повʼязка промокає? | Is blood spurting? Is there a pool? Is clothing soaked? Is a dressing soaked through? |
@@ -122,6 +129,8 @@
 
 ## D. Дихання і положення
 
+*(Архів / приховано в продукті при civilianSafeMode.)*
+
 | id | UA | EN |
 | --- | --- | --- |
 | D0 | Людина дихає нормально? Грудна клітка піднімається рівно? | Is the person breathing normally? Does the chest rise evenly? |
@@ -139,6 +148,8 @@
 
 ## E. Грудна клітка
 
+*(Архів / приховано в продукті при civilianSafeMode.)*
+
 | id | UA | EN |
 | --- | --- | --- |
 | E0 | Є дірка в грудях або спині між пупком і плечима? | Is there a hole in the chest or back between the navel and the shoulders? |
@@ -155,6 +166,8 @@
 
 ## F. Тривале стискання
 
+*(Архів / приховано в продукті при civilianSafeMode.)*
+
 | id | UA | EN |
 | --- | --- | --- |
 | F0 | Частину тіла притиснуло — плита, вагон, стіна? | Is part of the body trapped — slab, carriage, wall? |
@@ -167,6 +180,8 @@
 ---
 
 ## G. Психологічна підтримка
+
+*(Архів / приховано в продукті при civilianSafeMode.)*
 
 | id | UA | EN |
 | --- | --- | --- |
@@ -212,6 +227,8 @@
 ---
 
 ## J. Щоденний модуль
+
+*(Архів / приховано в продукті при civilianSafeMode; пункт Home «daily» ховається.)*
 
 | id | UA | EN |
 | --- | --- | --- |

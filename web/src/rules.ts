@@ -24,6 +24,14 @@ export interface CasualtyRules {
   targetRemaps: Record<string, string>;
 }
 
+export interface CivilianSafeModeRules {
+  enabled: boolean;
+  hiddenHomeWhens: string[];
+  blockedTargetIds: string[];
+  blockedBranches: string[];
+  redirectTo: string;
+}
+
 export interface EngineRules {
   schemaVersion: string;
   protocolGraphId?: string;
@@ -31,6 +39,7 @@ export interface EngineRules {
   sceneRecheck: SceneRecheckRules;
   safety: SafetyRules;
   casualty: CasualtyRules;
+  civilianSafeMode: CivilianSafeModeRules;
 }
 
 export function safetyQueue(

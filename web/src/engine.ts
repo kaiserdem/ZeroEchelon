@@ -323,6 +323,14 @@ export class ProtocolEngine {
       (b) => b.when !== "dial" && b.when !== "dial-101",
     );
 
+    if (
+      this.currentNode.id === "Home" &&
+      this.rules.civilianSafeMode.enabled
+    ) {
+      const hidden = new Set(this.rules.civilianSafeMode.hiddenHomeWhens);
+      buttons = buttons.filter((b) => !hidden.has(b.when));
+    }
+
     if (this.currentNode.id === "Call") {
       if (this.sessionRole === "casualty") {
         buttons = buttons
@@ -552,6 +560,16 @@ export class ProtocolEngine {
 
     const edge = this.currentNode.edges.find((e) => e.when === edgeWhen);
     if (!edge) {
+      throw new Error(
+        `Missing edge ${edgeWhen} on ${this.currentNode.id}`,
+      );
+    }
+
+    if (
+      this.currentNode.id === "Home" &&
+      this.rules.civilianSafeMode.enabled &&
+      this.rules.civilianSafeMode.hiddenHomeWhens.includes(edgeWhen)
+    ) {
       throw new Error(
         `Missing edge ${edgeWhen} on ${this.currentNode.id}`,
       );
@@ -877,6 +895,7 @@ export class ProtocolEngine {
       targetId = this.remapCasualtyTarget(targetId);
     }
     targetId = this.remapNoCprTarget(targetId);
+    targetId = this.remapCivilianSafeTarget(targetId);
 
     const next = nodeById(this.graph, targetId);
     if (!next) {
@@ -961,6 +980,19 @@ export class ProtocolEngine {
       return "NoCpr-stay";
     }
     return "NoCpr";
+  }
+
+  /** Hide treatment trees while keeping them in the graph for later restore. */
+  private remapCivilianSafeTarget(targetId: string): string {
+    const mode = this.rules.civilianSafeMode;
+    if (!mode.enabled) return targetId;
+    if (targetId === mode.redirectTo) return targetId;
+    if (mode.blockedTargetIds.includes(targetId)) return mode.redirectTo;
+    const branch = nodeById(this.graph, targetId)?.branch;
+    if (branch && mode.blockedBranches.includes(branch)) {
+      return mode.redirectTo;
+    }
+    return targetId;
   }
 
   private remapSafetyTarget(targetId: string, edgeWhen: string): string {

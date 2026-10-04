@@ -13,14 +13,15 @@
 | Шлях | Що буде |
 | --- | --- |
 | `schema/` | JSON Schema формату вузла (за docs/06) |
-| `graphs/zero-echelon-core/` | `manifest.json` + `graph.json` (зараз зріз S0–S5b) |
+| `graphs/zero-echelon-core/` | `manifest.json` + `graph.json` + `engine-rules.json` (`civilianSafeMode`) |
 | `locales/` | винесені рядки uk/en, якщо не вшиті в вузли |
 | `fixtures/` | короткі сценарії для автоперевірки рушія |
 
 ## Правила
 
-1. Жодної логіки «якщо кровотеча» у Swift чи TypeScript поза читанням цього графа.
+1. Жодної логіки «якщо кровотеча» у Swift чи TypeScript поза edges графа і remaps у `engine-rules.json`.
 2. Зміна тексту спочатку в `docs/07`, потім сюди.
-3. Вузли зі спірними рішеннями медика можна позначити `"status": "draft"` у метаданих.
+3. Активний шлях продукту задає `civilianSafeMode` у `engine-rules.json` (лікування сховано, не видалено).
+4. Після змін синхронізуйте копії в `ZeroEchelon/.../Resources/`.
 
 Код клієнтів цей каталог лише **читає**.

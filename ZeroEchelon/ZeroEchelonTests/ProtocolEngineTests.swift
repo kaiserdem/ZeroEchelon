@@ -32,8 +32,15 @@ struct ProtocolEngineTests {
         try loadPackage().graph
     }
 
-    private func makeEngine(locale: ContentLocale = .uk) throws -> ProtocolEngine {
-        try ProtocolEngine(package: try loadPackage(), locale: locale)
+    private func makeEngine(locale: ContentLocale = .uk, careTreesEnabled: Bool = false) throws -> ProtocolEngine {
+        var package = try loadPackage()
+        // Default product path: civilian safe mode. Care-tree tests opt in via careTreesEnabled.
+        package.rules.civilianSafeMode.enabled = !careTreesEnabled
+        return try ProtocolEngine(package: package, locale: locale)
+    }
+
+    private func makeCareEngine(locale: ContentLocale = .uk) throws -> ProtocolEngine {
+        try makeEngine(locale: locale, careTreesEnabled: true)
     }
 
     private func reachCare(engine: ProtocolEngine, role: String) throws {
@@ -57,7 +64,7 @@ struct ProtocolEngineTests {
         let graph = try loadGraph()
         for id in [
             "Home", "Count", "Casualty-menu", "C0", "D0", "E0", "Anti", "E2", "Vent", "E3", "Burp", "Watch",
-            "F0", "Form", "I0", "J0", "CanLeave", "A7",
+            "F0", "Form", "I0", "J0", "CanLeave", "A7", "Safe-civil",
             "B2", "B3", "Second", "Br", "Kid", "Four", "Red", "Yellow", "Green2", "NoResp", "NoCpr-stay",
             "G2", "G3", "Flags", "Organic", "Ground", "Slow", "Ban",
             "Local", "Pos", "Side", "Comf",
@@ -69,7 +76,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func witnessPathReachesBleeding() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next")
         #expect(engine.currentNode.id == "Count")
@@ -80,7 +87,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func casualtyPathOpensSelfMenu() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "casualty")
         _ = try engine.select(edgeWhen: "next-casualty")
         #expect(engine.currentNode.id == "Casualty-menu")
@@ -97,7 +104,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func noBleedPathReachesFormViaChestCrush() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next") // Count
         _ = try engine.select(edgeWhen: "one") // C0
@@ -132,18 +139,41 @@ struct ProtocolEngineTests {
         try engine.skipEntrySplashIfNeeded()
         #expect(engine.currentNode.id == "Home")
         let whens = Set(engine.visibleButtons.map(\.when))
+        #expect(whens == Set(["incident", "wave"]))
+        #expect(!whens.contains("daily"))
+    }
+
+    @Test func homeOffersDailyWhenCareTreesEnabled() throws {
+        let engine = try makeCareEngine()
+        try engine.skipEntrySplashIfNeeded()
+        let whens = Set(engine.visibleButtons.map(\.when))
         #expect(whens == Set(["incident", "daily", "wave"]))
     }
 
-    @Test func homeDailyGoesToJ0() throws {
+    @Test func civilianSafeModeAfterCallGoesToSafeCivilThenForm() throws {
         let engine = try makeEngine()
+        try reachCare(engine: engine, role: "witness")
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Safe-civil")
+        #expect(engine.voiceText.contains("Не надавайте медичну"))
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.currentNode.id == "Form")
+    }
+
+    @Test func graphContainsSafeCivil() throws {
+        let graph = try loadGraph()
+        #expect(graph.node(id: "Safe-civil") != nil)
+    }
+
+    @Test func homeDailyGoesToJ0() throws {
+        let engine = try makeCareEngine()
         try engine.skipEntrySplashIfNeeded()
         _ = try engine.select(edgeWhen: "daily")
         #expect(engine.currentNode.id == "J0")
     }
 
     @Test func dailyAllergyLocalOnlyGoesLocalThenForm() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try engine.skipEntrySplashIfNeeded()
         _ = try engine.select(edgeWhen: "daily")
         _ = try engine.select(edgeWhen: "allergy")
@@ -156,7 +186,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func dailyStrokePosYesGoesSide() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try engine.skipEntrySplashIfNeeded()
         _ = try engine.select(edgeWhen: "daily")
         _ = try engine.select(edgeWhen: "stroke")
@@ -171,7 +201,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func dailyPoisonPosNoGoesComf() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try engine.skipEntrySplashIfNeeded()
         _ = try engine.select(edgeWhen: "daily")
         _ = try engine.select(edgeWhen: "poison")
@@ -239,7 +269,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func readScreenShowsDispatcherDraft() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next") // Count
         _ = try engine.select(edgeWhen: "one")
@@ -300,7 +330,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func noCprSingleCasualtyAvoidsNextPersonVoice() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next") // Count
         _ = try engine.select(edgeWhen: "one") // C0
@@ -317,7 +347,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func noCprSeveralCasualtiesGoesToNextPerson() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next") // Count
         _ = try engine.select(edgeWhen: "many")
@@ -332,7 +362,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func chestWoundWithoutSealGoesOpenThenF0() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachE0(engine: engine)
         for edge in ["yes", "next", "next", "no", "next"] {
             // E0→E1→Anti→E2 no→Open→F0
@@ -342,7 +372,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func chestWoundWithSealBurpsThenF0() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachE0(engine: engine)
         for edge in ["yes", "next", "next", "yes", "next", "yes", "next"] {
             // E0→E1→Anti→E2 yes→Vent→E3 yes→Burp→F0
@@ -352,7 +382,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func sceneRecheckSafeResumesPendingEdge() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next") // Count (sets lastSceneCheck via A6→Call earlier)
         _ = try engine.select(edgeWhen: "one") // C0
@@ -370,7 +400,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func sceneRecheckThreatGoesToCanLeave() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next")
         _ = try engine.select(edgeWhen: "one")
@@ -399,7 +429,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func saltFourSignsBadGoesRedThenC0() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachFirstStill(engine: engine)
         for edge in ["next", "yes", "bad", "next"] {
             // First→Br yes→Four bad→Red→C0
@@ -409,7 +439,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func saltNoBreathAdultGoesNoRespThenHelpC0() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachFirstStill(engine: engine)
         for edge in ["next", "no", "no", "next", "no", "help"] {
             // First→Br no→Kid no→One→Again no→NoResp→help→C0
@@ -419,7 +449,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func saltFourSignsGoodYellowReturnsToB2() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachFirstStill(engine: engine)
         for edge in ["next", "yes", "good", "no", "more"] {
             // First→Br yes→Four good→Minor no→Yellow→more→B2
@@ -438,7 +468,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func gCalmPathReachesForm() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachG0(engine: engine)
         for edge in ["next", "next", "next", "no", "next", "next", "next"] {
             // G0→G1→G2→G3 no→Ground→Slow→Ban→Form
@@ -448,7 +478,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func gOrganicFlagsPathReachesBanThenForm() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try reachG0(engine: engine)
         for edge in ["next", "next", "next", "yes", "yes", "next", "next"] {
             // G0→G1→G2→G3 yes→Flags yes→Organic→Ban→Form
@@ -498,7 +528,7 @@ struct ProtocolEngineTests {
     }
 
     @Test func dispatcherDraftIncludesTourniquetAndSalt() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         try engine.skipEntrySplashIfNeeded()
         _ = try engine.select(edgeWhen: "incident")
 

@@ -354,6 +354,10 @@ final class ProtocolEngine: ObservableObject {
         var buttons = currentNode.primaryButtons(locale: locale)
             .filter { !["dial", "dial-101"].contains($0.when) }
 
+        if currentNode.id == "Home", rules.civilianSafeMode.enabled {
+            buttons = buttons.filter { !rules.safeModeHiddenHomeWhenSet.contains($0.when) }
+        }
+
         if currentNode.id == "Call" {
             switch sessionRole {
             case .casualty:
@@ -589,6 +593,13 @@ final class ProtocolEngine: ObservableObject {
         }
 
         guard let edge = currentNode.edges.first(where: { $0.when == edgeWhen }) else {
+            throw ProtocolGraphError.missingEdge(node: currentNode.id, when: edgeWhen)
+        }
+
+        if currentNode.id == "Home",
+           rules.civilianSafeMode.enabled,
+           rules.safeModeHiddenHomeWhenSet.contains(edgeWhen)
+        {
             throw ProtocolGraphError.missingEdge(node: currentNode.id, when: edgeWhen)
         }
 
@@ -891,6 +902,7 @@ final class ProtocolEngine: ObservableObject {
             targetId = remapCasualtyTarget(targetId)
         }
         targetId = remapNoCprTarget(targetId)
+        targetId = remapCivilianSafeTarget(targetId)
 
         guard let next = graph.node(id: targetId) else {
             throw ProtocolGraphError.missingNode(targetId)
@@ -963,6 +975,21 @@ final class ProtocolEngine: ObservableObject {
             return rules.casualty.redirectTo
         }
         return rules.casualty.targetRemaps[targetId] ?? targetId
+    }
+
+    /// Hide treatment trees while keeping them in the graph for later restore.
+    private func remapCivilianSafeTarget(_ targetId: String) -> String {
+        guard rules.civilianSafeMode.enabled else { return targetId }
+        if targetId == rules.civilianSafeMode.redirectTo { return targetId }
+        if rules.safeModeBlockedTargetSet.contains(targetId) {
+            return rules.civilianSafeMode.redirectTo
+        }
+        if let branch = graph.node(id: targetId)?.branch,
+           rules.safeModeBlockedBranchSet.contains(branch)
+        {
+            return rules.civilianSafeMode.redirectTo
+        }
+        return targetId
     }
 
     /// One casualty or self-help: stay with this person. Several: go to the next.
