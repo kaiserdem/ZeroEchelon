@@ -4,14 +4,14 @@
 
 Терміни звіряються з [глосарієм](01-обсяг-роли-глосарій.md). Заборонена лексика — інваріант 7 валідатора графа.
 
-**Активний продукт (civilianSafeMode):** озвучуються вхід, виклик, A (безпека), **Safe-civil**, H (звіт), I (друга хвиля). Розділи **B–G** і **J** нижче — архів / приховані в продукті: тексти лишаються каноном графа, але рушій їх не веде, поки `civilianSafeMode.enabled`.
+**Активний продукт (civilianSafeMode):** озвучуються вхід, виклик, A (фіксація видимих ознак), Observe-count / Observe-signs, **Safe-civil**, H (звіт), I (друга хвиля). Розділи **B–G** і **J** нижче — архів.
 
 ---
 
 ## Принципи формулювання
 
 1. Одна дія на фразу. Не «перевірте дихання і натисніть на рану». Виняток за рішенням продукту: **Str**, **Adr**, **Four**, **One** лишаються багатодієвими.
-2. Наказовий лад, теперішній час. Не «вам слід було б».
+2. Для цивільного свідка — фіксація і виклик, без наказів фізичної дії. Наказовий лад лишається в архівних деревах B–G.
 3. Спостережувані ознаки, не діагнози. Не «це пневмоторакс».
 4. Українська і англійська — смислові близнюки, не літеральний підрядник.
 5. Після наказу, якщо є типова помилка, — одне речення-заборона.
@@ -29,17 +29,17 @@
 | Start | Відкрито. Мережа не потрібна. | Opened. No network needed. |
 | Home | Оберіть. Що потрібно зараз? | Choose. What do you need now? |
 | Disclaimer | Спочатку викличте 112, якщо можете. | Call 112 first if you can. |
-| Disclaimer-note | Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає. *(менший текст під заголовком)* | This app only suggests steps — the decisions are yours. The law alone does not protect you for helping. *(smaller helper under title)* |
+| Disclaimer-note | Програма фіксує доступну інформацію і забезпечує виклик екстрених служб. Вона не замінює професійні служби і не надає юридичних консультацій. *(менший текст під заголовком)* | This app records available information and supports calling emergency services. It does not replace professional responders and does not give legal advice. *(smaller helper under title)* |
 | Loc-mode | Як передати місце диспетчеру? | How should we give the place to the dispatcher? |
 | Loc-2 | Координати на екрані. Зачитаєте їх диспетчеру. | Coordinates on screen. Read them to the dispatcher. |
 | Loc-3 | Назвіть адресу: населений пункт, вулиця, будинок, орієнтир. | Give the address: town, street, building, landmark. |
 | Type | Що сталося. Один вибір. | What happened. One choice. |
-| Role | Ви допомагаєте іншим — чи допомога потрібна вам? | Are you helping others — or do you need help yourself? |
-| Role-witness | Режим свідка. Спершу викличте 112, якщо можете. | Bystander mode. Call 112 first if you can. |
-| Role-casualty | Режим постраждалого. Викличте 112. Далі — що зробити для себе. | Casualty mode. Call 112. Next — what to do for yourself. |
+| Role | Цивільний свідок. Подія перед вами чи стосується вас? | Civilian witness. Is the event in front of you, or does it involve you? |
+| Role-witness | Цивільний свідок. Викличте 112, якщо можете. Далі — фіксація інформації без наближення. | Civilian witness. Call 112 if you can. Next — record information without approaching. |
+| Role-casualty | Цивільний свідок. Подія стосується вас. Викличте 112, якщо можете. Далі — фіксація без наближення. | Civilian witness. The event involves you. Call 112 if you can. Next — record without approaching. |
 | Casualty-menu | Що потрібно вам зараз. Оберіть одне. | What do you need right now. Choose one. |
 | Call | Викличте 112. Зачитайте текст на екрані. | Call 112. Read the text on the screen. |
-| Safe-civil | Не надавайте медичну допомогу за вказівками цього додатка. Якщо щойно було влучання або тривога — не заходьте в зону ураження. Викличте 112. Далі — звіт для служб. | Do not give medical care from this app's instructions. If there was just a strike or an alert — do not enter the impact zone. Call 112. Next — the report for responders. |
+| Safe-civil | Програма не дає вказівок щодо рятувальних чи медичних дій. Зафіксуйте доступну без наближення інформацію. Викличте 112. Далі — звіт для професійних служб. Якщо диспетчер вже дав вказівку — дійте лише за нею. | This app does not give rescue or medical instructions. Record information available without approaching. Call 112. Next — the report for professional responders. If the dispatcher already gave an instruction, follow that only. |
 
 ---
 
@@ -57,22 +57,19 @@
 
 | id | UA | EN |
 | --- | --- | --- |
-| A1 | Чи бачите міну, уламок боєприпасу, дрон, підозрілий предмет? | Do you see a mine, munition fragment, drone, or a suspicious object? |
-| A2 | Чи тріщить будинок, сиплеться пил, чути нові обвали? | Is the building cracking, dropping dust, or collapsing again? |
-| A3 | Чи є вогонь, густий дим, запах газу? | Is there fire, thick smoke, or a smell of gas? |
-| A4 | Чи є оголені дроти або вода біля проводів? | Are there bare wires, or water near wires? |
-| A5 | Чи є різкий запах, невідома рідина, маслянисті плями? | Is there a sharp smell, an unknown liquid, or oily stains? |
-| Out | Відійдіть на сто–триста метрів. Нічого не чіпайте. Натисніть 101 внизу. Не повертайтесь. | Move one hundred to three hundred metres away. Touch nothing. Tap 101 below. Do not go back. |
-| Cont | Вважайте зону небезпечною. Не дійте тут. Натисніть 101 внизу. | Treat the area as unsafe. Do not act here. Tap 101 below. |
-| CanLeave | Чи можете зараз відійти від небезпеки, не чіпаючи предмет і уламки? | Can you move away from the danger now without touching the object or rubble? |
-| Out-trapped | Не чіпайте предмет і уламки. Не смикайте. Не звільняйте. Натисніть 101 внизу. У звіті зазначте: ви або люди тут. | Do not touch the object or rubble. Do not pull. Do not free anyone. Tap 101 below. In the report mark: you or people are here. |
-| A6 | *(fallback у graph, якщо тип невідомий)* Не заходьте всередину завалу. Не рухайте уламки. | Do not enter the collapse. Do not move rubble. |
-| A6-traffic | Не стійте на проїзджій частині. Увімкніть аварійку. Не чіпайте проводи. | Do not stand in the roadway. Turn on hazard lights. Do not touch wires. |
-| A6-fire | Не заходьте в дим і полумʼя. Тримайтеся з навітряного боку. Не відкривайте гарячі двері. | Do not enter smoke or flames. Stay upwind. Do not open hot doors. |
-| A6-chemical | Не чіпайте рідину і плями. Не нюхайте. Відійдіть проти вітру, якщо можете. | Do not touch liquid or stains. Do not smell it. Move upwind if you can. |
-| A6-household | Вимкніть джерело небезпеки, якщо це безпечно. Не ризикуйте зайвий раз. | Turn off the hazard source if it is safe. Do not take extra risks. |
-| A6-collapse | Не заходьте всередину завалу. Не рухайте уламки. *(також explosion / train / shooting)* | Do not enter the collapse. Do not move rubble. *(also explosion / train / shooting)* |
-| A7 | Перевірте загрози знову. Повторний удар можливий. | Check the threats again. A second strike is possible. |
+| A1 | З місця, де ви є, не наближаючись: чи видно міну, уламок боєприпасу, дрон, підозрілий предмет? | From where you are, without approaching: is a mine, munition fragment, drone, or suspicious object visible? |
+| A2 | З місця, де ви є, не наближаючись: чи тріщить будинок, сиплеться пил, чути нові обвали? | From where you are, without approaching: is the building cracking, dropping dust, or collapsing again? |
+| A3 | З місця, де ви є, не наближаючись: чи є вогонь, густий дим, запах газу? | From where you are, without approaching: is there fire, thick smoke, or a smell of gas? |
+| A4 | З місця, де ви є, не наближаючись: чи є оголені дроти або вода біля проводів? | From where you are, without approaching: are there bare wires, or water near wires? |
+| A5 | З місця, де ви є, не наближаючись: чи є різкий запах, невідома рідина, маслянисті плями? | From where you are, without approaching: is there a sharp smell, an unknown liquid, or oily stains? |
+| Observe-count | Скільки людей видно звідси, без наближення? | How many people are visible from here, without approaching? |
+| Observe-signs | Яка ознака видима звідси, без контакту? Оберіть одне для служб. | Which sign is visible from here, without contact? Choose one for responders. |
+| Out | Ознаку небезпеки зафіксовано для професійних служб. Не наближайтесь, не перевіряйте і не змінюйте обстановку. Викличте 112. На цьому екрані — 101. | The hazard sign is recorded for professional responders. Do not approach, inspect, or change the scene. Call 112. 101 is on this screen. |
+| Cont | Зону зафіксовано як небезпечну для служб. Програма не дає вказівок діяти в зоні. Викличте 112. На цьому екрані — 101. | The area is recorded as hazardous for responders. This app does not instruct action in the zone. Call 112. 101 is on this screen. |
+| CanLeave | Ознаку небезпеки зафіксовано для служб. Не наближайтесь і не перевіряйте джерело. Викличте 112. На цьому екрані — 101. | The hazard sign is recorded for responders. Do not approach or inspect the source. Call 112. 101 is on this screen. |
+| Out-trapped | Не чіпайте предмет і уламки. Не змінюйте обстановку. Викличте 112. На цьому екрані — 101. У звіті зазначте, якщо люди видимі звідси. | Do not touch the object or rubble. Do not change the scene. Call 112. 101 is on this screen. In the report note if people are visible from here. |
+| A6 | Програма не дає вказівок наближатися, входити в зону чи змінювати обстановку. Зафіксовану інформацію передайте службам після виклику 112. | This app does not instruct you to approach, enter a zone, or change the scene. After calling 112, pass the recorded information to responders. |
+| A7 | З місця, де ви є: чи знову видно ознаки небезпеки? Повторний удар можливий. | From where you are: are signs of danger visible again? A second strike is possible. |
 
 ---
 
@@ -221,7 +218,7 @@
 | I2 | Сеча темна, як чай? Сечі стало менше? Кінцівка пухне і болить сильніше? | Is urine dark like tea? Less urine than usual? Is a limb more swollen and more painful? |
 | I3 | Головний біль не минає або наростає? Було блювання? Сонливість, плутана мова? | Headache that stays or grows? Any vomiting? Sleepiness, confused speech? |
 | I4 | Біль у животі? Кров у блювоті або в стільці? | Belly pain? Blood in vomit or stool? |
-| Go | Негайно 112 або до лікарні. Не чекайте. | Call 112 or go to hospital now. Do not wait. |
+| Go | Передайте ці ознаки професійним службам. Викличте 112. | Pass these signs to professional responders. Call 112. |
 | I5 | Немає цих ознак — спостереження триває. Це не висновок «усе добре». Повтор через двадцять чотири години. | No such signs — watching continues. This is not an all-clear. Repeat in twenty-four hours. |
 
 ---

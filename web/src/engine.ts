@@ -94,8 +94,6 @@ export class ProtocolEngine {
     switch (this.currentNode.id) {
       case "Loc-3":
         return this.manualLocationPrompt;
-      case "A6":
-        return this.a6VoiceForIncidentType();
       default:
         return textFor(this.currentNode.voice, this.locale);
     }
@@ -148,36 +146,6 @@ export class ProtocolEngine {
       : ProtocolEngine.defaultManualFields;
   }
 
-  private a6VoiceForIncidentType(): string {
-    switch (this.incidentType) {
-      case "traffic":
-        return this.locale === "uk"
-          ? "Не стійте на проїзджій частині. Увімкніть аварійку. Не чіпайте проводи."
-          : "Do not stand in the roadway. Turn on hazard lights. Do not touch wires.";
-      case "fire":
-        return this.locale === "uk"
-          ? "Не заходьте в дим і полумʼя. Тримайтеся з навітряного боку. Не відкривайте гарячі двері."
-          : "Do not enter smoke or flames. Stay upwind. Do not open hot doors.";
-      case "chemical":
-        return this.locale === "uk"
-          ? "Не чіпайте рідину і плями. Не нюхайте. Відійдіть проти вітру, якщо можете."
-          : "Do not touch liquid or stains. Do not smell it. Move upwind if you can.";
-      case "household":
-        return this.locale === "uk"
-          ? "Вимкніть джерело небезпеки, якщо це безпечно. Не ризикуйте зайвий раз."
-          : "Turn off the hazard source if it is safe. Do not take extra risks.";
-      case "collapse":
-      case "explosion":
-      case "train":
-      case "shooting":
-        return this.locale === "uk"
-          ? "Не заходьте всередину завалу. Не рухайте уламки."
-          : "Do not enter the collapse. Do not move rubble.";
-      default:
-        return textFor(this.currentNode.voice, this.locale);
-    }
-  }
-
   get antiPatternText(): string | null {
     return this.currentNode.antiPattern
       ? textFor(this.currentNode.antiPattern, this.locale)
@@ -187,8 +155,8 @@ export class ProtocolEngine {
   get helperText(): string | null {
     if (this.currentNode.id !== "Disclaimer") return null;
     return this.locale === "uk"
-      ? "Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає."
-      : "This app only suggests steps — the decisions are yours. The law alone does not protect you for helping.";
+      ? "Програма фіксує доступну інформацію і забезпечує виклик екстрених служб. Вона не замінює професійні служби і не надає юридичних консультацій."
+      : "This app records available information and supports calling emergency services. It does not replace professional responders and does not give legal advice.";
   }
 
   get showsHandoverQR(): boolean {
@@ -235,12 +203,33 @@ export class ProtocolEngine {
     const dash = "—";
     const typeValue = this.localizedIncidentTypeLabel() ?? dash;
     const placeValue = this.locationLine ?? dash;
-    let roleValue = dash;
-    if (this.sessionRole === "witness") {
-      roleValue = this.locale === "uk" ? "Свідок" : "Witness";
-    } else if (this.sessionRole === "casualty") {
-      roleValue = this.locale === "uk" ? "Постраждалий" : "Casualty";
+    const roleValue = this.localizedRoleCardValue() ?? dash;
+
+    if (this.rules.civilianSafeMode.enabled) {
+      const countValue = this.visibleCountLine() ?? dash;
+      const signsValue = this.visibleSignLine() ?? dash;
+      const hazardsValue = this.observedHazardLines().join("; ");
+      const hazardField = hazardsValue.length === 0 ? dash : hazardsValue;
+      if (this.locale === "uk") {
+        return [
+          { id: "type", label: "Тип події", value: typeValue },
+          { id: "place", label: "Місце", value: placeValue },
+          { id: "role", label: "Роль", value: roleValue },
+          { id: "casualties", label: "Видно звідси", value: countValue },
+          { id: "signs", label: "Ознаки без контакту", value: signsValue },
+          { id: "hazards", label: "Ознаки небезпеки", value: hazardField },
+        ];
+      }
+      return [
+        { id: "type", label: "Event type", value: typeValue },
+        { id: "place", label: "Location", value: placeValue },
+        { id: "role", label: "Role", value: roleValue },
+        { id: "casualties", label: "Visible from here", value: countValue },
+        { id: "signs", label: "Signs without contact", value: signsValue },
+        { id: "hazards", label: "Hazard signs", value: hazardField },
+      ];
     }
+
     const casualtiesValue = this.saltCasualtiesShort() ?? dash;
     const tourniquetValue = this.tourniquetOn
       ? this.tourniquetClock(this.tourniquetOn)
@@ -406,6 +395,36 @@ export class ProtocolEngine {
         this.locale === "uk" ? `Я ${roleLabel}.` : `I am ${roleLabel}.`,
       );
     }
+    if (this.sessionRole === "casualty") {
+      lines.push(
+        this.locale === "uk"
+          ? "Подія стосується мене."
+          : "The event involves me.",
+      );
+    }
+
+    if (this.rules.civilianSafeMode.enabled) {
+      const hazards = this.observedHazardLines();
+      if (hazards.length > 0) {
+        const joined = hazards.join("; ");
+        lines.push(
+          this.locale === "uk"
+            ? `Ознаки небезпеки: ${joined}.`
+            : `Hazard signs: ${joined}.`,
+        );
+      }
+      const count = this.visibleCountLine();
+      if (count) lines.push(`${count}.`);
+      const signs = this.visibleSignLine();
+      if (signs) lines.push(`${signs}.`);
+      lines.push(
+        this.locale === "uk"
+          ? "Інформація для професійних служб."
+          : "Information for professional responders.",
+      );
+      return lines.join("\n");
+    }
+
     const casualties = this.saltCasualtiesLine();
     if (casualties) lines.push(casualties);
     if (this.tourniquetOn) {
@@ -435,13 +454,111 @@ export class ProtocolEngine {
   }
 
   private localizedRoleLabel(): string | null {
-    if (this.sessionRole === "witness") {
-      return this.locale === "uk" ? "цивільний свідок" : "civilian bystander";
-    }
-    if (this.sessionRole === "casualty") {
-      return this.locale === "uk" ? "постраждалий" : "casualty";
+    if (this.sessionRole === "witness" || this.sessionRole === "casualty") {
+      return this.locale === "uk" ? "цивільний свідок" : "civilian witness";
     }
     return null;
+  }
+
+  private localizedRoleCardValue(): string | null {
+    const label = this.localizedRoleLabel();
+    if (!label) return null;
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }
+
+  private lastEdge(nodeId: string): string | null {
+    for (let i = this.steps.length - 1; i >= 0; i -= 1) {
+      const step = this.steps[i];
+      if (step?.nodeId === nodeId) return step.edge ?? null;
+    }
+    return null;
+  }
+
+  private observedHazardLines(): string[] {
+    const uk = this.locale === "uk";
+    const lines: string[] = [];
+    if (this.lastEdge("A1") === "yes") {
+      lines.push(
+        uk
+          ? "підозрілий предмет видно звідси"
+          : "suspicious object visible from here",
+      );
+    }
+    if (this.lastEdge("A2") === "yes") {
+      lines.push(
+        uk
+          ? "ознаки обвалення видно або чути звідси"
+          : "collapse signs visible or heard from here",
+      );
+    }
+    if (this.lastEdge("A3") === "yes") {
+      lines.push(
+        uk ? "вогонь, дим або запах газу звідси" : "fire, smoke, or gas smell from here",
+      );
+    }
+    if (this.lastEdge("A4") === "yes") {
+      lines.push(
+        uk
+          ? "оголені дроти або вода біля проводів видно звідси"
+          : "bare wires or water near wires visible from here",
+      );
+    }
+    if (this.lastEdge("A5") === "yes") {
+      lines.push(
+        uk
+          ? "різкий запах, рідина або плями видно звідси"
+          : "sharp smell, liquid, or stains visible from here",
+      );
+    }
+    return lines;
+  }
+
+  private visibleCountLine(): string | null {
+    const uk = this.locale === "uk";
+    switch (this.lastEdge("Observe-count")) {
+      case "none":
+        return uk ? "Людей звідси не видно" : "No people visible from here";
+      case "one":
+        return uk
+          ? "Видно одну людину, без наближення"
+          : "One person visible, without approaching";
+      case "several":
+        return uk
+          ? "Видно кількох людей, без наближення"
+          : "Several people visible, without approaching";
+      case "many":
+        return uk
+          ? "Видно багато людей, без наближення"
+          : "Many people visible, without approaching";
+      case "cannot":
+        return uk ? "Кількість звідси не видно" : "Count not visible from here";
+      default:
+        return null;
+    }
+  }
+
+  private visibleSignLine(): string | null {
+    const uk = this.locale === "uk";
+    switch (this.lastEdge("Observe-signs")) {
+      case "still":
+        return uk ? "На вид нерухомі, без контакту" : "Appear still, without contact";
+      case "blood":
+        return uk ? "Видно кров, без контакту" : "Blood visible, without contact";
+      case "no-voice":
+        return uk ? "Не відповідають на оклик звідси" : "No reply to a call from here";
+      case "trapped":
+        return uk
+          ? "Видно під завалом, без контакту"
+          : "Appear under rubble, without contact";
+      case "none":
+        return uk
+          ? "Ознак стану звідси не видно"
+          : "No condition signs visible from here";
+      case "cannot":
+        return uk ? "Ознаки звідси не видно" : "Signs not visible from here";
+      default:
+        return null;
+    }
   }
 
   private saltCasualtiesLine(): string | null {
@@ -1008,13 +1125,23 @@ export class ProtocolEngine {
 
     if (
       safety.threatIds.includes(this.currentNode.id) &&
-      safety.advanceOnEdges.includes(edgeWhen)
+      (safety.advanceOnEdges.includes(edgeWhen) ||
+        (this.rules.civilianSafeMode.enabled && edgeWhen === "yes"))
     ) {
       const idx = queue.indexOf(this.currentNode.id);
+      let next: string;
       if (idx >= 0 && idx + 1 < queue.length) {
-        return queue[idx + 1]!;
+        next = queue[idx + 1]!;
+      } else {
+        next = safety.fallbackNext;
       }
-      return safety.fallbackNext;
+      if (
+        this.rules.civilianSafeMode.enabled &&
+        (next === safety.fallbackNext || next === "A6")
+      ) {
+        return "Observe-count";
+      }
+      return next;
     }
 
     return targetId;

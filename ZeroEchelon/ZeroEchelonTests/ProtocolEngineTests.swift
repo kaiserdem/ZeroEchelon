@@ -44,11 +44,31 @@ struct ProtocolEngineTests {
     }
 
     private func reachCare(engine: ProtocolEngine, role: String) throws {
-        for edge in ["next", "incident", "agree", "gnss", "next", "explosion", role, "next", "no", "no", "no", "no", "no", "next"] {
+        try reachCall(engine: engine, role: role)
+        #expect(engine.currentNode.id == "Call")
+    }
+
+    private func reachCall(engine: ProtocolEngine, role: String) throws {
+        for edge in ["next", "incident", "agree", "gnss", "next", "explosion", role, "next"] {
             _ = try engine.select(edgeWhen: edge)
         }
-        // Call
-        #expect(engine.currentNode.id == "Call")
+        try advanceToCall(engine: engine)
+    }
+
+    private func advanceToCall(engine: ProtocolEngine) throws {
+        var hops = 0
+        while engine.currentNode.id != "Call" {
+            hops += 1
+            #expect(hops < 20)
+            switch engine.currentNode.id {
+            case "Observe-count", "Observe-signs":
+                _ = try engine.select(edgeWhen: "cannot")
+            case "A6":
+                _ = try engine.select(edgeWhen: "next")
+            default:
+                _ = try engine.select(edgeWhen: "no")
+            }
+        }
     }
 
     /// Witness, one casualty, no bleed, breathing OK, stay → Neck → E0.
@@ -65,6 +85,7 @@ struct ProtocolEngineTests {
         for id in [
             "Home", "Count", "Casualty-menu", "C0", "D0", "E0", "Anti", "E2", "Vent", "E3", "Burp", "Watch",
             "F0", "Form", "I0", "J0", "CanLeave", "A7", "Safe-civil",
+            "Observe-count", "Observe-signs",
             "B2", "B3", "Second", "Br", "Kid", "Four", "Red", "Yellow", "Green2", "NoResp", "NoCpr-stay",
             "G2", "G3", "Flags", "Organic", "Ground", "Slow", "Ban",
             "Local", "Pos", "Side", "Comf",
@@ -96,11 +117,20 @@ struct ProtocolEngineTests {
     }
 
     @Test func threatCanLeaveTrapped() throws {
-        let engine = try makeEngine()
+        let engine = try makeCareEngine()
         for edge in ["next", "incident", "agree", "gnss", "next", "collapse", "witness", "next", "yes", "no"] {
             _ = try engine.select(edgeWhen: edge)
         }
         #expect(engine.currentNode.id == "Out-trapped")
+    }
+
+    @Test func civilianSafeModeHazardYesContinuesObservation() throws {
+        let engine = try makeEngine()
+        try reachFirstSafety(engine: engine, type: "explosion")
+        #expect(engine.currentNode.id == "A1")
+        _ = try engine.select(edgeWhen: "yes")
+        #expect(engine.currentNode.id == "A2")
+        #expect(engine.currentNode.id != "CanLeave")
     }
 
     @Test func noBleedPathReachesFormViaChestCrush() throws {
@@ -155,9 +185,31 @@ struct ProtocolEngineTests {
         try reachCare(engine: engine, role: "witness")
         _ = try engine.select(edgeWhen: "next")
         #expect(engine.currentNode.id == "Safe-civil")
-        #expect(engine.voiceText.contains("Не надавайте медичну"))
+        #expect(engine.voiceText.contains("не дає вказівок"))
         _ = try engine.select(edgeWhen: "next")
         #expect(engine.currentNode.id == "Form")
+    }
+
+    @Test func civilianDraftRecordsVisibleFacts() throws {
+        let engine = try makeEngine()
+        try reachFirstSafety(engine: engine, type: "explosion")
+        _ = try engine.select(edgeWhen: "yes") // A1
+        _ = try engine.select(edgeWhen: "no")
+        _ = try engine.select(edgeWhen: "no")
+        _ = try engine.select(edgeWhen: "no")
+        _ = try engine.select(edgeWhen: "no")
+        #expect(engine.currentNode.id == "Observe-count")
+        _ = try engine.select(edgeWhen: "several")
+        #expect(engine.currentNode.id == "Observe-signs")
+        _ = try engine.select(edgeWhen: "blood")
+        #expect(engine.currentNode.id == "A6")
+        _ = try engine.select(edgeWhen: "next")
+        #expect(engine.dispatcherDraft.contains("підозрілий предмет"))
+        #expect(engine.dispatcherDraft.contains("кількох людей"))
+        #expect(engine.dispatcherDraft.contains("Видно кров"))
+        #expect(engine.dispatcherDraft.contains("цивільний свідок"))
+        #expect(!engine.dispatcherDraft.contains("червоних"))
+        #expect(!engine.dispatcherDraft.contains("Зроблено"))
     }
 
     @Test func graphContainsSafeCivil() throws {
@@ -257,9 +309,12 @@ struct ProtocolEngineTests {
         _ = try engine.select(edgeWhen: "witness")
         _ = try engine.select(edgeWhen: "next")
         while engine.currentNode.id != "Call" {
-            if engine.currentNode.id == "A6" {
+            switch engine.currentNode.id {
+            case "Observe-count", "Observe-signs":
+                _ = try engine.select(edgeWhen: "cannot")
+            case "A6":
                 _ = try engine.select(edgeWhen: "next")
-            } else {
+            default:
                 _ = try engine.select(edgeWhen: "no")
             }
         }
@@ -305,28 +360,24 @@ struct ProtocolEngineTests {
         #expect(engine.locationLine?.contains("50.51120") == true)
         // Finish role → safety → Call
         _ = try engine.select(edgeWhen: "next")
-        while engine.currentNode.id != "Call" {
-            if engine.currentNode.id == "A6" {
-                #expect(engine.voiceText.contains("проїзджій") || engine.voiceText.contains("roadway"))
-                _ = try engine.select(edgeWhen: "next")
-            } else {
-                _ = try engine.select(edgeWhen: "no")
-            }
-        }
+        try advanceToCall(engine: engine)
         #expect(engine.dispatcherDraft.contains("50.51120"))
         #expect(engine.dispatcherDraft.hasPrefix("ДТП."))
+        #expect(engine.dispatcherDraft.contains("Інформація для професійних служб"))
         #expect(!engine.dispatcherDraft.contains("місце вже на екрані"))
+        #expect(!engine.dispatcherDraft.contains("Потрібна допомога"))
     }
 
-    @Test func trafficA6AvoidsCollapseWording() throws {
+    @Test func trafficA6AvoidsPhysicalCommands() throws {
         let engine = try makeEngine()
         try reachFirstSafety(engine: engine, type: "traffic")
-        while engine.currentNode.id != "A6" {
-            _ = try engine.select(edgeWhen: "no")
-        }
-        #expect(engine.currentNode.id == "A6")
-        #expect(engine.voiceText.contains("проїзджій"))
+        try advanceToCall(engine: engine)
+        // A6 is informational; no movement or hazard-control orders.
+        try engine.setCurrentNodeForTesting("A6")
+        #expect(engine.voiceText.contains("не дає вказівок"))
+        #expect(!engine.voiceText.contains("аварійку"))
         #expect(!engine.voiceText.contains("завалу"))
+        #expect(!engine.voiceText.contains("Відійдіть"))
     }
 
     @Test func noCprSingleCasualtyAvoidsNextPersonVoice() throws {
@@ -499,10 +550,13 @@ struct ProtocolEngineTests {
         try reachFirstSafety(engine: engine, type: "traffic")
         #expect(engine.currentNode.id == "A4")
         var seen = [engine.currentNode.id]
-        while engine.currentNode.id != "Call", seen.count < 10 {
-            if engine.currentNode.id == "A6" {
+        while engine.currentNode.id != "Call", seen.count < 16 {
+            switch engine.currentNode.id {
+            case "Observe-count", "Observe-signs":
+                _ = try engine.select(edgeWhen: "cannot")
+            case "A6":
                 _ = try engine.select(edgeWhen: "next")
-            } else {
+            default:
                 _ = try engine.select(edgeWhen: "no")
             }
             seen.append(engine.currentNode.id)

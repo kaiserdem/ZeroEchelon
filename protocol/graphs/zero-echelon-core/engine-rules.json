@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "notes": "Shared engine policy for all clients (iOS / web / future Android). civilianSafeMode.enabled=true hides treatment commands (B–G/J) after police/DSNS feedback 2026-10; set false to restore care trees. No clinical branching outside graph edges + these remaps.",
+  "notes": "Shared engine policy for all clients (iOS / web / future Android). civilianSafeMode.enabled=true: civilian witness records visible facts, calls 112, hands off to responders; no physical-action orders. Treatment trees B–G/J stay in graph; set enabled=false to restore care path. No clinical branching outside graph edges + these remaps.",
   "sceneRecheck": {
     "nodeId": "A7",
     "intervalSeconds": 180,
