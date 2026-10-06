@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "protocolGraphId": "zero-echelon-core",
-  "graphVersion": "2026-09-14-handed",
+  "graphVersion": "2026-10-05-witness-info",
   "locale": [
     "uk",
     "en"
@@ -152,7 +152,7 @@
             "en": "After-event checklist"
           }
         ],
-        "note": "Головний екран. Гостра подія → Disclaimer → Loc. J/I без повного S0."
+        "note": "Головний екран. Гостра подія → Disclaimer → Loc. J/I без повного S0. civilianSafeMode: daily hidden until care trees restored."
       }
     },
     {
@@ -432,8 +432,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Ви допомагаєте іншим — чи допомога потрібна вам?",
-        "en": "Are you helping others — or do you need help yourself?"
+        "ua": "Цивільний свідок. Подія перед вами чи стосується вас?",
+        "en": "Civilian witness. Is the event in front of you, or does it involve you?"
       },
       "edges": [
         {
@@ -451,13 +451,13 @@
         "buttons": [
           {
             "when": "witness",
-            "ua": "Допомагаю іншим",
-            "en": "Helping others"
+            "ua": "Спостерігаю подію",
+            "en": "I am observing"
           },
           {
             "when": "casualty",
-            "ua": "Допомога мені",
-            "en": "I need help"
+            "ua": "Подія стосується мене",
+            "en": "The event involves me"
           }
         ]
       }
@@ -478,8 +478,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Режим свідка. Спершу викличте 112, якщо можете.",
-        "en": "Bystander mode. Call 112 first if you can."
+        "ua": "Цивільний свідок. Викличте 112, якщо можете. Далі — фіксація інформації без наближення.",
+        "en": "Civilian witness. Call 112 if you can. Next — record information without approaching."
       },
       "edges": [
         {
@@ -509,8 +509,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Режим постраждалого. Викличте 112. Далі — що зробити для себе.",
-        "en": "Casualty mode. Call 112. Next — what to do for yourself."
+        "ua": "Цивільний свідок. Подія стосується вас. Викличте 112, якщо можете. Далі — фіксація без наближення.",
+        "en": "Civilian witness. The event involves you. Call 112 if you can. Next — record without approaching."
       },
       "edges": [
         {
@@ -545,8 +545,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Чи бачите міну, уламок боєприпасу, дрон, підозрілий предмет?",
-        "en": "Do you see a mine, munition fragment, drone, or a suspicious object?"
+        "ua": "З місця, де ви є, не наближаючись: чи видно міну, уламок боєприпасу, дрон, підозрілий предмет?",
+        "en": "From where you are, without approaching: is a mine, munition fragment, drone, or suspicious object visible?"
       },
       "edges": [
         {
@@ -605,8 +605,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Чи тріщить будинок, сиплеться пил, чути нові обвали?",
-        "en": "Is the building cracking, dropping dust, or collapsing again?"
+        "ua": "З місця, де ви є, не наближаючись: чи тріщить будинок, сиплеться пил, чути нові обвали?",
+        "en": "From where you are, without approaching: is the building cracking, dropping dust, or collapsing again?"
       },
       "edges": [
         {
@@ -665,8 +665,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Чи є вогонь, густий дим, запах газу?",
-        "en": "Is there fire, thick smoke, or a smell of gas?"
+        "ua": "З місця, де ви є, не наближаючись: чи є вогонь, густий дим, запах газу?",
+        "en": "From where you are, without approaching: is there fire, thick smoke, or a smell of gas?"
       },
       "edges": [
         {
@@ -725,8 +725,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Чи є оголені дроти або вода біля проводів?",
-        "en": "Are there bare wires, or water near wires?"
+        "ua": "З місця, де ви є, не наближаючись: чи є оголені дроти або вода біля проводів?",
+        "en": "From where you are, without approaching: are there bare wires, or water near wires?"
       },
       "edges": [
         {
@@ -785,8 +785,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Чи є різкий запах, невідома рідина, маслянисті плями?",
-        "en": "Is there a sharp smell, an unknown liquid, or oily stains?"
+        "ua": "З місця, де ви є, не наближаючись: чи є різкий запах, невідома рідина, маслянисті плями?",
+        "en": "From where you are, without approaching: is there a sharp smell, an unknown liquid, or oily stains?"
       },
       "edges": [
         {
@@ -825,6 +825,165 @@
       }
     },
     {
+      "id": "Observe-count",
+      "type": "question",
+      "branch": "A",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 1,
+      "registry": [
+        "B1"
+      ],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Скільки людей видно звідси, без наближення?",
+        "en": "How many people are visible from here, without approaching?"
+      },
+      "edges": [
+        {
+          "when": "none",
+          "to": "Observe-signs"
+        },
+        {
+          "when": "one",
+          "to": "Observe-signs"
+        },
+        {
+          "when": "several",
+          "to": "Observe-signs"
+        },
+        {
+          "when": "many",
+          "to": "Observe-signs"
+        },
+        {
+          "when": "cannot",
+          "to": "Observe-signs"
+        }
+      ],
+      "ui": {
+        "screenId": "S4c",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "none",
+            "ua": "Нікого не видно",
+            "en": "None visible"
+          },
+          {
+            "when": "one",
+            "ua": "Одна людина",
+            "en": "One person"
+          },
+          {
+            "when": "several",
+            "ua": "Кілька",
+            "en": "Several"
+          },
+          {
+            "when": "many",
+            "ua": "Багато",
+            "en": "Many"
+          },
+          {
+            "when": "cannot",
+            "ua": "Не видно звідси",
+            "en": "Cannot see from here"
+          }
+        ],
+        "note": "Лише фіксація для служб. Немає вказівки наближатися чи рахувати зблизька."
+      }
+    },
+    {
+      "id": "Observe-signs",
+      "type": "question",
+      "branch": "A",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 1,
+      "registry": [
+        "B1"
+      ],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Яка ознака видима звідси, без контакту? Оберіть одне для служб.",
+        "en": "Which sign is visible from here, without contact? Choose one for responders."
+      },
+      "edges": [
+        {
+          "when": "still",
+          "to": "A6"
+        },
+        {
+          "when": "blood",
+          "to": "A6"
+        },
+        {
+          "when": "no-voice",
+          "to": "A6"
+        },
+        {
+          "when": "trapped",
+          "to": "A6"
+        },
+        {
+          "when": "none",
+          "to": "A6"
+        },
+        {
+          "when": "cannot",
+          "to": "A6"
+        }
+      ],
+      "ui": {
+        "screenId": "S4d",
+        "template": "question",
+        "buttons": [
+          {
+            "when": "still",
+            "ua": "Нерухомі на вид",
+            "en": "Appear still"
+          },
+          {
+            "when": "blood",
+            "ua": "Видно кров",
+            "en": "Blood visible"
+          },
+          {
+            "when": "no-voice",
+            "ua": "Не відповідають на оклик звідси",
+            "en": "No reply to a call from here"
+          },
+          {
+            "when": "trapped",
+            "ua": "Видно під завалом",
+            "en": "Appear under rubble"
+          },
+          {
+            "when": "none",
+            "ua": "Ознак звідси не видно",
+            "en": "No signs visible from here"
+          },
+          {
+            "when": "cannot",
+            "ua": "Не видно звідси",
+            "en": "Cannot see from here"
+          }
+        ],
+        "note": "Не діагноз. Не інструкція лікування. Лише передача службам."
+      }
+    },
+    {
       "id": "A6",
       "type": "action",
       "branch": "A",
@@ -842,8 +1001,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Не заходьте всередину завалу. Не рухайте уламки.",
-        "en": "Do not enter the collapse. Do not move rubble."
+        "ua": "Програма не дає вказівок наближатися, входити в зону чи змінювати обстановку. Зафіксовану інформацію передайте службам після виклику 112.",
+        "en": "This app does not instruct you to approach, enter a zone, or change the scene. After calling 112, pass the recorded information to responders."
       },
       "edges": [
         {
@@ -857,11 +1016,11 @@
         "buttons": [
           {
             "when": "next",
-            "ua": "Зрозумів",
-            "en": "Got it"
+            "ua": "Далі",
+            "en": "Next"
           }
         ],
-        "note": "Після Call рушій періодично піднімає A7 під час допомоги (B–G)."
+        "note": "Інформаційне обмеження для цивільного свідка. Не наказ фізичної дії."
       }
     },
     {
@@ -884,8 +1043,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Перевірте загрози знову. Повторний удар можливий.",
-        "en": "Check the threats again. A second strike is possible."
+        "ua": "З місця, де ви є: чи знову видно ознаки небезпеки? Повторний удар можливий.",
+        "en": "From where you are: are signs of danger visible again? A second strike is possible."
       },
       "edges": [
         {
@@ -902,13 +1061,13 @@
         "buttons": [
           {
             "when": "safe",
-            "ua": "Зона ще робоча",
-            "en": "Scene still workable"
+            "ua": "Ознак звідси не видно",
+            "en": "None visible from here"
           },
           {
             "when": "threat",
-            "ua": "Знову небезпечно",
-            "en": "Danger again"
+            "ua": "Знову видно ознаку",
+            "en": "A sign is visible again"
           }
         ],
         "note": "Вставляється рушієм під час B–G кожні ~3 хв. safe — resume відкладеного ребра."
@@ -935,8 +1094,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Чи можете зараз відійти від небезпеки, не чіпаючи предмет і уламки?",
-        "en": "Can you move away from the danger now without touching the object or rubble?"
+        "ua": "Ознаку небезпеки зафіксовано для служб. Не наближайтесь і не перевіряйте джерело. Викличте 112. На цьому екрані — 101.",
+        "en": "The hazard sign is recorded for responders. Do not approach or inspect the source. Call 112. 101 is on this screen."
       },
       "edges": [
         {
@@ -954,13 +1113,13 @@
         "buttons": [
           {
             "when": "yes",
-            "ua": "Так, можу відійти",
-            "en": "Yes, I can leave"
+            "ua": "Можу передати службам",
+            "en": "I can pass this to responders"
           },
           {
             "when": "no",
-            "ua": "Ні, не можу",
-            "en": "No, I cannot"
+            "ua": "Не можу передати зараз",
+            "en": "I cannot pass this now"
           }
         ],
         "note": "Немає ребра «підійти допомогти біля загрози»."
@@ -988,8 +1147,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Не чіпайте предмет і уламки. Не смикайте. Не звільняйте. Натисніть 101 внизу. У звіті зазначте: ви або люди тут.",
-        "en": "Do not touch the object or rubble. Do not pull. Do not free anyone. Tap 101 below. In the report mark: you or people are here."
+        "ua": "Не чіпайте предмет і уламки. Не змінюйте обстановку. Викличте 112. На цьому екрані — 101. У звіті зазначте, якщо люди видимі звідси.",
+        "en": "Do not touch the object or rubble. Do not change the scene. Call 112. 101 is on this screen. In the report note if people are visible from here."
       },
       "edges": [
         {
@@ -1030,8 +1189,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Відійдіть на сто–триста метрів. Нічого не чіпайте. Натисніть 101 внизу. Не повертайтесь.",
-        "en": "Move one hundred to three hundred metres away. Touch nothing. Tap 101 below. Do not go back."
+        "ua": "Ознаку небезпеки зафіксовано для професійних служб. Не наближайтесь, не перевіряйте і не змінюйте обстановку. Викличте 112. На цьому екрані — 101.",
+        "en": "The hazard sign is recorded for professional responders. Do not approach, inspect, or change the scene. Call 112. 101 is on this screen."
       },
       "edges": [
         {
@@ -1073,8 +1232,8 @@
       "handsBusy": false,
       "delegationRequired": false,
       "voice": {
-        "ua": "Вважайте зону небезпечною. Не дійте тут. Натисніть 101 внизу.",
-        "en": "Treat the area as unsafe. Do not act here. Tap 101 below."
+        "ua": "Зону зафіксовано як небезпечну для служб. Програма не дає вказівок діяти в зоні. Викличте 112. На цьому екрані — 101.",
+        "en": "The area is recorded as hazardous for responders. This app does not instruct action in the zone. Call 112. 101 is on this screen."
       },
       "edges": [
         {
@@ -1154,7 +1313,46 @@
             "en": "Next (for me)"
           }
         ],
-        "note": "Рушій показує одну кнопку Далі за sessionRole."
+        "note": "Рушій показує одну кнопку Далі за sessionRole. When civilianSafeMode.enabled, next→Safe-civil."
+      }
+    },
+    {
+      "id": "Safe-civil",
+      "type": "action",
+      "branch": "entry",
+      "roles": [
+        "witness",
+        "casualty"
+      ],
+      "precedence": 2,
+      "registry": [
+        "A7"
+      ],
+      "conflict": [],
+      "veto": false,
+      "handsBusy": false,
+      "delegationRequired": false,
+      "voice": {
+        "ua": "Програма не дає вказівок щодо рятувальних чи медичних дій. Зафіксуйте доступну без наближення інформацію. Викличте 112. Далі — звіт для професійних служб. Якщо диспетчер вже дав вказівку — дійте лише за нею.",
+        "en": "This app does not give rescue or medical instructions. Record information available without approaching. Call 112. Next — the report for professional responders. If the dispatcher already gave an instruction, follow that only."
+      },
+      "edges": [
+        {
+          "when": "next",
+          "to": "Form"
+        }
+      ],
+      "ui": {
+        "screenId": "S5c",
+        "template": "action",
+        "buttons": [
+          {
+            "when": "next",
+            "ua": "Відкрити звіт",
+            "en": "Open report"
+          }
+        ],
+        "note": "Civilian safe mode landing after Call. Treatment trees B–G/J stay in graph; engine-rules.civilianSafeMode redirects here. Flip enabled=false to restore care path."
       }
     },
     {
@@ -4787,8 +4985,8 @@
         "A3"
       ],
       "voice": {
-        "ua": "Негайно 112 або до лікарні. Не чекайте.",
-        "en": "Call 112 or go to hospital now. Do not wait."
+        "ua": "Передайте ці ознаки професійним службам. Викличте 112.",
+        "en": "Pass these signs to professional responders. Call 112."
       },
       "edges": [
         {

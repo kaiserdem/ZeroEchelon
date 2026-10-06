@@ -48,6 +48,7 @@ struct NodeFrameView: View {
     var onOpenLastReport: (() -> Void)?
 
     @State private var showSettings = false
+    @State private var showCivicHub = false
 
     private var isVeto: Bool { engine.currentNode.veto }
 
@@ -59,10 +60,46 @@ struct NodeFrameView: View {
                     speakOnAppear: $speakOnAppear,
                     onClose: { showSettings = false }
                 )
+            } else if showCivicHub {
+                civicNavigationStack
             } else {
                 protocolFrame
             }
         }
+    }
+
+    /// Full-screen civic stack: hub + pushed section screens (no sheet).
+    private var civicNavigationStack: some View {
+        NavigationView {
+            Group {
+                if let hub = try? CivicHubView.make(
+                    locale: engine.locale,
+                    onClose: { showCivicHub = false }
+                ) {
+                    hub
+                } else {
+                    VStack(spacing: 16) {
+                        CivicChrome.backBar(
+                            backTitle: engine.locale == .uk ? "Назад" : "Back",
+                            action: { showCivicHub = false }
+                        )
+                        Spacer()
+                        Text(engine.locale == .uk
+                             ? "Дані не завантажились."
+                             : "Data failed to load.")
+                            .font(CivicTheme.helperFont)
+                            .foregroundStyle(CivicTheme.muted)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(CivicTheme.canvas)
+                    .navigationBarHidden(true)
+                }
+            }
+        }
+        .navigationViewStyle(.stack)
     }
 
     /// Home / Type / Form / Give: title + body + actions share one ScrollView.
@@ -99,6 +136,9 @@ struct NodeFrameView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         protocolContentStack
                         protocolActionsStack
+                        if engine.currentNode.id == "Home" {
+                            civicHubButton
+                        }
                         if engine.currentNode.id == "Home",
                            let summary = engine.lastEventSummaryLine
                         {
@@ -486,6 +526,31 @@ struct NodeFrameView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .background(screenBackground)
+    }
+
+    /// Quiet peace-layer entry — Home only; not a protocol graph edge.
+    private var civicHubButton: some View {
+        Button {
+            showCivicHub = true
+        } label: {
+            Text(engine.locale == .uk
+                 ? "Лікар, аптека, донор"
+                 : "Doctor, pharmacy, donor")
+                .font(.system(size: 17, weight: .semibold))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(CivicTheme.accent)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .padding(.horizontal, 14)
+                .background(
+                    CivicTheme.secondaryFill,
+                    in: RoundedRectangle(cornerRadius: CivicTheme.buttonCorner)
+                )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(engine.locale == .uk
+                            ? "Лікар, аптека, донор"
+                            : "Doctor, pharmacy, donor")
     }
 
     private func lastEventCard(_ summary: String) -> some View {

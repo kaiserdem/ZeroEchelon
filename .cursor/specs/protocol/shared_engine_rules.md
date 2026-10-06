@@ -6,7 +6,8 @@
 
 ## Requirements
 
-- [x] Файл `engine-rules.json` з sceneRecheck, safety queues, casualty remaps
+- [x] Файл `engine-rules.json` з sceneRecheck, safety queues, casualty remaps, `civilianSafeMode`
+- [x] `civilianSafeMode.enabled` ховає дерева лікування (див. [civilian_safe_mode.md](civilian_safe_mode.md))
 - [x] Swift `EngineRules` + `GraphLoader.loadBundledPackage()`
 - [x] `ProtocolEngine` читає rules (не хардкодить черги A1–A6 / A7 / casualty)
 - [x] Web `ProtocolEngine` імпортує той самий JSON

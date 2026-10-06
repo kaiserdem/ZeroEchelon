@@ -1,0 +1,98 @@
+{
+  "version": "2026-09-28-mock",
+  "consultations": [
+    {
+      "id": "consult-therapist",
+      "name": "Онлайн-терапевт",
+      "specialty": {
+        "ua": "Терапевт",
+        "en": "General practitioner"
+      },
+      "formats": {
+        "ua": "Відео або чат · зараз / на час",
+        "en": "Video or chat · now / scheduled"
+      },
+      "priceNote": {
+        "ua": "Орієнтовно від 350 ₴ · оплата в сервісі партнера",
+        "en": "From about ₴350 · pay in partner app"
+      },
+      "exampleURL": "https://example.com/consult/therapist"
+    },
+    {
+      "id": "consult-pediatrician",
+      "name": "Онлайн-педіатр",
+      "specialty": {
+        "ua": "Педіатр",
+        "en": "Pediatrician"
+      },
+      "formats": {
+        "ua": "Відео · на час",
+        "en": "Video · scheduled"
+      },
+      "priceNote": {
+        "ua": "Орієнтовно від 450 ₴ · оплата в сервісі партнера",
+        "en": "From about ₴450 · pay in partner app"
+      },
+      "exampleURL": "https://example.com/consult/pediatrician"
+    }
+  ],
+  "clinics": [
+    {
+      "id": "clinic-poly3",
+      "name": "Поліклініка № 3",
+      "address": "вул. Центральна, 12, Київ",
+      "hours": {
+        "ua": "пн–пт, 8:00–18:00",
+        "en": "Mon–Fri, 8:00–18:00"
+      },
+      "phone": "+380441112233"
+    },
+    {
+      "id": "clinic-family",
+      "name": "Центр первинної допомоги «Оболонь»",
+      "address": "просп. Оболонський, 26, Київ",
+      "hours": {
+        "ua": "пн–сб, 8:00–16:00",
+        "en": "Mon–Sat, 8:00–16:00"
+      },
+      "phone": "+380441223344"
+    }
+  ],
+  "pharmacies": [
+    {
+      "id": "pharm-lesya",
+      "name": "Аптека на Лесі",
+      "address": "вул. Лесі Українки, 7, Київ",
+      "hours": {
+        "ua": "цілодобово",
+        "en": "24 hours"
+      },
+      "phone": "+380441334455",
+      "isDutyNight": true
+    },
+    {
+      "id": "pharm-khreshchatyk",
+      "name": "Аптека «Хрещатик»",
+      "address": "вул. Хрещатик, 15, Київ",
+      "hours": {
+        "ua": "пн–нд, 8:00–22:00",
+        "en": "Mon–Sun, 8:00–22:00"
+      },
+      "phone": "+380441445566",
+      "isDutyNight": false
+    }
+  ],
+  "donationCenters": [
+    {
+      "id": "donor-kyiv",
+      "name": "Київський міський центр крові",
+      "address": "вул. Шпитальна, 4, Київ",
+      "hours": {
+        "ua": "пн–сб, 8:00–15:00",
+        "en": "Mon–Sat, 8:00–15:00"
+      },
+      "phone": "+380441556677",
+      "signupURL": "https://example.com/donor/signup"
+    }
+  ]
+}

@@ -35,4 +35,6 @@ cd ZeroEchelon && xcodegen generate
 | `ZeroEchelonTests/` | Unit-тести графа / engine |
 | `project.yml` | XcodeGen |
 
-Джерело протоколу в репо: `../protocol/`. Після правок графа оновіть копію в `ZeroEchelon/Resources/graph.json`.
+Джерело протоколу в репо: `../protocol/`. Після правок графа **і** `engine-rules.json` оновіть копії в `ZeroEchelon/Resources/`.
+
+Активний режим: `civilianSafeMode.enabled: true` (Call → Safe-civil, без команд лікування).

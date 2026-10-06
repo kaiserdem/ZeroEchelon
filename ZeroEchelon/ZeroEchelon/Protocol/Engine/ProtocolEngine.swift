@@ -144,8 +144,6 @@ final class ProtocolEngine: ObservableObject {
         switch currentNode.id {
         case "Loc-3":
             return manualLocationPrompt
-        case "A6":
-            return a6VoiceForIncidentType()
         default:
             return currentNode.voice.text(for: locale)
         }
@@ -199,34 +197,6 @@ final class ProtocolEngine: ObservableObject {
         return fromGraph.isEmpty ? Self.defaultManualFields : fromGraph
     }
 
-    /// Closing safety order before Call — wording depends on incident type.
-    private func a6VoiceForIncidentType() -> String {
-        switch incidentType {
-        case "traffic":
-            return locale == .uk
-                ? "Не стійте на проїзджій частині. Увімкніть аварійку. Не чіпайте проводи."
-                : "Do not stand in the roadway. Turn on hazard lights. Do not touch wires."
-        case "fire":
-            return locale == .uk
-                ? "Не заходьте в дим і полумʼя. Тримайтеся з навітряного боку. Не відкривайте гарячі двері."
-                : "Do not enter smoke or flames. Stay upwind. Do not open hot doors."
-        case "chemical":
-            return locale == .uk
-                ? "Не чіпайте рідину і плями. Не нюхайте. Відійдіть проти вітру, якщо можете."
-                : "Do not touch liquid or stains. Do not smell it. Move upwind if you can."
-        case "household":
-            return locale == .uk
-                ? "Вимкніть джерело небезпеки, якщо це безпечно. Не ризикуйте зайвий раз."
-                : "Turn off the hazard source if it is safe. Do not take extra risks."
-        case "collapse", "explosion", "train", "shooting":
-            return locale == .uk
-                ? "Не заходьте всередину завалу. Не рухайте уламки."
-                : "Do not enter the collapse. Do not move rubble."
-        default:
-            return currentNode.voice.text(for: locale)
-        }
-    }
-
     var antiPatternText: String? {
         currentNode.antiPattern?.text(for: locale)
     }
@@ -235,8 +205,8 @@ final class ProtocolEngine: ObservableObject {
     var helperText: String? {
         guard currentNode.id == "Disclaimer" else { return nil }
         return locale == .uk
-            ? "Цей застосунок лише підказує кроки — рішення ваші. Закон сам по собі вас за допомогу не захищає."
-            : "This app only suggests steps — the decisions are yours. The law alone does not protect you for helping."
+            ? "Програма фіксує доступну інформацію і забезпечує виклик екстрених служб. Вона не замінює професійні служби і не надає юридичних консультацій."
+            : "This app records available information and supports calling emergency services. It does not replace professional responders and does not give legal advice."
     }
 
     /// True on the medic handover screen — show an offline QR of the draft.
@@ -274,13 +244,33 @@ final class ProtocolEngine: ObservableObject {
         let dash = "—"
         let typeValue = localizedIncidentTypeLabel() ?? dash
         let placeValue = locationLine ?? dash
-        let roleValue: String = {
-            switch sessionRole {
-            case .witness: locale == .uk ? "Свідок" : "Witness"
-            case .casualty: locale == .uk ? "Постраждалий" : "Casualty"
-            case nil: dash
+        let roleValue = localizedRoleCardValue() ?? dash
+
+        if rules.civilianSafeMode.enabled {
+            let countValue = visibleCountLine() ?? dash
+            let signsValue = visibleSignLine() ?? dash
+            let hazardsValue = observedHazardLines().joined(separator: "; ")
+            let hazardField = hazardsValue.isEmpty ? dash : hazardsValue
+            if locale == .uk {
+                return [
+                    ("type", "Тип події", typeValue),
+                    ("place", "Місце", placeValue),
+                    ("role", "Роль", roleValue),
+                    ("casualties", "Видно звідси", countValue),
+                    ("signs", "Ознаки без контакту", signsValue),
+                    ("hazards", "Ознаки небезпеки", hazardField),
+                ]
             }
-        }()
+            return [
+                ("type", "Event type", typeValue),
+                ("place", "Location", placeValue),
+                ("role", "Role", roleValue),
+                ("casualties", "Visible from here", countValue),
+                ("signs", "Signs without contact", signsValue),
+                ("hazards", "Hazard signs", hazardField),
+            ]
+        }
+
         let casualtiesValue = saltCasualtiesShort() ?? dash
         let tourniquetValue: String = {
             if let tq = tourniquetOn {
@@ -353,6 +343,10 @@ final class ProtocolEngine: ObservableObject {
     var visibleButtons: [ProtocolButton] {
         var buttons = currentNode.primaryButtons(locale: locale)
             .filter { !["dial", "dial-101"].contains($0.when) }
+
+        if currentNode.id == "Home", rules.civilianSafeMode.enabled {
+            buttons = buttons.filter { !rules.safeModeHiddenHomeWhenSet.contains($0.when) }
+        }
 
         if currentNode.id == "Call" {
             switch sessionRole {
@@ -427,6 +421,33 @@ final class ProtocolEngine: ObservableObject {
         if let roleLabel = localizedRoleLabel() {
             lines.append(locale == .uk ? "Я \(roleLabel)." : "I am \(roleLabel).")
         }
+        if sessionRole == .casualty {
+            lines.append(
+                locale == .uk
+                    ? "Подія стосується мене."
+                    : "The event involves me."
+            )
+        }
+
+        if rules.civilianSafeMode.enabled {
+            let hazards = observedHazardLines()
+            if !hazards.isEmpty {
+                let joined = hazards.joined(separator: "; ")
+                lines.append(locale == .uk ? "Ознаки небезпеки: \(joined)." : "Hazard signs: \(joined).")
+            }
+            if let count = visibleCountLine() {
+                lines.append(count + ".")
+            }
+            if let signs = visibleSignLine() {
+                lines.append(signs + ".")
+            }
+            lines.append(
+                locale == .uk
+                    ? "Інформація для професійних служб."
+                    : "Information for professional responders."
+            )
+            return lines.joined(separator: "\n")
+        }
 
         if let casualties = saltCasualtiesLine() {
             lines.append(casualties)
@@ -454,9 +475,65 @@ final class ProtocolEngine: ObservableObject {
 
     private func localizedRoleLabel() -> String? {
         switch sessionRole {
-        case .witness: locale == .uk ? "цивільний свідок" : "civilian bystander"
-        case .casualty: locale == .uk ? "постраждалий" : "casualty"
-        case nil: nil
+        case .witness, .casualty:
+            locale == .uk ? "цивільний свідок" : "civilian witness"
+        case nil:
+            nil
+        }
+    }
+
+    private func localizedRoleCardValue() -> String? {
+        guard let label = localizedRoleLabel() else { return nil }
+        return label.prefix(1).uppercased() + label.dropFirst()
+    }
+
+    private func lastEdge(on nodeId: String) -> String? {
+        steps.last(where: { $0.nodeId == nodeId })?.edge
+    }
+
+    private func observedHazardLines() -> [String] {
+        let uk = locale == .uk
+        var lines: [String] = []
+        if lastEdge(on: "A1") == "yes" {
+            lines.append(uk ? "підозрілий предмет видно звідси" : "suspicious object visible from here")
+        }
+        if lastEdge(on: "A2") == "yes" {
+            lines.append(uk ? "ознаки обвалення видно або чути звідси" : "collapse signs visible or heard from here")
+        }
+        if lastEdge(on: "A3") == "yes" {
+            lines.append(uk ? "вогонь, дим або запах газу звідси" : "fire, smoke, or gas smell from here")
+        }
+        if lastEdge(on: "A4") == "yes" {
+            lines.append(uk ? "оголені дроти або вода біля проводів видно звідси" : "bare wires or water near wires visible from here")
+        }
+        if lastEdge(on: "A5") == "yes" {
+            lines.append(uk ? "різкий запах, рідина або плями видно звідси" : "sharp smell, liquid, or stains visible from here")
+        }
+        return lines
+    }
+
+    private func visibleCountLine() -> String? {
+        let uk = locale == .uk
+        switch lastEdge(on: "Observe-count") {
+        case "none": return uk ? "Людей звідси не видно" : "No people visible from here"
+        case "one": return uk ? "Видно одну людину, без наближення" : "One person visible, without approaching"
+        case "several": return uk ? "Видно кількох людей, без наближення" : "Several people visible, without approaching"
+        case "many": return uk ? "Видно багато людей, без наближення" : "Many people visible, without approaching"
+        case "cannot": return uk ? "Кількість звідси не видно" : "Count not visible from here"
+        default: return nil
+        }
+    }
+
+    private func visibleSignLine() -> String? {
+        let uk = locale == .uk
+        switch lastEdge(on: "Observe-signs") {
+        case "still": return uk ? "На вид нерухомі, без контакту" : "Appear still, without contact"
+        case "blood": return uk ? "Видно кров, без контакту" : "Blood visible, without contact"
+        case "no-voice": return uk ? "Не відповідають на оклик звідси" : "No reply to a call from here"
+        case "trapped": return uk ? "Видно під завалом, без контакту" : "Appear under rubble, without contact"
+        case "none": return uk ? "Ознак стану звідси не видно" : "No condition signs visible from here"
+        case "cannot": return uk ? "Ознаки звідси не видно" : "Signs not visible from here"
+        default: return nil
         }
     }
 
@@ -589,6 +666,13 @@ final class ProtocolEngine: ObservableObject {
         }
 
         guard let edge = currentNode.edges.first(where: { $0.when == edgeWhen }) else {
+            throw ProtocolGraphError.missingEdge(node: currentNode.id, when: edgeWhen)
+        }
+
+        if currentNode.id == "Home",
+           rules.civilianSafeMode.enabled,
+           rules.safeModeHiddenHomeWhenSet.contains(edgeWhen)
+        {
             throw ProtocolGraphError.missingEdge(node: currentNode.id, when: edgeWhen)
         }
 
@@ -891,6 +975,7 @@ final class ProtocolEngine: ObservableObject {
             targetId = remapCasualtyTarget(targetId)
         }
         targetId = remapNoCprTarget(targetId)
+        targetId = remapCivilianSafeTarget(targetId)
 
         guard let next = graph.node(id: targetId) else {
             throw ProtocolGraphError.missingNode(targetId)
@@ -965,6 +1050,21 @@ final class ProtocolEngine: ObservableObject {
         return rules.casualty.targetRemaps[targetId] ?? targetId
     }
 
+    /// Hide treatment trees while keeping them in the graph for later restore.
+    private func remapCivilianSafeTarget(_ targetId: String) -> String {
+        guard rules.civilianSafeMode.enabled else { return targetId }
+        if targetId == rules.civilianSafeMode.redirectTo { return targetId }
+        if rules.safeModeBlockedTargetSet.contains(targetId) {
+            return rules.civilianSafeMode.redirectTo
+        }
+        if let branch = graph.node(id: targetId)?.branch,
+           rules.safeModeBlockedBranchSet.contains(branch)
+        {
+            return rules.civilianSafeMode.redirectTo
+        }
+        return targetId
+    }
+
     /// One casualty or self-help: stay with this person. Several: go to the next.
     private func remapNoCprTarget(_ targetId: String) -> String {
         guard targetId == "NoCpr" else { return targetId }
@@ -985,13 +1085,20 @@ final class ProtocolEngine: ObservableObject {
             return queue.first ?? safety.entryTarget
         }
 
-        if rules.threatIdSet.contains(currentNode.id),
-           rules.advanceEdgeSet.contains(edgeWhen)
-        {
+        let advancing =
+            rules.advanceEdgeSet.contains(edgeWhen)
+            || (rules.civilianSafeMode.enabled && edgeWhen == "yes")
+        if rules.threatIdSet.contains(currentNode.id), advancing {
+            let next: String
             if let idx = queue.firstIndex(of: currentNode.id), idx + 1 < queue.count {
-                return queue[idx + 1]
+                next = queue[idx + 1]
+            } else {
+                next = safety.fallbackNext
             }
-            return safety.fallbackNext
+            if rules.civilianSafeMode.enabled, next == safety.fallbackNext || next == "A6" {
+                return "Observe-count"
+            }
+            return next
         }
 
         return targetId

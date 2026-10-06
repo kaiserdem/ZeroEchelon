@@ -7,6 +7,16 @@ struct EngineRules: Codable, Hashable, Sendable {
     var sceneRecheck: SceneRecheckRules
     var safety: SafetyRules
     var casualty: CasualtyRules
+    /// When enabled, hide treatment trees (B–G/J) and land on `redirectTo` after Call.
+    var civilianSafeMode: CivilianSafeModeRules
+}
+
+struct CivilianSafeModeRules: Codable, Hashable, Sendable {
+    var enabled: Bool
+    var hiddenHomeWhens: [String]
+    var blockedTargetIds: [String]
+    var blockedBranches: [String]
+    var redirectTo: String
 }
 
 struct SceneRecheckRules: Codable, Hashable, Sendable {
@@ -42,6 +52,9 @@ extension EngineRules {
     var advanceEdgeSet: Set<String> { Set(safety.advanceOnEdges) }
     var casualtyRedirectNodeSet: Set<String> { Set(casualty.redirectNodeIds) }
     var casualtyRedirectBranchSet: Set<String> { Set(casualty.redirectBranches) }
+    var safeModeHiddenHomeWhenSet: Set<String> { Set(civilianSafeMode.hiddenHomeWhens) }
+    var safeModeBlockedTargetSet: Set<String> { Set(civilianSafeMode.blockedTargetIds) }
+    var safeModeBlockedBranchSet: Set<String> { Set(civilianSafeMode.blockedBranches) }
 
     func safetyQueue(for incidentType: String?) -> [String] {
         let key = incidentType ?? "default"
